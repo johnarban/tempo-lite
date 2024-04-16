@@ -6,11 +6,6 @@
   <div
     id="main-content"
   >
-    <WorldWideTelescope
-      :wwt-namespace="wwtNamespace"
-    ></WorldWideTelescope>
-
-
     <!-- This contains the splash screen content -->
 
     <v-overlay
@@ -238,19 +233,12 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { MiniDSBase, BackgroundImageset, skyBackgroundImagesets } from "@cosmicds/vue-toolkit";
 import { GotoRADecZoomParams } from "@wwtelescope/engine-pinia";
 
 type SheetType = "text" | "video" | null;
 
 export default defineComponent({
-  extends: MiniDSBase,
-  
   props: {
-    wwtNamespace: {
-      type: String,
-      required: true
-    },
     initialCameraParams: {
       type: Object as PropType<Omit<GotoRADecZoomParams, 'instant'>>,
       default() {
@@ -266,7 +254,6 @@ export default defineComponent({
     const showSplashScreen = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
     return {
       showSplashScreen,
-      backgroundImagesets: [] as BackgroundImageset[],
       sheet: null as SheetType,
       layersLoaded: false,
       positionSet: false,
@@ -274,24 +261,16 @@ export default defineComponent({
       accentColor: "#ffffff",
       buttonColor: "#ffffff",
 
-      tab: 0
+      tab: 0,
+
+      touchscreen: false,
     };
   },
 
-  mounted() {
-    this.waitForReady().then(async () => {
-      
-      this.backgroundImagesets = [...skyBackgroundImagesets];
-
-      this.gotoRADecZoom({
-        ...this.initialCameraParams,
-        instant: true
-      }).then(() => this.positionSet = true);
-
-      // If there are layers to set up, do that here!
-      this.layersLoaded = true;
-
-    });
+  created() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    this.touchscreen = ('ontouchstart' in window) || ('ontouchstart' in document.documentElement) || !!window.navigator.msPointerEnabled;
   },
 
   computed: {
@@ -357,6 +336,13 @@ export default defineComponent({
   },
 
   methods: {
+    blurActiveElement() {
+      const active = document.activeElement;
+      if (active instanceof HTMLElement) {
+        active.blur();
+      }
+    },
+
     closeSplashScreen() {
       this.showSplashScreen = false; 
     },

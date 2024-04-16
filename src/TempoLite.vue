@@ -9,11 +9,15 @@
   
     <div class="content-with-sidebars">
       <div>
-        <div id="map" style="width: 100%; height: 600px;"></div>
-        <div style="text-align: center;">
+        <div id="map"></div>
+        <div>
           <img src="./assets/colorbar.png" width="487" height="102">
         </div>
-        <div>
+        <div id="slider-row">
+        <icon-button
+          :fa-icon="playing ? 'pause' : 'play'"
+          @activate="playOrPause"
+        ></icon-button>
           <v-slider
             v-model="timeIndex"
             :min="0"
@@ -21,11 +25,6 @@
             :step="1"
           ></v-slider>
         </div>
-        <icon-button
-          :fa-icon="playing ? 'stop' : 'start'"
-          @click="playOrPause"
-        ></icon-button>
-        <v-btn id="play" style="margin-right:10px;">Play</v-btn><v-btn id="stop">Stop</v-btn>
       </div>
   
       <div>
@@ -327,7 +326,6 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     this.touchscreen = ('ontouchstart' in window) || ('ontouchstart' in document.documentElement) || !!window.navigator.msPointerEnabled;
-    console.log(this.timeValues);
   },
 
   mounted() {
@@ -444,15 +442,17 @@ export default defineComponent({
       if (this.playing && this.playInterval) {
         clearInterval(this.playInterval);
         this.playInterval = null;
-      } else {
-        if (this.timeIndex >= this.maxIndex) {
-          if (this.playInterval) {
-            clearInterval(this.playInterval);
-            this.playInterval = null;
+      } else if (!this.playing) {
+        this.playInterval = setInterval(() => {
+          if (this.timeIndex >= this.maxIndex) {
+            if (this.playInterval) {
+              clearInterval(this.playInterval);
+              this.playInterval = null;
+            }
+          } else {
+            this.timeIndex += 1;
           }
-        } else {
-          this.timeIndex += 1; 
-        }
+        }, 200);
       }
       this.playing = !this.playing;
     },
@@ -515,62 +515,16 @@ body {
   margin: 0;
   overflow: hidden;
   font-size: 11pt;
-
-  .wwtelescope-component {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    border-style: none;
-    border-width: 0;
-    margin: 0;
-    padding: 0;
-  }
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.modal {
-  position: absolute;
-  top: 0px;
-  left: 0px;
+#map {
   width: 100%;
-  height: 100%;
-  z-index: 100;
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 600px;
 }
 
-#modal-loading {
-  background-color: #000;
-  .container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    .spinner {
-      background-image: url("https://projects.cosmicds.cfa.harvard.edu/cds-website/misc/lunar_loader.gif");
-      background-repeat: no-repeat;
-      background-size: contain;
-      width: 3rem;
-      height: 3rem;
-    }
-    p {
-      margin: 0 0 0 1rem;
-      padding: 0;
-      font-size: 150%;
-    }
-  }
+#slider-row {
+  display: flex;
+  flex-direction: row;
 }
 
 #splash-overlay {

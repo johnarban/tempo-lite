@@ -11,4 +11,4 @@ It is based on code developed by @jfoster17 in [this repo](https://github.com/jf
 3. `cd <story-folder-name>` 
 4. `yarn` (to install dependencies)
 5. `yarn serve` (to run development server for TEMPO Lite Data Story)
-6. Copy/paste url (under `App running at:`) into your browser
+6. Copy/paste url (under `App running at:`) into your browser.

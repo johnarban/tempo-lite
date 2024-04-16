@@ -11,10 +11,15 @@
       <div>
         <div id="map" style="width: 100%; height: 600px;"></div>
         <div style="text-align: center;">
-          <img src="colorbar.png" width="487" height="102">
+          <img src="./assets/colorbar.png" width="487" height="102">
         </div>
         <div>
-          <input type="range" min="0" max="172" value="0" class="slider" id="slider"><label id="sliderLabel"></label>
+          <v-slider
+            v-model="timeIndex"
+            :min="0"
+            :max="maxIndex"
+            :step="1"
+          ></v-slider>
         </div>
         <icon-button
           :fa-icon="playing ? 'stop' : 'start'"
@@ -36,7 +41,7 @@
           id="texas"
           @click="() => {
             map?.fitBounds(texasBounds);
-            timestep = 10;
+            timeIndex = 10;
           }"
         >
           Texas
@@ -46,7 +51,7 @@
           id="northeast"
           @click="() => {
             map?.fitBounds(northeastBounds);
-            timestep = 72;
+            timeIndex = 72;
           }"
         >
           Northeast
@@ -84,20 +89,6 @@
         </div>
       </div>
     </v-overlay>
-
-    <transition name="fade">
-      <div
-        class="modal"
-        id="modal-loading"
-        v-show="isLoading"
-      >
-        <div class="container">
-          <div class="spinner"></div>
-          <p>Loading …</p>
-        </div>
-      </div>
-    </transition>
-
 
     <!-- This block contains the elements (e.g. icon buttons displayed at/near the top of the screen -->
 
@@ -507,6 +498,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     this.touchscreen = ('ontouchstart' in window) || ('ontouchstart' in document.documentElement) || !!window.navigator.msPointerEnabled;
+    console.log(this.timeValues);
   },
 
   mounted() {
@@ -531,23 +523,11 @@ export default defineComponent({
       pane: 'labels'
     }).addTo(this.map as Map);
 
-    this.imageOverlay.setUrl(this.imageUrl);
+    this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
 
   },
 
   computed: {
-
-    /**
-    These properties relate to the state of the mini.
-    `isLoading` is a bit redundant here, but it could potentially have
-    independent logic.
-    */
-    ready(): boolean {
-      return this.layersLoaded && this.positionSet;
-    },
-    isLoading(): boolean {
-      return !this.ready;
-    },
 
     /**
     Properties related to device/screen characteristics
@@ -596,7 +576,7 @@ export default defineComponent({
       }
     },
     imageUrl(): string {
-      return `https://tempo-demo-images.s3.amazonaws.com/img_/${this.timeValues[this.timeIndex]}/_cividis_stretch.png`;
+      return `https://tempo-demo-images.s3.amazonaws.com/img_${this.timeValues[this.timeIndex]}_cividis_stretch.png`;
     },
   },
 
@@ -652,6 +632,7 @@ export default defineComponent({
   watch: {
     imageUrl(url: string) {
       this.imageOverlay.setUrl(url);
+      console.log(this.imageOverlay);
     }
   }
 });
@@ -718,7 +699,6 @@ body {
     padding: 0;
   }
 }
-
 
 .fade-enter-active,
 .fade-leave-active {

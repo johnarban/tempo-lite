@@ -68,15 +68,7 @@
             value="2"
           ></v-radio>
         </v-radio-group>
-      </div>
-  
-      <div id="information">
-      <article>
-        <h2>TEMPO Data</h2>
-        <p>Some descriptive text about TEMPO and the data we are showing here.</p>
-      </article>
-      </div>
-      <div v-if="false">
+        <div>
         <v-btn
           id="home"
           @click="() => {
@@ -106,6 +98,14 @@
         >
           Northeast
         </v-btn>
+      </div>
+      </div>
+  
+      <div id="information">
+      <article>
+        <h2>TEMPO Data</h2>
+        <p>Some descriptive text about TEMPO and the data we are showing here.</p>
+      </article>
       </div>
     </div>
     <!-- This contains the splash screen content -->
@@ -539,6 +539,7 @@ export default defineComponent({
   --smithsonian-blue: #009ade;
   --smithsonian-yellow: #ffcc33;
   --info-background: #092088;
+  --map-height: 500px;
 }
 
 html {
@@ -582,18 +583,18 @@ body {
 
 #map {
   width: 100%;
-  height: 600px;
+  height: var(--map-height)
 }
 
 // define the layout
 .content-with-sidebars {
   position: relative;
-  padding: 2rem;
+  padding: 0;
   
   display: grid;
   grid-template-columns: .08fr .8fr .3fr;
-  gap: 5px;
-  
+  grid-template-rows: 50px auto auto auto;
+  gap: 20px 10px;
   
   > * {
     background-color: transparent;
@@ -611,8 +612,6 @@ body {
   #title {
     grid-column: 2 / 3;
     grid-row: 1 / 2;
-    font-size: 40px;
-    text-align: left;
   }
   
   #where {
@@ -644,21 +643,31 @@ body {
 }
 
 //  style the content 
+#main-content {
+  padding: 2rem;
+}
+
 .content-with-sidebars {
   font-family: "Lexend", sans-serif;
   font-optical-sizing: auto;
   font-weight: normal;
   font-style: normal;
+  background-color: transparent;
 }
 
 #title {
   color: var(--smithsonian-yellow);
+  font-weight: 600;
+  font-size: 40px;
+  text-align: left;
+  text-wrap: nowrap;
 }
 
 #information {
   background-color: var(--info-background);
   border-radius: 10px;
   padding: 1rem;
+  margin-top: 1rem;
 }
 
 
@@ -872,15 +881,18 @@ video {
 
 .v-slider-thumb__surface::after {
   background-image: url("./assets/smithsonian.png");
-  background-size: 20px 20px;
-  height: 20px;
-  width: 20px;
+  background-size: 30px 30px;
+  height: 30px;
+  width: 30px;
 }
 
 .v-slider-thumb__label {
   background-color: #ffd302;
-  border: 3px solid #068ede;
-  width: 210px;
+  border: 0.25rem solid #068ede;
+  width: max-content;
+  height: 2.5rem;
+  font-size: 1rem;
+
 
   &::before {
     color: #068ede;

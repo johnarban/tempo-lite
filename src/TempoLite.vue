@@ -712,7 +712,8 @@ video {
 }
 
 .v-slider-thumb__surface::after {
-  content: url("./assets/smithsonian_small.png");
+  background-image: url("./assets/smithsonian.png");
+  background-size: 20px 20px;
   height: 20px;
   width: 20px;
 }

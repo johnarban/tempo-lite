@@ -23,7 +23,15 @@
             :min="0"
             :max="maxIndex"
             :step="1"
-          ></v-slider>
+            color="#068ede95"
+            thumb-label="always"
+          >
+            <template v-slot:thumb-label="{ modelValue }">
+              <div class="thumb-label">
+                {{ datetimes[modelValue] }}
+              </div>
+            </template>
+          </v-slider>
         </div>
       </div>
   
@@ -327,6 +335,7 @@ export default defineComponent({
         opacity: 1,
         interactive: false,
       }),
+      datetimes,
     };
   },
 
@@ -707,6 +716,23 @@ video {
   // (around 400px or less)
   .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
     display: none;
+  }
+}
+
+.v-slider-thumb__surface::after {
+  background-image: url("./assets/smithsonian.png");
+  background-size: 20px 20px;
+  height: 20px;
+  width: 20px;
+}
+
+.v-slider-thumb__label {
+  background-color: #ffd302;
+  border: 3px solid #068ede;
+  width: 210px;
+
+  &::before {
+    color: #068ede;
   }
 }
 </style>

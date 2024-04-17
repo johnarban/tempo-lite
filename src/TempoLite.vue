@@ -23,8 +23,15 @@
             :min="0"
             :max="maxIndex"
             :step="1"
-            color="#068ede"
-          ></v-slider>
+            color="#068ede95"
+            thumb-label="always"
+          >
+            <template v-slot:thumb-label="{ modelValue }">
+              <div class="thumb-label">
+                {{ datetimes[modelValue] }}
+              </div>
+            </template>
+          </v-slider>
         </div>
       </div>
   
@@ -328,6 +335,7 @@ export default defineComponent({
         opacity: 1,
         interactive: false,
       }),
+      datetimes,
     };
   },
 
@@ -716,5 +724,15 @@ video {
   background-size: 20px 20px;
   height: 20px;
   width: 20px;
+}
+
+.v-slider-thumb__label {
+  background-color: #ffd302;
+  border: 3px solid #068ede;
+  width: 210px;
+
+  &::before {
+    color: #068ede;
+  }
 }
 </style>

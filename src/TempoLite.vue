@@ -27,6 +27,7 @@
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
         <icon-button
+          v-if="false"
           :fa-icon="playing ? 'pause' : 'play'"
           @activate="playOrPause"
         ></icon-button>
@@ -37,6 +38,8 @@
             :step="1"
             color="#068ede95"
             thumb-label="always"
+            :track-size="10"
+            
           >
             <template v-slot:thumb-label="{ modelValue }">
               <div class="thumb-label">
@@ -689,6 +692,7 @@ body {
 #slider-row {
   display: flex;
   flex-direction: row;
+  padding-inline: 2rem;
 }
 
 #splash-overlay {
@@ -881,5 +885,17 @@ video {
   &::before {
     color: #068ede;
   }
+}
+
+.v-slider.v-input--horizontal .v-slider-thumb__label {
+  top: calc(var(--v-slider-thumb-size) * 1.5);
+}
+
+.v-slider.v-input--horizontal .v-slider-thumb__label::before {
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid currentColor;
+    top: -15px;
 }
 </style>

@@ -23,6 +23,7 @@
             :min="0"
             :max="maxIndex"
             :step="1"
+            color="#068ede"
           ></v-slider>
         </div>
       </div>
@@ -708,5 +709,11 @@ video {
   .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
     display: none;
   }
+}
+
+.v-slider-thumb__surface::after {
+  content: url("./assets/smithsonian_small.png");
+  height: 20px;
+  width: 20px;
 }
 </style>

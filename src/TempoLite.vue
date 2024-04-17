@@ -34,7 +34,15 @@
       </article>
       </div>
       <div>
-        <v-btn id="home">Home</v-btn>
+        <v-btn
+          id="home"
+          @click="() => {
+            map?.fitBounds(bounds);
+            timeIndex = 0;
+          }"
+        >
+          Home
+        </v-btn>
         <br>
         <v-btn
           id="texas"

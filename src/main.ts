@@ -2,7 +2,7 @@ import Vue, { createApp } from "vue";
 
 import { FundingAcknowledgment, IconButton, CreditLogos } from "@cosmicds/vue-toolkit";
 import TempoLite from "./TempoLite.vue";
-
+import Colorbar from './ColorBar.vue';
 import vuetify from "../plugins/vuetify";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -53,6 +53,7 @@ createApp(TempoLite, {})
   .component('icon-button', IconButton)
   .component('funding-acknowledgement', FundingAcknowledgment)
   .component('credit-logos', CreditLogos)
+  .component('colorbar', Colorbar)
 
   // Mount
   .mount("#app");

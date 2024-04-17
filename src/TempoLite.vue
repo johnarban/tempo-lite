@@ -6,13 +6,25 @@
   <div
     id="main-content"
   >
-  
+    
     <div class="content-with-sidebars">
-      <div>
+      <!-- tempo logo -->
+      <img 
+        src="./assets/TEMPO-Logo-Small.png"
+        alt="TEMPO Logo"
+        style="width: 100px; height: 100px;"
+      >
+      <h1 id="title">How much NO<sub>2</sub>&hellip;</h1>
+      <div id="where" class="big-label">where</div>
+      <div id="map-container">
         <div id="map"></div>
-        <div>
-          <img src="./assets/colorbar.png" width="487" height="102">
-        </div>
+        <colorbar 
+          label="Amount of NO2"
+          backgroundColor="transparent"
+          :nsteps="10"
+          :cmap="cividis"/>
+      </div>
+        <div id="when" class="big-label">when</div>
         <div id="slider-row">
         <icon-button
           :fa-icon="playing ? 'pause' : 'play'"
@@ -33,15 +45,35 @@
             </template>
           </v-slider>
         </div>
+      
+      <div id="select-option">
+        <!-- make a v-radio-group with 3 options -->
+        <v-radio-group
+          v-model="tab"
+          row
+        >
+          <v-radio
+            label="Option 1"
+            value="0"
+          ></v-radio>
+          <v-radio
+            label="Option 2"
+            value="1"
+          ></v-radio>
+          <v-radio
+            label="August 2023 - This is a really long option"
+            value="2"
+          ></v-radio>
+        </v-radio-group>
       </div>
   
-      <div>
+      <div id="information">
       <article>
         <h2>TEMPO Data</h2>
         <p>Some descriptive text about TEMPO and the data we are showing here.</p>
       </article>
       </div>
-      <div>
+      <div v-if="false">
         <v-btn
           id="home"
           @click="() => {
@@ -112,7 +144,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import L, { Map } from "leaflet";
-
+import  { cividis } from "./cividis";
 type SheetType = "text" | "video" | null;
 type Timeout = ReturnType<typeof setTimeout>;
 
@@ -346,6 +378,7 @@ export default defineComponent({
   },
 
   mounted() {
+    this.showSplashScreen = false;
     this.map = L.map("map").setView([40, -50], 3, {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -425,6 +458,11 @@ export default defineComponent({
   },
 
   methods: {
+    
+    cividis(x: number): string {
+      return cividis(x);
+    },
+    
     blurActiveElement() {
       const active = document.activeElement;
       if (active instanceof HTMLElement) {
@@ -489,9 +527,15 @@ export default defineComponent({
   src: url("./assets/HighwayGothicNarrow.ttf");
 }
 
+// import Lexand from google fonts
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+
 :root {
   --default-font-size: clamp(0.7rem, min(1.7vh, 1.7vw), 1.1rem);
   --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem);
+  --smithsonian-blue: #009ade;
+  --smithsonian-yellow: #ffcc33;
+  --info-background: #092088;
 }
 
 html {
@@ -522,7 +566,6 @@ body {
   width: 100%;
   height: var(--app-content-height);
   overflow: hidden;
-
   transition: height 0.1s ease-in-out;
 }
 
@@ -537,6 +580,110 @@ body {
 #map {
   width: 100%;
   height: 600px;
+}
+
+// define the layout
+.content-with-sidebars {
+  position: relative;
+  padding: 2rem;
+  
+  display: grid;
+  grid-template-columns: .08fr .8fr .3fr;
+  gap: 5px;
+  
+  
+  > * {
+    background-color: transparent;
+  }
+  
+  > div {
+    outline: 1px solid transparent;
+  }
+  
+  #select-option {
+    grid-column: 3 / 4;
+    grid-row: 2 / 3;
+  }
+  
+  #title {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    font-size: 40px;
+    text-align: left;
+  }
+  
+  #where {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+  }
+  
+  #map-container {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+  }
+  
+  #when {
+    grid-column: 1 / 2;
+    grid-row: 3 / 4;
+  }
+  
+  #slider-row {
+    grid-column: 2 / 3;
+    grid-row: 3 / 4;
+  }
+  
+  #information {
+    grid-column: 2 / 4;
+    grid-row: 4 / 5;
+  }
+  
+  
+}
+
+//  style the content 
+.content-with-sidebars {
+  font-family: "Lexend", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: normal;
+  font-style: normal;
+}
+
+#title {
+  color: var(--smithsonian-yellow);
+}
+
+#information {
+  background-color: var(--info-background);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+
+.big-label {
+  font-size: 40px;
+  text-align: right;
+  align-self: end;
+  color: var(--smithsonian-blue);
+}
+
+#map-container {
+  display: flex;
+  flex-direction: row;
+
+  > #map {
+    flex-basis: 80%;
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+
+  > .colorbar-container {
+    flex-grow: 0;
+    flex-shrink: 1;
+    
+    .colorbar-label {
+      transform: rotate(180deg) translate(-110%,-50%)
+    }
+  }
 }
 
 #slider-row {

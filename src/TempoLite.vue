@@ -540,8 +540,10 @@ export default defineComponent({
         this.playInterval = setInterval(() => {
           if (this.timeIndex >= this.maxIndex) {
             if (this.playInterval) {
-              clearInterval(this.playInterval);
-              this.playInterval = null;
+              // clearInterval(this.playInterval);
+              // this.playInterval = null;
+              // let it loop
+              this.timeIndex = 0;
             }
           } else {
             this.timeIndex += 1;

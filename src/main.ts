@@ -15,6 +15,8 @@ import {
   faPause,
   faTimes,
   faVideo,
+  faMagnifyingGlass,
+  faCircleXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faBookOpen);
@@ -22,6 +24,9 @@ library.add(faPlay);
 library.add(faPause);
 library.add(faTimes);
 library.add(faVideo);
+library.add(faMagnifyingGlass);
+library.add(faCircleXmark);
+
 
 
 /** v-hide directive taken from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */

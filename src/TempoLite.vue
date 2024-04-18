@@ -24,6 +24,20 @@
           backgroundColor="transparent"
           :nsteps="10"
           :cmap="cividis"/>
+          <location-search
+            v-model="searchOpen"
+            small
+            stay-open
+            buttonSize="xl"
+            persist-selected
+            :search-provider="geocodingInfoForSearch"
+            @set-location="(feature: MapBoxFeature) => {
+              if (feature !== null) {
+                map?.setView([feature.center[1], feature.center[0]], 6);
+              }
+            }"
+            @error="(error: string) => searchErrorMessage = error"
+          ></location-search>
       </div>
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
@@ -109,17 +123,7 @@
       </div>
     </div>
 
-    <location-search
-      v-model="searchOpen"
-      small
-      buttonSize="xl"
-      :search-provider="geocodingInfoForSearch"
-      :accentColor="accentColor"
-      @set-location="(feature: MapBoxFeature) => {
-        map?.setView([feature.center[1], feature.center[0]], 6);
-      }"
-      @error="(error: string) => searchErrorMessage = error"
-    ></location-search>
+    
 
     <!-- This contains the splash screen content -->
 
@@ -734,6 +738,10 @@ body {
   align-self: start;
 }
 
+#slider-row, #when {
+  margin-top: 1rem;
+}
+
 #map-container {
   position: relative;
   display: flex;
@@ -745,10 +753,19 @@ body {
     flex-shrink: 1;
   }
   
-  > #map-legend {
+  .forward-geocoding-container {
     position: absolute;
     bottom: 0;
     left: 0;
+    
+    z-index: 1000;
+    width: 250px;
+  }
+  
+  > #map-legend {
+    position: absolute;
+    top: 0;
+    right: 58px;
     width: fit-content;
     z-index: 1000;
     
@@ -760,6 +777,8 @@ body {
     background-color: #fff5;
     padding-left: 0.5rem;
     padding-right: 0.25rem;
+    
+    backdrop-filter: blur(5px);
     
     hr.line-legend {
       display: inline-block;
@@ -986,15 +1005,16 @@ video {
 }
 
 .v-slider.v-input--horizontal .v-slider-thumb__label {
-  top: calc(var(--v-slider-thumb-size) * 1.5);
+  // top: calc(var(--v-slider-thumb-size) * 1.5);
+  z-index:2000;
 }
 
 .v-slider.v-input--horizontal .v-slider-thumb__label::before {
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid transparent;
-    border-bottom: 6px solid currentColor;
-    top: -15px;
+    border-bottom: 6px solid transparent;
+    border-top: 6px solid currentColor;
+    bottom: -15px;
 }
 
 #control-checkboxes {

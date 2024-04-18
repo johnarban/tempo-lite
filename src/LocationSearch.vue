@@ -1,130 +1,114 @@
-
 <template>
-  <div
-    class="forward-geocoding-container"
-    :style="cssStyles"
-  >
-    <div
-      class="forward-geocoding-input-row"
+  <div class="forward-geocoding-container" :style="cssStyles">
+    <v-combobox
+      v-show="searchOpen"
+      :class="['forward-geocoding-input', locationJustUpdated ? 'geocode-success' : '', small ? 'forward-geocoding-input-small' : '']"
+      v-model="searchText"
+      :items="searchResults ? searchResults.features : []"
+      item-title="place_name"
+      :label="locationJustUpdated ? (comboFocused ? 'Enter a location' : locationUpdatedText) : (searchErrorMessage ?? 'Enter a location')"
+      :bg-color="bgColor"
+      :density="small ? 'compact' : 'default'"
+      hide-details
+      solo
+      :color="accentColor"
+      @input="() => {}"
+      @update:model-value="setLocationFromSearchFeature"
+      @keydown.enter="performForwardGeocodingSearch"
+      @keydown.esc="searchResults = null"
+      :error-messages="searchErrorMessage"
+      @click:append="focusCombobox"
+      @update:focused="comboFocused = $event"
+      ref="searchInput"
     >
-      <v-text-field
-        v-show="searchOpen"
-        v-model="searchText"
-        :class="['forward-geocoding-input', locationJustUpdated ? 'geocode-success' : '', small ? 'forward-geocoding-input-small' : '']"
-        :label="locationJustUpdated ? 'Location Updated' : 'Enter a location'"
-        bg-color='black'
-        density="compact"
-        hide-details
-        variant="solo"
-        :color="accentColor"
-        @keydown.stop
-        @keyup.enter="() => performForwardGeocodingSearch()"
-        @keyup.esc="searchResults = null"
-        @click:clear="searchResults = null"
-        :error-messages="searchErrorMessage"
-      ></v-text-field>
+    <template v-slot:append>
       <font-awesome-icon
         class="geocoding-search-icon"
         icon="magnifying-glass"
         :size="searchOpen ? 'xl' : buttonSize"
         :color="!searchOpen || (searchText && searchText.length > 2) ? accentColor : 'gray'"
-        @click="() => {
-          if (searchOpen) {
-            performForwardGeocodingSearch();
-          } else {
-            searchOpen = true;
-          }
-        }"
+        @click="toggleSearch"
       ></font-awesome-icon>
-      
+
       <slot name="append-icon" class="geocode-icon"></slot>
-      
+
       <font-awesome-icon
         class="geocoding-close-icon"
         v-show="searchOpen && !stayOpen"
         icon="circle-xmark"
         :size="searchOpen ? 'xl' : '1x'"
         color="gray"
-        @click="() => {
-          searchOpen = false;
-          clearSearchData();
-        }"
+        @click="closeSearch"
       ></font-awesome-icon>
-      
-    </div>
-    
-    <div
-      class="forward-geocoding-results"
-      :class="[small ? 'results-small' : '']"
-      v-if="searchResults !== null"
-    >
-      <div
-        v-for="(feature, index) in (searchResults !== null ?  searchResults.features : [])"
-        class="forward-geocoding-result"
-        :key="index"
-        @click="() => setLocationFromSearchFeature(feature)"
-      >
-        {{ feature.place_name }}
-      </div>
-    </div>
+    </template>
+  </v-combobox>
+  <font-awesome-icon
+      v-show="!searchOpen && !stayOpen"
+      class="geocoding-search-icon"
+      icon="magnifying-glass"
+      :size="searchOpen ? 'xl' : buttonSize"
+      :color="!searchOpen || (searchText && searchText.length > 2) ? accentColor : 'gray'"
+      @click="toggleSearch"
+    ></font-awesome-icon>
   </div>
-</template> 
-
-
+</template>
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { MapBoxFeatureCollection } from "./mapbox";
+import { MapBoxFeatureCollection, MapBoxFeature } from "./mapbox";
 
-// function type that takes in string and Promise<MapBoxFeatureCollection | null>
 type SearchProvider = (searchText: string) => Promise<MapBoxFeatureCollection | null>;
-
 
 export default defineComponent({
   name: 'LocationSearch',
-  
-  emits: ['update:modelValue','set-location', 'error', 'geolocate'],
-  
+
+  emits: ['update:modelValue', 'set-location', 'error', 'geolocate'],
+
   props: {
-    
     searchProvider: {
       type: Function as PropType<SearchProvider>,
       default: () => {}
     },
-    
     modelValue: {
       type: Boolean,
       default: true,
       required: false,
     },
-    
     stayOpen: {
       type: Boolean,
       default: false,
     },
-    
     accentColor: {
       type: String,
       default: 'white',
     },
-    
     small: {
       type: Boolean,
       default: false,
     },
-    
     theme: {
       type: String,
       default: 'dark',
     },
-    
     buttonSize: {
       type: String,
       default: '1x',
     },
     
+    bgColor: {
+      type: String,
+      default: 'white',
+    },
+    
+    persistSelected: {
+      type: Boolean,
+      default: false,
+    },
   },
   
+  
+  
+
   
   data() {
     return {
@@ -133,21 +117,25 @@ export default defineComponent({
       searchResults: null as MapBoxFeatureCollection | null,
       searchErrorMessage: null as string | null,
       locationJustUpdated: false,
+      locationUpdatedText: 'Location updated',
+      comboFocused: false,
     };
   },
-  
+
   computed: {
-    
     cssStyles() {
       return {
         '--accent-color': this.accentColor,
-        '--bg-color': 'black',
+        '--bg-color': this.bgColor,
         '--fg-container-padding': this.searchOpen ? (this.small ? '0px 5px 0px 0px' : '5px 10px 12px 10px') : '0px',
         '--border-radius': this.searchOpen ? '7px' : '20px',
       };
     },
   },
   
+  
+  
+
   
   methods: {
     performForwardGeocodingSearch() {
@@ -159,6 +147,7 @@ export default defineComponent({
           this.setLocationFromSearchFeature(info.features[0]);
         } else if (info !== null && info.features?.length == 0) {
           this.searchErrorMessage = "No matching places were found";
+          console.log('No matching places were found');
           this.$emit('error', this.searchErrorMessage);
         } else {
           this.searchResults = info;
@@ -166,12 +155,48 @@ export default defineComponent({
       });
     },
     
-    setLocationFromSearchFeature(feature: unknown) {
+    blurCombobox() {
+      console.log('blurring');
+      const input = this.$refs.searchInput as HTMLInputElement;
+      console.log(input);
+      input.blur();
+    },
+    
+    focusCombobox() {
+      const input = this.$refs.searchInput as HTMLInputElement;
+      input.focus();
+    },
+    
+    setLocationFromSearchFeature(feature: MapBoxFeature | string) {
+      // if it's a  string do nothing
+      console.log('setLocationFromSearchFeature', feature);
+      if (typeof feature === 'string') {
+        return;
+      }
+      console.log('setting location');
+      if (feature === null) { return; }
+      this.locationUpdatedText = feature.place_name.split(',').slice(0, 2).join(', ');
+      // blur (defocus) the v-combobox
+      this.blurCombobox();
       this.timedJustUpdatedLocation();
       this.clearSearchData();
       this.$emit('set-location', feature);
     },
-    
+
+    toggleSearch() {
+      if (this.searchOpen) {
+        this.performForwardGeocodingSearch();
+        this.focusCombobox();
+      } else {
+        this.searchOpen = true;
+      }
+    },
+
+    closeSearch() {
+      this.searchOpen = false;
+      this.clearSearchData();
+    },
+
     clearSearchData() {
       this.searchResults = null;
       this.searchText = null;
@@ -181,7 +206,7 @@ export default defineComponent({
     timedJustUpdatedLocation() {
       this.locationJustUpdated = true;
       setTimeout(() => {
-        this.locationJustUpdated = false;
+        this.locationJustUpdated = this.persistSelected;
       }, 5000);
     },
   },
@@ -211,22 +236,24 @@ export default defineComponent({
 </script>
 
 
-<style lang="less" scoped>
+<style lang="less">
 
 // https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors
-.forward-geocoding-container::v-deep {
+.forward-geocoding-container {
   --border-radius: 20px;
   position: relative;
-  width: fit-content;
   color: var(--accent-color);
-  background-color: var(--bg-color);
-  border: 2px solid var(--accent-color);
+  background-color: rgba(255, 255, 255, 0.4);
   border-radius: var(--border-radius);
   padding: var(--fg-container-padding);
+  backdrop-filter: blur(2px);
 
+  .v-field {
+    background-color: transparent !important;
+  }
+  
   .v-text-field {
     min-width: 150px;
-    width: min(200px, 20vw);
   }
   
   .forward-geocoding-input > .v-input__control > .v-field {
@@ -234,7 +261,6 @@ export default defineComponent({
   }
   
   .forward-geocoding-input.geocode-success label {
-    color: var(--accent-color);
     opacity: 1;
   }
   
@@ -260,36 +286,5 @@ export default defineComponent({
     cursor: pointer;
   }
 
-  // For some reason setting width: 100% makes the search results 2px too small
-  // It's probably some Vuetify styling thing
-  // Maybe there's a better workaround, but this gets the job done for now
-  .forward-geocoding-results {
-    position: absolute;
-    top: 42px;
-    left: -1px;
-    width: calc(100% + 2px);
-    background: var(--bg-color);
-    border: 2px solid var(--accent-color);
-    border-top: 0px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    padding: 0px 10px;
-    
-    &.results-small {
-      top: 37px;
-      width: calc(100% + 4px);
-      left: -2px;
-    }
-
-    .forward-geocoding-result {
-      border-top: 1px solid var(--accent-color);
-      font-size: 12pt;
-      pointer-events: auto;
-
-      &:hover {
-        cursor: pointer;
-      }
-    }
-  }
 }
 </style>

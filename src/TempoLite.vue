@@ -51,39 +51,66 @@
           </v-slider>
         </div>
       
-      <div id="select-option">
-        <!-- make a v-radio-group with 3 options -->
-        <h2>Sample Scenarios</h2>
-        <v-radio-group
-          v-model="tab"
-          row
+      <div id="user-options">
+        <div>
+          <!-- make a v-radio-group with 3 options -->
+          <h2>Sample Scenarios</h2>
+          <v-radio-group
+            v-model="tab"
+            row
+          >
+            <v-radio
+              label="Option 1"
+              value="0"
+              @click="() => {
+              map?.fitBounds(bounds);
+              timeIndex = 0;
+            }"
+            ></v-radio>
+            <v-radio
+              label="Option 2"
+              value="1"
+              @click="() => {
+              map?.fitBounds(texasBounds);
+              timeIndex = 10;
+            }"
+            ></v-radio>
+            <v-radio
+              label="August 2023 - This is a really long option"
+              value="2"
+              @click="() => {
+              map?.fitBounds(northeastBounds);
+              timeIndex = 72;
+            }"
+            ></v-radio>
+          </v-radio-group>
+        </div>
+        <div
+          id="controls"
+          class="control-icon-wrapper"
         >
-          <v-radio
-            label="Option 1"
-            value="0"
-            @click="() => {
-            map?.fitBounds(bounds);
-            timeIndex = 0;
-          }"
-          ></v-radio>
-          <v-radio
-            label="Option 2"
-            value="1"
-            @click="() => {
-            map?.fitBounds(texasBounds);
-            timeIndex = 10;
-          }"
-          ></v-radio>
-          <v-radio
-            label="August 2023 - This is a really long option"
-            value="2"
-            @click="() => {
-            map?.fitBounds(northeastBounds);
-            timeIndex = 72;
-          }"
-          ></v-radio>
-        </v-radio-group>
+          <div>
+            <font-awesome-icon
+              size="lg"
+              :icon="showControls ? `chevron-down` : `gear`"
+              @click="showControls = !showControls"
+              @keyup.enter="showControls = !showControls"
+              tabindex="0"
+            /> 
+          </div>
+
+          <div v-if="showControls" id="control-checkboxes">
+            <v-checkbox
+              v-model="showFieldOfRegard"
+              @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
+              label="TEMPO Field of Regard"
+              hide-details
+            />       
+          </div>
+        </div>
       </div>
+
+
   
       <div id="information">
       <article>
@@ -337,6 +364,17 @@ export default defineComponent({
       new L.LatLng(17.025, -129.975),
       new L.LatLng(63.975, -54.475)
     );
+    const fieldOfRegardLayer = L.geoJSON(
+      fieldOfRegard as GeoJSON.GeometryCollection,
+      {
+        style: {
+          color: "red",
+          fillColor: "transparent",
+          weight: 1,
+          opacity: 0.8,
+        },
+      }
+    ) as L.Layer;
 
     return {
       showSplashScreen,
@@ -363,6 +401,7 @@ export default defineComponent({
         new L.LatLng(40.3, -74.5),
         new L.LatLng(43.5, -69.6)
       ),
+      fieldOfRegardLayer,
 
       timestep: 0,
       timeIndex: 0,
@@ -377,6 +416,9 @@ export default defineComponent({
 
       searchOpen: true,
       searchErrorMessage: null as string | null,
+
+      showControls: true,
+      showFieldOfRegard: true,
     };
   },
 
@@ -411,18 +453,9 @@ export default defineComponent({
 
     this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
     
-   
-    L.geoJSON(
-      fieldOfRegard as GeoJSON.GeometryCollection,
-      {
-        style: {
-          color: "red",
-          fillColor: "transparent",
-          weight: 1,
-          opacity: 0.8,
-        },
-      }).addTo(this.map as Map);
-    
+    if (this.showFieldOfRegard) {
+      this.fieldOfRegardLayer.addTo(this.map as Map);
+    }
   },
 
   computed: {
@@ -540,7 +573,15 @@ export default defineComponent({
   watch: {
     imageUrl(url: string) {
       this.imageOverlay.setUrl(url);
-    }
+    },
+
+    showFieldOfRegard (show: boolean) {
+      if (show) {
+        this.fieldOfRegardLayer.addTo(this.map as Map);
+      } else if (this.map) {
+        this.map.removeLayer(this.fieldOfRegardLayer as L.Layer);
+      }
+    }  
   }
 });
 </script>
@@ -625,7 +666,7 @@ body {
     outline: 1px solid transparent;
   }
   
-  #select-option {
+  #user-options {
     margin-left: 1rem;
     grid-column: 3 / 4;
     grid-row: 2 / 3;
@@ -965,5 +1006,16 @@ video {
     border-top: 6px solid transparent;
     border-bottom: 6px solid currentColor;
     top: -15px;
+}
+
+#controls {
+  background: black;
+  padding-block: 0.5em;
+  padding-inline: 0.5em;
+  border-radius: 5px;
+  border: solid 1px white;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
 }
 </style>

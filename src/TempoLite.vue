@@ -40,6 +40,7 @@
             color="#068ede95"
             thumb-label="always"
             :track-size="10"
+            hide-details
             
           >
             <template v-slot:thumb-label="{ modelValue }">
@@ -635,7 +636,7 @@ body {
   gap: 20px 10px;
   
   > * {
-    background-color: transparent;
+    background-color: #cccccc33;
   }
   
   > div {
@@ -716,6 +717,10 @@ body {
   color: var(--smithsonian-blue);
 }
 
+#when {
+  align-self: start;
+}
+
 #map-container {
   position: relative;
   display: flex;
@@ -765,7 +770,7 @@ body {
 #slider-row {
   display: flex;
   flex-direction: row;
-  padding-inline: 2rem;
+  padding-left: 1rem;
 }
 
 #splash-overlay {
@@ -961,6 +966,10 @@ video {
   &::before {
     color: #068ede;
   }
+}
+
+.v-slider.v-input--horizontal {
+  grid-template-rows: auto 0px;
 }
 
 .v-slider.v-input--horizontal .v-slider-thumb__label {

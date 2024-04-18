@@ -18,7 +18,7 @@
       <div id="where" class="big-label">where</div>
       <div id="map-container">
         <div id="map"></div>
-        <div id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
+        <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
         <colorbar 
           label="Amount of NO2"
           backgroundColor="transparent"
@@ -108,8 +108,8 @@
             v-model="showFieldOfRegard"
             @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
             label="TEMPO Field of Regard"
+            color="#c10124"
             hide-details
-            density="compact"
           />       
         </div>
       </div>
@@ -362,7 +362,7 @@ export default defineComponent({
       fieldOfRegard as GeoJSON.GeometryCollection,
       {
         style: {
-          color: "red",
+          color: "#c10124",
           fillColor: "transparent",
           weight: 1,
           opacity: 0.8,
@@ -733,8 +733,9 @@ body {
 
 
 .big-label {
-  font-size: 40px;
+  font-size: 2rem;
   text-align: right;
+  margin-right: 0.5rem;
   align-self: end;
   color: var(--smithsonian-blue);
 }
@@ -744,7 +745,7 @@ body {
 }
 
 #slider-row, #when {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
 #map-container {
@@ -787,7 +788,7 @@ body {
     
     hr.line-legend {
       display: inline-block;
-      border: 0.5px solid red;
+      border: 0.5px solid #c10124;
       width: 3rem;
     }
     
@@ -1035,6 +1036,6 @@ video {
 }
 
 #control-checkboxes {
-  margin-top: 1em;
+  margin-top: 0.5em;
 }
 </style>

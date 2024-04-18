@@ -29,8 +29,8 @@
             small
             stay-open
             buttonSize="xl"
+            persist-selected
             :search-provider="geocodingInfoForSearch"
-            :accentColor="accentColor"
             @set-location="(feature: MapBoxFeature) => {
               if (feature !== null) {
                 map?.setView([feature.center[1], feature.center[0]], 6);
@@ -738,15 +738,17 @@ body {
   
   .forward-geocoding-container {
     position: absolute;
-    top: 0;
-    right: 60px;
+    bottom: 0;
+    left: 0;
+    
     z-index: 1000;
+    width: 250px;
   }
   
   > #map-legend {
     position: absolute;
-    bottom: 0;
-    left: 0;
+    top: 0;
+    right: 58px;
     width: fit-content;
     z-index: 1000;
     
@@ -758,6 +760,8 @@ body {
     background-color: #fff5;
     padding-left: 0.5rem;
     padding-right: 0.25rem;
+    
+    backdrop-filter: blur(5px);
     
     hr.line-legend {
       display: inline-block;

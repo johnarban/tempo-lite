@@ -6,8 +6,8 @@
       v-model="searchText"
       :items="searchResults ? searchResults.features : []"
       item-title="place_name"
-      :label="locationJustUpdated ? 'Location Updated' : (searchErrorMessage ?? 'Enter a location')"
-      bg-color="black"
+      :label="locationJustUpdated ? locationUpdatedText : (searchErrorMessage ?? 'Enter a location')"
+      :bg-color="bgColor"
       :density="small ? 'compact' : 'default'"
       hide-details
       solo
@@ -92,6 +92,16 @@ export default defineComponent({
       type: String,
       default: '1x',
     },
+    
+    bgColor: {
+      type: String,
+      default: 'white',
+    },
+    
+    persistSelected: {
+      type: Boolean,
+      default: false,
+    },
   },
   
   
@@ -105,6 +115,7 @@ export default defineComponent({
       searchResults: null as MapBoxFeatureCollection | null,
       searchErrorMessage: null as string | null,
       locationJustUpdated: false,
+      locationUpdatedText: 'Location updated',
     };
   },
 
@@ -112,7 +123,7 @@ export default defineComponent({
     cssStyles() {
       return {
         '--accent-color': this.accentColor,
-        '--bg-color': 'black',
+        '--bg-color': this.bgColor,
         '--fg-container-padding': this.searchOpen ? (this.small ? '0px 5px 0px 0px' : '5px 10px 12px 10px') : '0px',
         '--border-radius': this.searchOpen ? '7px' : '20px',
       };
@@ -155,6 +166,7 @@ export default defineComponent({
         return;
       }
       console.log('setting location');
+      this.locationUpdatedText = feature.place_name.split(',').slice(0, 2).join(', ');
       // blur (defocus) the v-combobox
       this.blurCombobox();
       this.timedJustUpdatedLocation();
@@ -184,7 +196,7 @@ export default defineComponent({
     timedJustUpdatedLocation() {
       this.locationJustUpdated = true;
       setTimeout(() => {
-        this.locationJustUpdated = false;
+        this.locationJustUpdated = this.persistSelected;
       }, 5000);
     },
   },
@@ -220,17 +232,18 @@ export default defineComponent({
 .forward-geocoding-container {
   --border-radius: 20px;
   position: relative;
-  width: fit-content;
   color: var(--accent-color);
-  background-color: var(--bg-color);
-  border: 2px solid var(--accent-color);
+  background-color: rgba(255, 255, 255, 0.4);
   border-radius: var(--border-radius);
   padding: var(--fg-container-padding);
+  backdrop-filter: blur(2px);
 
-
+  .v-field {
+    background-color: transparent !important;
+  }
+  
   .v-text-field {
     min-width: 150px;
-    width: min(200px, 20vw);
   }
   
   .forward-geocoding-input > .v-input__control > .v-field {
@@ -238,7 +251,6 @@ export default defineComponent({
   }
   
   .forward-geocoding-input.geocode-success label {
-    color: var(--accent-color);
     opacity: 1;
   }
   
@@ -264,36 +276,5 @@ export default defineComponent({
     cursor: pointer;
   }
 
-  // For some reason setting width: 100% makes the search results 2px too small
-  // It's probably some Vuetify styling thing
-  // Maybe there's a better workaround, but this gets the job done for now
-  .forward-geocoding-results {
-    position: absolute;
-    top: 42px;
-    left: -1px;
-    width: calc(100% + 2px);
-    background: var(--bg-color);
-    border: 2px solid var(--accent-color);
-    border-top: 0px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    padding: 0px 10px;
-    
-    &.results-small {
-      top: 37px;
-      width: calc(100% + 4px);
-      left: -2px;
-    }
-
-    .forward-geocoding-result {
-      border-top: 1px solid var(--accent-color);
-      font-size: 12pt;
-      pointer-events: auto;
-
-      &:hover {
-        cursor: pointer;
-      }
-    }
-  }
 }
 </style>

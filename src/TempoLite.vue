@@ -24,6 +24,20 @@
           backgroundColor="transparent"
           :nsteps="10"
           :cmap="cividis"/>
+          <location-search
+            v-model="searchOpen"
+            small
+            stay-open
+            buttonSize="xl"
+            persist-selected
+            :search-provider="geocodingInfoForSearch"
+            @set-location="(feature: MapBoxFeature) => {
+              if (feature !== null) {
+                map?.setView([feature.center[1], feature.center[0]], 6);
+              }
+            }"
+            @error="(error: string) => searchErrorMessage = error"
+          ></location-search>
       </div>
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
@@ -52,57 +66,55 @@
           </v-slider>
         </div>
       
-      <div id="select-option">
-        <!-- make a v-radio-group with 3 options -->
-        <v-radio-group
-          v-model="tab"
-          row
-        >
-          <v-radio
-            label="Option 1"
-            value="0"
-          ></v-radio>
-          <v-radio
-            label="Option 2"
-            value="1"
-          ></v-radio>
-          <v-radio
-            label="August 2023 - This is a really long option"
-            value="2"
-          ></v-radio>
-        </v-radio-group>
+      <div id="user-options">
         <div>
-        <v-btn
-          id="home"
-          @click="() => {
-            map?.fitBounds(bounds);
-            timeIndex = 0;
-          }"
-        >
-          Home
-        </v-btn>
-        <br>
-        <v-btn
-          id="texas"
-          @click="() => {
-            map?.fitBounds(texasBounds);
-            timeIndex = 10;
-          }"
-        >
-          Texas
-        </v-btn>
-        <br>
-        <v-btn
-          id="northeast"
-          @click="() => {
-            map?.fitBounds(northeastBounds);
-            timeIndex = 72;
-          }"
-        >
-          Northeast
-        </v-btn>
+          <!-- make a v-radio-group with 3 options -->
+          <h2>Sample Scenarios</h2>
+          <v-radio-group
+            v-model="tab"
+            row
+          >
+            <v-radio
+              label="Option 1"
+              value="0"
+              @click="() => {
+              map?.fitBounds(bounds);
+              timeIndex = 0;
+            }"
+            ></v-radio>
+            <v-radio
+              label="Option 2"
+              value="1"
+              @click="() => {
+              map?.fitBounds(texasBounds);
+              timeIndex = 10;
+            }"
+            ></v-radio>
+            <v-radio
+              label="August 2023 - This is a really long option"
+              value="2"
+              @click="() => {
+              map?.fitBounds(northeastBounds);
+              timeIndex = 72;
+            }"
+            ></v-radio>
+          </v-radio-group>
+        </div>
+
+        <hr style="border-color: grey;">
+
+        <div id="control-checkboxes">
+          <v-checkbox
+            v-model="showFieldOfRegard"
+            @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
+            label="TEMPO Field of Regard"
+            hide-details
+            density="compact"
+          />       
+        </div>
       </div>
-      </div>
+
+
   
       <div id="information">
       <article>
@@ -112,17 +124,7 @@
       </div>
     </div>
 
-    <location-search
-      v-model="searchOpen"
-      small
-      buttonSize="xl"
-      :search-provider="geocodingInfoForSearch"
-      :accentColor="accentColor"
-      @set-location="(feature: MapBoxFeature) => {
-        map?.setView([feature.center[1], feature.center[0]], 6);
-      }"
-      @error="(error: string) => searchErrorMessage = error"
-    ></location-search>
+    
 
     <!-- This contains the splash screen content -->
 
@@ -356,6 +358,17 @@ export default defineComponent({
       new L.LatLng(17.025, -129.975),
       new L.LatLng(63.975, -54.475)
     );
+    const fieldOfRegardLayer = L.geoJSON(
+      fieldOfRegard as GeoJSON.GeometryCollection,
+      {
+        style: {
+          color: "red",
+          fillColor: "transparent",
+          weight: 1,
+          opacity: 0.8,
+        },
+      }
+    ) as L.Layer;
 
     return {
       showSplashScreen,
@@ -382,6 +395,7 @@ export default defineComponent({
         new L.LatLng(40.3, -74.5),
         new L.LatLng(43.5, -69.6)
       ),
+      fieldOfRegardLayer,
 
       timestep: 0,
       timeIndex: 0,
@@ -396,6 +410,9 @@ export default defineComponent({
 
       searchOpen: true,
       searchErrorMessage: null as string | null,
+
+      showControls: true,
+      showFieldOfRegard: true,
     };
   },
 
@@ -430,18 +447,9 @@ export default defineComponent({
 
     this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
     
-   
-    L.geoJSON(
-      fieldOfRegard as GeoJSON.GeometryCollection,
-      {
-        style: {
-          color: "red",
-          fillColor: "transparent",
-          weight: 1,
-          opacity: 0.8,
-        },
-      }).addTo(this.map as Map);
-    
+    if (this.showFieldOfRegard) {
+      this.fieldOfRegardLayer.addTo(this.map as Map);
+    }
   },
 
   computed: {
@@ -561,7 +569,15 @@ export default defineComponent({
   watch: {
     imageUrl(url: string) {
       this.imageOverlay.setUrl(url);
-    }
+    },
+
+    showFieldOfRegard (show: boolean) {
+      if (show) {
+        this.fieldOfRegardLayer.addTo(this.map as Map);
+      } else if (this.map) {
+        this.map.removeLayer(this.fieldOfRegardLayer as L.Layer);
+      }
+    }  
   }
 });
 </script>
@@ -646,7 +662,8 @@ body {
     outline: 1px solid transparent;
   }
   
-  #select-option {
+  #user-options {
+    margin-left: 1rem;
     grid-column: 3 / 4;
     grid-row: 2 / 3;
   }
@@ -724,6 +741,10 @@ body {
   align-self: start;
 }
 
+#slider-row, #when {
+  margin-top: 1rem;
+}
+
 #map-container {
   position: relative;
   display: flex;
@@ -735,10 +756,19 @@ body {
     flex-shrink: 1;
   }
   
-  > #map-legend {
+  .forward-geocoding-container {
     position: absolute;
     bottom: 0;
     left: 0;
+    
+    z-index: 1000;
+    width: 250px;
+  }
+  
+  > #map-legend {
+    position: absolute;
+    top: 0;
+    right: 58px;
     width: fit-content;
     z-index: 1000;
     
@@ -750,6 +780,8 @@ body {
     background-color: #fff5;
     padding-left: 0.5rem;
     padding-right: 0.25rem;
+    
+    backdrop-filter: blur(5px);
     
     hr.line-legend {
       display: inline-block;
@@ -987,14 +1019,19 @@ video {
 }
 
 .v-slider.v-input--horizontal .v-slider-thumb__label {
-  top: calc(var(--v-slider-thumb-size) * 1.5);
+  // top: calc(var(--v-slider-thumb-size) * 1.5);
+  z-index:2000;
 }
 
 .v-slider.v-input--horizontal .v-slider-thumb__label::before {
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid transparent;
-    border-bottom: 6px solid currentColor;
-    top: -15px;
+    border-bottom: 6px solid transparent;
+    border-top: 6px solid currentColor;
+    bottom: -15px;
+}
+
+#control-checkboxes {
+  margin-top: 1em;
 }
 </style>

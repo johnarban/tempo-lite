@@ -738,8 +738,8 @@ body {
   
   .forward-geocoding-container {
     position: absolute;
-    bottom: 0;
-    left: 0;
+    top: 0;
+    right: 60px;
     z-index: 1000;
   }
   

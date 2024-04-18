@@ -41,12 +41,6 @@
       </div>
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
-        <icon-button
-          id="play-pause"
-          :fa-icon="playing ? 'pause' : 'play'"
-          fa-size="sm"
-          @activate="playOrPause"
-        ></icon-button>
           <v-slider
             v-model="timeIndex"
             :min="0"
@@ -64,6 +58,12 @@
               </div>
             </template>
           </v-slider>
+          <icon-button
+            id="play-pause"
+            :fa-icon="playing ? 'pause' : 'play'"
+            fa-size="sm"
+            @activate="playOrPause"
+          ></icon-button>
         </div>
       
       <div id="user-options">
@@ -376,7 +376,8 @@ export default defineComponent({
       layersLoaded: false,
       positionSet: false,
       
-      accentColor: "#ffffff",
+      accentColor: "#068ede",
+      accentColor2: "#ffd302",
       buttonColor: "#ffffff",
 
       tab: 0,
@@ -470,6 +471,7 @@ export default defineComponent({
     cssVars() {
       return {
         '--accent-color': this.accentColor,
+        '--accent-color-2': this.accentColor2,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
     },
@@ -810,13 +812,15 @@ body {
   > #play-pause-button {
     height: fit-content;
     align-self: center;
-    margin-right: 1rem;
-    width: 2rem;
-    color: white;
-    padding-right: 6px;
+    padding-inline: 0.5em;
+    width: 2.5rem;
+    color: var(--accent-color);
+    border: 2px solid var(--accent-color);
   }
-  
-  
+
+  .icon-wrapper {
+    padding-inline: 0.5em !important;
+  }
 }
 
 #splash-overlay {
@@ -1002,15 +1006,14 @@ video {
 }
 
 .v-slider-thumb__label {
-  background-color: #ffd302;
-  border: 0.25rem solid #068ede;
+  background-color: var(--accent-color-2);
+  border: 0.25rem solid var(--accent-color);
   width: max-content;
   height: 2.5rem;
   font-size: 1rem;
 
-
   &::before {
-    color: #068ede;
+    color: var(--accent-color);
   }
 }
 

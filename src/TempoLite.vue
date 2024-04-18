@@ -53,6 +53,7 @@
       
       <div id="select-option">
         <!-- make a v-radio-group with 3 options -->
+        <h2>Sample Scenarios</h2>
         <v-radio-group
           v-model="tab"
           row
@@ -60,47 +61,28 @@
           <v-radio
             label="Option 1"
             value="0"
+            @click="() => {
+            map?.fitBounds(bounds);
+            timeIndex = 0;
+          }"
           ></v-radio>
           <v-radio
             label="Option 2"
             value="1"
+            @click="() => {
+            map?.fitBounds(texasBounds);
+            timeIndex = 10;
+          }"
           ></v-radio>
           <v-radio
             label="August 2023 - This is a really long option"
             value="2"
-          ></v-radio>
-        </v-radio-group>
-        <div>
-        <v-btn
-          id="home"
-          @click="() => {
-            map?.fitBounds(bounds);
-            timeIndex = 0;
-          }"
-        >
-          Home
-        </v-btn>
-        <br>
-        <v-btn
-          id="texas"
-          @click="() => {
-            map?.fitBounds(texasBounds);
-            timeIndex = 10;
-          }"
-        >
-          Texas
-        </v-btn>
-        <br>
-        <v-btn
-          id="northeast"
-          @click="() => {
+            @click="() => {
             map?.fitBounds(northeastBounds);
             timeIndex = 72;
           }"
-        >
-          Northeast
-        </v-btn>
-      </div>
+          ></v-radio>
+        </v-radio-group>
       </div>
   
       <div id="information">
@@ -644,6 +626,7 @@ body {
   }
   
   #select-option {
+    margin-left: 1rem;
     grid-column: 3 / 4;
     grid-row: 2 / 3;
   }

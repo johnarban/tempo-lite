@@ -28,7 +28,7 @@
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
         <icon-button
-          v-if="false"
+          id="play-pause"
           :fa-icon="playing ? 'pause' : 'play'"
           @activate="playOrPause"
         ></icon-button>
@@ -770,7 +770,17 @@ body {
 #slider-row {
   display: flex;
   flex-direction: row;
-  padding-left: 1rem;
+  padding-left: 0;
+  
+  > #play-pause-button {
+    height: fit-content;
+    align-self: center;
+    margin-right: 1rem;
+    width: 3rem;
+    color: white
+  }
+  
+  
 }
 
 #splash-overlay {

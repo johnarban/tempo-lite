@@ -725,6 +725,10 @@ body {
   align-self: start;
 }
 
+#slider-row, #when {
+  margin-top: 1rem;
+}
+
 #map-container {
   position: relative;
   display: flex;
@@ -988,14 +992,15 @@ video {
 }
 
 .v-slider.v-input--horizontal .v-slider-thumb__label {
-  top: calc(var(--v-slider-thumb-size) * 1.5);
+  // top: calc(var(--v-slider-thumb-size) * 1.5);
+  z-index:2000;
 }
 
 .v-slider.v-input--horizontal .v-slider-thumb__label::before {
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid transparent;
-    border-bottom: 6px solid currentColor;
-    top: -15px;
+    border-bottom: 6px solid transparent;
+    border-top: 6px solid currentColor;
+    bottom: -15px;
 }
 </style>

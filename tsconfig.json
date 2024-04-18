@@ -30,6 +30,7 @@
   "include": [
     "plugins/*.ts",
     "src/**/*.ts",
+    "src/assets/*.json",
     "src/**/*.vue"
   ]
 }

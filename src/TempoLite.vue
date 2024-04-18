@@ -109,6 +109,19 @@
       </article>
       </div>
     </div>
+
+    <location-search
+      v-model="searchOpen"
+      small
+      buttonSize="xl"
+      :search-provider="geocodingInfoForSearch"
+      :accentColor="accentColor"
+      @set-location="(feature: MapBoxFeature) => {
+        map?.setView([feature.center[1], feature.center[0]], 6);
+      }"
+      @error="(error: string) => searchErrorMessage = error"
+    ></location-search>
+
     <!-- This contains the splash screen content -->
 
     <v-overlay
@@ -148,8 +161,13 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import L, { Map } from "leaflet";
+
 import  { cividis } from "./cividis";
 import fieldOfRegard from "./assets/TEMPO_FOR.json";
+// We DO use MapBoxFeature in the template, but eslint isn't picking this up for some reason
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
+
 type SheetType = "text" | "video" | null;
 type Timeout = ReturnType<typeof setTimeout>;
 
@@ -373,6 +391,9 @@ export default defineComponent({
         interactive: false,
       }),
       datetimes,
+
+      searchOpen: true,
+      searchErrorMessage: null as string | null,
     };
   },
 
@@ -528,6 +549,9 @@ export default defineComponent({
       }
       this.playing = !this.playing;
     },
+    async geocodingInfoForSearch(searchText: string): Promise<MapBoxFeatureCollection | null> {
+      return geocodingInfoForSearch(searchText, { countries: ["US", "CA", "MX", "CU", "BM", "HT", "DO"] }).catch(_err => null);
+    }
   },
 
   watch: {

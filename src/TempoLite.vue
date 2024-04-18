@@ -18,6 +18,7 @@
       <div id="where" class="big-label">where</div>
       <div id="map-container">
         <div id="map"></div>
+        <div id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
         <colorbar 
           label="Amount of NO2"
           backgroundColor="transparent"
@@ -39,6 +40,7 @@
             color="#068ede95"
             thumb-label="always"
             :track-size="10"
+            hide-details
             
           >
             <template v-slot:thumb-label="{ modelValue }">
@@ -162,6 +164,7 @@ import { defineComponent } from "vue";
 import L, { Map } from "leaflet";
 
 import  { cividis } from "./cividis";
+import fieldOfRegard from "./assets/TEMPO_FOR.json";
 // We DO use MapBoxFeature in the template, but eslint isn't picking this up for some reason
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
@@ -425,7 +428,19 @@ export default defineComponent({
     }).addTo(this.map as Map);
 
     this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
-
+    
+   
+    L.geoJSON(
+      fieldOfRegard as GeoJSON.GeometryCollection,
+      {
+        style: {
+          color: "red",
+          fillColor: "transparent",
+          weight: 1,
+          opacity: 0.8,
+        },
+      }).addTo(this.map as Map);
+    
   },
 
   computed: {
@@ -702,7 +717,12 @@ body {
   color: var(--smithsonian-blue);
 }
 
+#when {
+  align-self: start;
+}
+
 #map-container {
+  position: relative;
   display: flex;
   flex-direction: row;
 
@@ -710,6 +730,31 @@ body {
     flex-basis: 80%;
     flex-grow: 1;
     flex-shrink: 1;
+  }
+  
+  > #map-legend {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: fit-content;
+    z-index: 1000;
+    
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    color: black;
+    background-color: #fff5;
+    padding-left: 0.5rem;
+    padding-right: 0.25rem;
+    
+    hr.line-legend {
+      display: inline-block;
+      border: 0.5px solid red;
+      width: 3rem;
+    }
+    
+
   }
 
   > .colorbar-container {
@@ -725,7 +770,7 @@ body {
 #slider-row {
   display: flex;
   flex-direction: row;
-  padding-inline: 2rem;
+  padding-left: 1rem;
 }
 
 #splash-overlay {
@@ -921,6 +966,10 @@ video {
   &::before {
     color: #068ede;
   }
+}
+
+.v-slider.v-input--horizontal {
+  grid-template-rows: auto 0px;
 }
 
 .v-slider.v-input--horizontal .v-slider-thumb__label {

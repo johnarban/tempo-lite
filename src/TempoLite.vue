@@ -23,6 +23,20 @@
           backgroundColor="transparent"
           :nsteps="10"
           :cmap="cividis"/>
+          <location-search
+            v-model="searchOpen"
+            small
+            stay-open
+            buttonSize="xl"
+            :search-provider="geocodingInfoForSearch"
+            :accentColor="accentColor"
+            @set-location="(feature: MapBoxFeature) => {
+              if (feature !== null) {
+                map?.setView([feature.center[1], feature.center[0]], 6);
+              }
+            }"
+            @error="(error: string) => searchErrorMessage = error"
+          ></location-search>
       </div>
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
@@ -110,17 +124,7 @@
       </div>
     </div>
 
-    <location-search
-      v-model="searchOpen"
-      small
-      buttonSize="xl"
-      :search-provider="geocodingInfoForSearch"
-      :accentColor="accentColor"
-      @set-location="(feature: MapBoxFeature) => {
-        map?.setView([feature.center[1], feature.center[0]], 6);
-      }"
-      @error="(error: string) => searchErrorMessage = error"
-    ></location-search>
+    
 
     <!-- This contains the splash screen content -->
 
@@ -708,6 +712,7 @@ body {
 }
 
 #map-container {
+  position: relative;
   display: flex;
   flex-direction: row;
 
@@ -715,6 +720,13 @@ body {
     flex-basis: 80%;
     flex-grow: 1;
     flex-shrink: 1;
+  }
+  
+  .forward-geocoding-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
   }
 
   > .colorbar-container {

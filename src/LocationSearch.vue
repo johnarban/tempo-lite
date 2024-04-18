@@ -6,7 +6,7 @@
       v-model="searchText"
       :items="searchResults ? searchResults.features : []"
       item-title="place_name"
-      :label="locationJustUpdated ? locationUpdatedText : (searchErrorMessage ?? 'Enter a location')"
+      :label="locationJustUpdated ? (comboFocused ? 'Enter a location' : locationUpdatedText) : (searchErrorMessage ?? 'Enter a location')"
       :bg-color="bgColor"
       :density="small ? 'compact' : 'default'"
       hide-details
@@ -18,6 +18,7 @@
       @keydown.esc="searchResults = null"
       :error-messages="searchErrorMessage"
       @click:append="focusCombobox"
+      @update:focused="comboFocused = $event"
       ref="searchInput"
     >
     <template v-slot:append>
@@ -117,6 +118,7 @@ export default defineComponent({
       searchErrorMessage: null as string | null,
       locationJustUpdated: false,
       locationUpdatedText: 'Location updated',
+      comboFocused: false,
     };
   },
 

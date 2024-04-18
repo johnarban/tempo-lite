@@ -30,6 +30,7 @@
         <icon-button
           id="play-pause"
           :fa-icon="playing ? 'pause' : 'play'"
+          fa-size="sm"
           @activate="playOrPause"
         ></icon-button>
           <v-slider
@@ -778,8 +779,9 @@ body {
     height: fit-content;
     align-self: center;
     margin-right: 1rem;
-    width: 3rem;
-    color: white
+    width: 2rem;
+    color: white;
+    padding-right: 6px;
   }
   
   

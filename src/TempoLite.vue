@@ -87,6 +87,7 @@
         </div>
 
         <hr style="border-color: grey;">
+
         <div id="control-checkboxes">
           <v-checkbox
             v-model="showFieldOfRegard"
@@ -996,14 +997,7 @@ video {
     top: -15px;
 }
 
-#controls {
-  background: black;
-  padding-block: 0.5em;
-  padding-inline: 0.5em;
-  border-radius: 5px;
-  border: solid 1px white;
-  display: flex;
-  flex-direction: column;
-  pointer-events: auto;
+#control-checkboxes {
+  margin-top: 1em;
 }
 </style>

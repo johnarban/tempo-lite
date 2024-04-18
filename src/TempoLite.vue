@@ -636,7 +636,7 @@ body {
   gap: 20px 10px;
   
   > * {
-    background-color: #cccccc33;
+    background-color: transparent;
   }
   
   > div {

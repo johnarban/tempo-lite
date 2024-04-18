@@ -172,6 +172,7 @@ export default defineComponent({
         return;
       }
       console.log('setting location');
+      if (feature === null) { return; }
       this.locationUpdatedText = feature.place_name.split(',').slice(0, 2).join(', ');
       // blur (defocus) the v-combobox
       this.blurCombobox();
@@ -182,8 +183,8 @@ export default defineComponent({
 
     toggleSearch() {
       if (this.searchOpen) {
+        this.performForwardGeocodingSearch();
         this.focusCombobox();
-        // this.performForwardGeocodingSearch();
       } else {
         this.searchOpen = true;
       }

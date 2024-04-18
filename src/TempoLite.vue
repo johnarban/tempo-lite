@@ -85,28 +85,16 @@
             ></v-radio>
           </v-radio-group>
         </div>
-        <div
-          id="controls"
-          class="control-icon-wrapper"
-        >
-          <div>
-            <font-awesome-icon
-              size="lg"
-              :icon="showControls ? `chevron-down` : `gear`"
-              @click="showControls = !showControls"
-              @keyup.enter="showControls = !showControls"
-              tabindex="0"
-            /> 
-          </div>
 
-          <div v-if="showControls" id="control-checkboxes">
-            <v-checkbox
-              v-model="showFieldOfRegard"
-              @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
-              label="TEMPO Field of Regard"
-              hide-details
-            />       
-          </div>
+        <hr style="border-color: grey;">
+        <div id="control-checkboxes">
+          <v-checkbox
+            v-model="showFieldOfRegard"
+            @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
+            label="TEMPO Field of Regard"
+            hide-details
+            density="compact"
+          />       
         </div>
       </div>
 

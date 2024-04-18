@@ -17,6 +17,7 @@
       @keydown.enter="performForwardGeocodingSearch"
       @keydown.esc="searchResults = null"
       :error-messages="searchErrorMessage"
+      @click:append="focusCombobox"
       ref="searchInput"
     >
     <template v-slot:append>
@@ -159,6 +160,11 @@ export default defineComponent({
       input.blur();
     },
     
+    focusCombobox() {
+      const input = this.$refs.searchInput as HTMLInputElement;
+      input.focus();
+    },
+    
     setLocationFromSearchFeature(feature: MapBoxFeature | string) {
       // if it's a  string do nothing
       console.log('setLocationFromSearchFeature', feature);
@@ -176,7 +182,8 @@ export default defineComponent({
 
     toggleSearch() {
       if (this.searchOpen) {
-        this.performForwardGeocodingSearch();
+        this.focusCombobox();
+        // this.performForwardGeocodingSearch();
       } else {
         this.searchOpen = true;
       }

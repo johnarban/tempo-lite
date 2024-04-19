@@ -5,7 +5,7 @@
       :class="['forward-geocoding-input', locationJustUpdated ? 'geocode-success' : '', small ? 'forward-geocoding-input-small' : '']"
       v-model="searchText"
       :items="searchResults ? searchResults.features : []"
-      item-title="place_name"
+      :item-title="textForMapboxFeature"
       :label="locationJustUpdated ? (comboFocused ? 'Enter a location' : locationUpdatedText) : (searchErrorMessage ?? 'Enter a location')"
       :bg-color="bgColor"
       :density="small ? 'compact' : 'default'"
@@ -55,7 +55,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { MapBoxFeatureCollection, MapBoxFeature } from "./mapbox";
+import { MapBoxFeatureCollection, MapBoxFeature, textForMapboxFeature } from "./mapbox";
 
 type SearchProvider = (searchText: string) => Promise<MapBoxFeatureCollection | null>;
 
@@ -153,6 +153,13 @@ export default defineComponent({
           this.searchResults = info;
         }
       });
+    },
+    
+    textForMapboxFeature(feature: MapBoxFeature) {
+      if (typeof feature === 'string') {
+        return;
+      }
+      return textForMapboxFeature(feature);
     },
     
     blurCombobox() {

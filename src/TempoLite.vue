@@ -28,23 +28,24 @@
           end-value="150"
           >
           <template v-slot:label>
-              <div style="text-align: center;">Amount of NO&#x2082;<br> (10&sup1;&#x2074; molecules/cm&sup2;)</div>
+              <div style="text-align: center;">Amount of NO&#x2082;<br><span class="unit-label">(10&sup1;&#x2074; molecules/cm&sup2;)</span></div>
           </template>
         </colorbar>
-          <location-search
-            v-model="searchOpen"
-            small
-            stay-open
-            buttonSize="xl"
-            persist-selected
-            :search-provider="geocodingInfoForSearch"
-            @set-location="(feature: MapBoxFeature) => {
-              if (feature !== null) {
-                map?.setView([feature.center[1], feature.center[0]], 6);
-              }
-            }"
-            @error="(error: string) => searchErrorMessage = error"
-          ></location-search>
+
+        <location-search
+          v-model="searchOpen"
+          small
+          stay-open
+          buttonSize="xl"
+          persist-selected
+          :search-provider="geocodingInfoForSearch"
+          @set-location="(feature: MapBoxFeature) => {
+            if (feature !== null) {
+              map?.setView([feature.center[1], feature.center[0]], 6);
+            }
+          }"
+          @error="(error: string) => searchErrorMessage = error"
+        ></location-search>
       </div>
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
@@ -677,7 +678,7 @@ body {
   }
   
   #user-options {
-    margin-left: 1rem;
+    margin-left: 1.5rem;
     grid-column: 3 / 4;
     grid-row: 2 / 3;
   }
@@ -803,16 +804,18 @@ body {
       border: 0.5px solid #c10124;
       width: 3rem;
     }
-    
-
   }
 
   > .colorbar-container {
     flex-grow: 0;
     flex-shrink: 1;
-    
+
     .colorbar-label {
       transform: rotate(180deg) translate(-110%,-50%)
+    }
+
+    .unit-label {
+      font-size: 11pt;
     }
   }
 }

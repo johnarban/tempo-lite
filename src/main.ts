@@ -18,6 +18,7 @@ import {
   faMagnifyingGlass,
   faCircleXmark,
   faSquareXmark,
+  faHome,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faBookOpen);
@@ -28,7 +29,7 @@ library.add(faVideo);
 library.add(faMagnifyingGlass);
 library.add(faCircleXmark);
 library.add(faSquareXmark);
-
+library.add(faHome);
 
 
 /** v-hide directive taken from https://www.ryansouthgate.com/2020/01/30/vue-js-v-hide-element-whilst-keeping-occupied-space/ */

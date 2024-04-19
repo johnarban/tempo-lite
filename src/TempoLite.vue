@@ -103,6 +103,28 @@
             ></v-radio>
           </v-radio-group>
         </div>
+        
+        <div id="sample-text">
+          <div v-if="tab===0">
+            <h3>November 1, 2023</h3>
+            <p>
+              We see the effects of fires along California's central corridor and Arizona. 
+              <br> Additionally we can see an interesting lack of diurnal variation in Las Vegas. 
+            </p>
+          </div>
+          <div v-else-if="tab===1">
+            <h3>Option 2</h3>
+            <p>
+              We can see the continued effects of fires around Arizona, along with traffic along the I-10 brweetn Phoenix and Tucson.
+            </p>
+          </div>
+          <div v-else-if="tab===2">
+            <h3>August 2023</h3>
+            <p>
+              This is a sample scenario. It is a short description of the scenario.
+            </p>
+          </div>
+        </div>
 
         <hr style="border-color: grey;">
 
@@ -747,6 +769,12 @@ body {
   margin-top: 1rem;
 }
 
+
+#sample-text {
+  border: 1px solid black;
+  border-top: 1px solid white;
+  padding: 1rem;
+}
 
 .big-label {
   font-size: 2rem;

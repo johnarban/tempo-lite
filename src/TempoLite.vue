@@ -640,7 +640,7 @@ body {
   display: grid;
   grid-template-columns: .08fr .8fr .3fr;
   grid-template-rows: 50px var(--map-height) 78px 1fr;
-  gap: 15px 10px;
+  gap: 20px 10px;
   
   > * {
     background-color: transparent;
@@ -688,7 +688,7 @@ body {
   }
   
   #information {
-    grid-column: 2 / 4;
+    grid-column: 2 / 3;
     grid-row: 4 / 5;
   }
 
@@ -727,7 +727,7 @@ body {
   background-color: var(--info-background);
   border-radius: 10px;
   padding-inline: 1rem;
-  margin-right: 200px;
+  // margin-right: 200px;
 }
 
 // prevent overflows of the content

@@ -9,11 +9,14 @@
     
     <div class="content-with-sidebars">
       <!-- tempo logo -->
-      <img 
+      <a href="https://tempo.si.edu" target="_blank" rel="noopener noreferrer" >
+        <img 
         src="./assets/TEMPO-Logo-Small.png"
         alt="TEMPO Logo"
         style="width: 100px; height: 100px;"
       >
+      </a>
+
       <h1 id="title">How much NO<sub>2</sub>&hellip;</h1>
       <div id="where" class="big-label">where</div>
       <div id="map-container">
@@ -113,14 +116,20 @@
           />       
         </div>
       </div>
-
-
   
       <div id="information">
       <article>
-        <h2>TEMPO Data</h2>
-        <p>Some descriptive text about TEMPO and the data we are showing here.</p>
+        <h2>TEMPO NO<sub>2</sub> Data</h2>
+        <p>
+          TEMPO, a collaboration between the Smithsonian and NASA, is the first space-based probe to measure air pollution hourly over North America at neighborhood scales. NO<sub>2</sub> (nitrogen dioxide) is one of the pollutants detected by TEMPO. It is produced by wildfires and the burning of fossil fuels. NO<sub>2</sub> contributes to the formation of harmful ground-level ozone and toxic particulates in the air we breathe.
+        </p>
       </article>
+      </div>
+      <div id="body-logos">
+        <a href="https://www.si.edu/" target="_blank" rel="noopener noreferrer" class="mr-1" 
+        ><img alt="Smithsonian Logo" src="./assets/smithsonian.png"
+         /></a>
+        <credit-logos/>
       </div>
     </div>
 
@@ -638,7 +647,7 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  font-size: 11pt;
+  font-size: 12pt;
 }
 
 #map {
@@ -696,8 +705,15 @@ body {
   }
   
   #information {
-    grid-column: 2 / 4;
+    grid-column: 2 / 3;
     grid-row: 4 / 5;
+  }
+
+  #body-logos { 
+    grid-column: 3 / 4;
+    grid-row: 4 / 5;
+    align-self: end;
+    justify-self: end;
   }
   
   
@@ -813,14 +829,15 @@ body {
   > #play-pause-button {
     height: fit-content;
     align-self: center;
-    padding-inline: 0.5em;
+    padding-inline: 0.5rem;
+    margin-left: 0.75rem;
     width: 2.5rem;
     color: var(--accent-color);
     border: 2px solid var(--accent-color);
   }
 
   .icon-wrapper {
-    padding-inline: 0.5em !important;
+    padding-inline: 0.5rem !important;
   }
 }
 
@@ -1038,4 +1055,19 @@ video {
 #control-checkboxes {
   margin-top: 0.5em;
 }
+
+#body-logos {
+  display: flex;
+  flex-direction: row;
+  img {
+    height: 35px;
+    vertical-align: middle;
+    margin: 2px;
+  }
+}
+
+#icons-container > a[href="https://worldwidetelescope.org/home/"] {
+  display: none;
+}
+
 </style>

@@ -253,11 +253,23 @@ export default defineComponent({
   .v-field {
     background-color: transparent !important;
   }
+
+  .v-label.v-field-label:not(.text-white) {
+    font-size: 1.2rem;
+  }
+
+  .v-input--horizontal .v-input__append {
+    margin-inline-start: 0;
+  }
   
   .v-text-field {
     min-width: 150px;
   }
   
+  .v-field--variant-filled.v-field--has-background .v-field__overlay {
+    border-top-right-radius: 0px;
+}
+
   .forward-geocoding-input > .v-input__control > .v-field {
     border-radius: var(--border-radius);
   }

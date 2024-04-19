@@ -9,11 +9,14 @@
     
     <div class="content-with-sidebars">
       <!-- tempo logo -->
-      <img 
+      <a href="https://tempo.si.edu" target="_blank" rel="noopener noreferrer" >
+        <img 
         src="./assets/TEMPO-Logo-Small.png"
         alt="TEMPO Logo"
         style="width: 100px; height: 100px;"
       >
+      </a>
+
       <h1 id="title">How much NO<sub>2</sub>&hellip;</h1>
       <div id="where" class="big-label">where</div>
       <div id="map-container">
@@ -123,7 +126,7 @@
       </article>
       </div>
       <div id="body-logos">
-        <a class="mr-1" href="https://www.si.edu/" target="_blank" rel="noopener noreferrer"
+        <a href="https://www.si.edu/" target="_blank" rel="noopener noreferrer" class="mr-1" 
         ><img alt="Smithsonian Logo" src="./assets/smithsonian.png"
          /></a>
         <credit-logos/>

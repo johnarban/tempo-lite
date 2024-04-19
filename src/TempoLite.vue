@@ -23,7 +23,10 @@
           label="Amount of NO2"
           backgroundColor="transparent"
           :nsteps="10"
-          :cmap="cividis"/>
+          :cmap="svs"
+          start-value="1"
+          end-value="150"
+          />
           <location-search
             v-model="searchOpen"
             small
@@ -167,6 +170,7 @@ import { defineComponent } from "vue";
 import L, { Map } from "leaflet";
 
 import  { cividis } from "./cividis";
+import  { svs } from "./svs_cmap";
 import fieldOfRegard from "./assets/TEMPO_FOR.json";
 // We DO use MapBoxFeature in the template, but eslint isn't picking this up for some reason
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -511,6 +515,10 @@ export default defineComponent({
     
     cividis(x: number): string {
       return cividis(x);
+    },
+    
+    svs(x: number): string {
+      return svs(x);
     },
     
     blurActiveElement() {

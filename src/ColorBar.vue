@@ -6,11 +6,11 @@
     class="colorbar">
   </div>
   <div class="colorbar-labels"> 
-    <div><slot name="start">0%</slot></div>
+    <div><slot name="start">{{ startValue }}</slot></div>
     <div>
       <slot name="label">{{ label }}</slot>
     </div>
-    <div><slot name="end">100%</slot></div>
+    <div><slot name="end">{{ endValue }}</slot></div>
   </div>
 </div>
 </template>
@@ -54,6 +54,16 @@ export default defineComponent({
     triangles: {
       type: Boolean,
       default: true
+    },
+    
+    startValue: {
+      type: String,
+      default: '0%'
+    },
+    
+    endValue: {
+      type: String,
+      default: '100%'
     }
     
   },

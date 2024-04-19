@@ -253,6 +253,14 @@ export default defineComponent({
   .v-field {
     background-color: transparent !important;
   }
+
+  .v-label.v-field-label {
+    font-size: 1.2rem;
+  }
+
+  .v-input--horizontal .v-input__append {
+    margin-inline-start: 0;
+  }
   
   .v-text-field {
     min-width: 150px;

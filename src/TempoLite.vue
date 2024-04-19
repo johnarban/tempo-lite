@@ -461,7 +461,7 @@ export default defineComponent({
               // clearInterval(this.playInterval);
               // this.playInterval = null;
               // let it loop
-              this.timeIndex = 0;
+              this.timeIndex = this.minIndex;
             }
           } else {
             this.timeIndex += 1;

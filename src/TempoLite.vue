@@ -23,7 +23,6 @@
         <div id="map"></div>
         <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
         <colorbar 
-          label="Amount of NO2"
           backgroundColor="transparent"
           :nsteps="10"
           :cmap="svs"
@@ -31,7 +30,7 @@
           end-value="150"
           >
           <template v-slot:label>
-              <div style="text-align: center;">Amount of NO&#x2082;<br><span class="unit-label">(10&sup1;&#x2074; molecules/cm&sup2;)</span></div>
+              <div style="text-align: center;">Amount of Tropospheric NO&#x2082;<br><span class="unit-label">(10&sup1;&#x2074; molecules/cm&sup2;)</span></div>
           </template>
         </colorbar>
 
@@ -90,7 +89,7 @@
        <div id="user-options">
          <div>
            <!-- make a v-radio-group with 3 options -->
-          <h2>Sample Scenarios</h2>
+          <h2>Featured Datasets</h2>
           <v-radio-group
             v-model="radio"
             row
@@ -116,7 +115,7 @@
           <div v-if="radio===0">
             <h3>November 1, 2023</h3>
             <p>
-              We see the effects of traffic along California's central corridor and small-scale fires in Arizona. 
+              We see the effects of fires along California's central corridor in Arizona. 
               <br> Additionally we can see an interesting lack of diurnal variation in Las Vegas. 
             </p>
           </div>
@@ -124,6 +123,7 @@
             <h3>November 3, 2023</h3>
             <p>
               We can see the effects of small-scale fires around Arizona, along with traffic along the I-10 brweetn Phoenix and Tucson.
+              <br> In the midwest, the large plumes we are seeing are likely the result of (coal-powered) energy production. 
             </p>
           </div>
           <div v-else-if="radio===2">

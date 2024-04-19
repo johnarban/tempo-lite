@@ -88,7 +88,7 @@
         </div>
 
        <div id="user-options">
-         <div>
+         <div id="date-radio">
            <!-- make a v-radio-group with 3 options -->
           <h2>Featured Dates</h2>
           <v-radio-group
@@ -690,8 +690,6 @@ body {
     align-self: end;
     justify-self: end;
   }
-  
-  
 }
 
 //  style the content 
@@ -722,6 +720,10 @@ body {
   margin-top: 1rem;
 }
 
+
+#date-radio {
+  padding-bottom: 1rem;
+}
 
 #locations-of-interest {
   border: 1px solid black;
@@ -1049,6 +1051,10 @@ video {
 }
 
 #icons-container > a[href="https://worldwidetelescope.org/home/"] {
+  display: none;
+}
+
+.v-radio-group .v-input__details {
   display: none;
 }
 

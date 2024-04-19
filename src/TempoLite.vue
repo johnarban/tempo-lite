@@ -26,21 +26,29 @@
           label="Amount of NO2"
           backgroundColor="transparent"
           :nsteps="10"
-          :cmap="cividis"/>
-          <location-search
-            v-model="searchOpen"
-            small
-            stay-open
-            buttonSize="xl"
-            persist-selected
-            :search-provider="geocodingInfoForSearch"
-            @set-location="(feature: MapBoxFeature) => {
-              if (feature !== null) {
-                map?.setView([feature.center[1], feature.center[0]], 6);
-              }
-            }"
-            @error="(error: string) => searchErrorMessage = error"
-          ></location-search>
+          :cmap="svs"
+          start-value="1"
+          end-value="150"
+          >
+          <template v-slot:label>
+              <div style="text-align: center;">Amount of NO&#x2082;<br><span class="unit-label">(10&sup1;&#x2074; molecules/cm&sup2;)</span></div>
+          </template>
+        </colorbar>
+
+        <location-search
+          v-model="searchOpen"
+          small
+          stay-open
+          buttonSize="xl"
+          persist-selected
+          :search-provider="geocodingInfoForSearch"
+          @set-location="(feature: MapBoxFeature) => {
+            if (feature !== null) {
+              map?.setView([feature.center[1], feature.center[0]], 6);
+            }
+          }"
+          @error="(error: string) => searchErrorMessage = error"
+        ></location-search>
       </div>
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
@@ -176,6 +184,7 @@ import { defineComponent } from "vue";
 import L, { Map } from "leaflet";
 
 import  { cividis } from "./cividis";
+import  { svs } from "./svs_cmap";
 import fieldOfRegard from "./assets/TEMPO_FOR.json";
 // We DO use MapBoxFeature in the template, but eslint isn't picking this up for some reason
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -522,6 +531,10 @@ export default defineComponent({
       return cividis(x);
     },
     
+    svs(x: number): string {
+      return svs(x);
+    },
+    
     blurActiveElement() {
       const active = document.activeElement;
       if (active instanceof HTMLElement) {
@@ -674,7 +687,7 @@ body {
   }
   
   #user-options {
-    margin-left: 1rem;
+    margin-left: 1.5rem;
     grid-column: 3 / 4;
     grid-row: 2 / 3;
   }
@@ -787,7 +800,7 @@ body {
   > #map-legend {
     position: absolute;
     top: 0;
-    right: 58px;
+    right: 65px;
     width: fit-content;
     z-index: 1000;
     
@@ -807,16 +820,18 @@ body {
       border: 0.5px solid #c10124;
       width: 3rem;
     }
-    
-
   }
 
   > .colorbar-container {
     flex-grow: 0;
     flex-shrink: 1;
-    
+
     .colorbar-label {
       transform: rotate(180deg) translate(-110%,-50%)
+    }
+
+    .unit-label {
+      font-size: 11pt;
     }
   }
 }

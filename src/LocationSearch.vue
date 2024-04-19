@@ -266,6 +266,10 @@ export default defineComponent({
     min-width: 150px;
   }
   
+  .v-field--variant-filled.v-field--has-background .v-field__overlay {
+    border-top-right-radius: 0px;
+}
+
   .forward-geocoding-input > .v-input__control > .v-field {
     border-radius: var(--border-radius);
   }

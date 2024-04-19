@@ -153,6 +153,36 @@
         <p>
           TEMPO, a collaboration between the Smithsonian and NASA, is the first space-based probe to measure air pollution hourly over North America at neighborhood scales. NO<sub>2</sub> (nitrogen dioxide) is one of the pollutants detected by TEMPO. It is produced by wildfires and the burning of fossil fuels. NO<sub>2</sub> contributes to the formation of harmful ground-level ozone and toxic particulates in the air we breathe.
         </p>
+        <p>
+          <a style="text-decoration: underline;">
+            Data Credits
+            <v-dialog
+              activator="parent"
+              :scrim="false"
+              location="center center"
+              >
+              <template v-slot:default="{ isActive }">
+                <v-card max-width="fit-content">
+                  <v-card-text>
+                    <p>
+                      Data provided to the CosmicDS team through a cooperative agreement with TEMPO Collaboration. <br><br>
+                      TEMPO field of regard courtesy Heesung Chong. <br><br>
+                      TEMPO L3 version 2 data courtesy Caroline Nowland. <br><br>
+                      Data processing Jonathan Foster (glue-solutions) <br>
+                    </p>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-btn
+                        class="ml-auto"
+                        text="Close"
+                        @click="isActive.value = false"
+                      ></v-btn>
+                    </v-card-actions>
+                </v-card>
+              </template>
+            </v-dialog>
+        </a>
+      </p>
       </article>
       </div>
       <div id="body-logos">
@@ -576,7 +606,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: auto;
 
   font-family: Verdana, Arial, Helvetica, sans-serif;
 }
@@ -585,7 +615,7 @@ body {
   position: fixed;
   width: 100%;
   height: var(--app-content-height);
-  overflow: hidden;
+  overflow: auto;
   transition: height 0.1s ease-in-out;
 }
 
@@ -609,8 +639,8 @@ body {
   
   display: grid;
   grid-template-columns: .08fr .8fr .3fr;
-  grid-template-rows: 50px auto auto auto;
-  gap: 20px 10px;
+  grid-template-rows: 50px var(--map-height) 78px 1fr;
+  gap: 15px 10px;
   
   > * {
     background-color: transparent;
@@ -658,7 +688,7 @@ body {
   }
   
   #information {
-    grid-column: 2 / 3;
+    grid-column: 2 / 4;
     grid-row: 4 / 5;
   }
 
@@ -696,14 +726,19 @@ body {
 #information {
   background-color: var(--info-background);
   border-radius: 10px;
-  padding: 1rem;
-  margin-top: 1rem;
+  padding-inline: 1rem;
+  margin-right: 200px;
 }
 
+// prevent overflows of the content
+#user-options {
+  display: grid;
+}
 
 #sample-text {
   border: 1px solid black;
   padding: 1rem;
+  overflow-y: scroll;
 }
 
 .big-label {

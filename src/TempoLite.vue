@@ -284,6 +284,7 @@ export default defineComponent({
         { tz: 'US/Mountain', name: 'Mountain Daylight' },
         { tz: 'US/Arizona', name: 'Mountain Standard' },
         { tz: 'US/Pacific', name: 'Pacific Daylight' },
+        { tz: 'US/Alaska', name: 'Alaska Daylight' },
       ] as TimezoneInfo[],
       selectedTimezone: "US/Eastern",
 

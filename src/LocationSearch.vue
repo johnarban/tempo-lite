@@ -5,7 +5,7 @@
       :class="['forward-geocoding-input', locationJustUpdated ? 'geocode-success' : '', small ? 'forward-geocoding-input-small' : '']"
       v-model="searchText"
       :items="searchResults ? searchResults.features : []"
-      item-title="place_name"
+      :item-title="textForMapboxFeature"
       :bg-color="bgColor"
       :label="locationLabel"
       :density="small ? 'compact' : 'default'"
@@ -28,7 +28,7 @@
         class="geocoding-search-icon"
         icon="magnifying-glass"
         :size="searchOpen ? 'xl' : buttonSize"
-        :color="!searchOpen || (searchText && searchText.length > 2) ? accentColor : 'gray'"
+        color="gray"
         @click="toggleSearch"
       ></font-awesome-icon>
 
@@ -49,7 +49,7 @@
       class="geocoding-search-icon"
       icon="magnifying-glass"
       :size="searchOpen ? 'xl' : buttonSize"
-      :color="!searchOpen || (searchText && searchText.length > 2) ? accentColor : 'gray'"
+      color="gray"
       @click.prevent="toggleSearch"
     ></font-awesome-icon>
   </div>
@@ -57,7 +57,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { MapBoxFeatureCollection, MapBoxFeature } from "./mapbox";
+import { MapBoxFeatureCollection, MapBoxFeature, textForMapboxFeature } from "./mapbox";
 
 type SearchProvider = (searchText: string) => Promise<MapBoxFeatureCollection | null>;
 
@@ -171,6 +171,14 @@ export default defineComponent({
       });
     },
     
+    textForMapboxFeature(feature: MapBoxFeature) {
+      if (typeof feature === 'string') {
+        return;
+      }
+      return textForMapboxFeature(feature);
+    },
+    
+       
     onFocusChange(focused: boolean) {
       console.log('focus change', focused);
       this.comboFocused = focused;
@@ -198,7 +206,13 @@ export default defineComponent({
       }
       console.log('setting location');
       if (feature === null) { return; }
-      this.locationUpdatedText = feature.place_name.split(',').slice(0, 2).join(', ');
+      const name = this.textForMapboxFeature(feature);
+      if ( name !== undefined) {
+        this.locationUpdatedText = name;
+      } else {
+        this.locationUpdatedText = feature.place_name.split(',').slice(0, 2).join(', ');
+      }
+      
       // blur (defocus) the v-combobox
       this.blurCombobox();
       this.timedJustUpdatedLocation();
@@ -212,6 +226,7 @@ export default defineComponent({
         this.performForwardGeocodingSearch();
         // this.$nextTick(() => this.focusCombobox());
         this.menuOpen = true;
+        this.focusCombobox();
       } else {
         this.searchOpen = true;
       }
@@ -279,13 +294,14 @@ export default defineComponent({
     background-color: transparent !important;
   }
 
-  .v-label.v-field-label:not(.text-white) {
+  // there are two separate labels, we want the 2nd one to be large. the first is the small floating label
+  .v-field > .v-field__field > .v-label.v-field-label:nth-child(2) {
     font-size: 1.2rem;
   }
 
-  .v-input--horizontal .v-input__append {
-    margin-inline-start: 0;
-  }
+  // .v-input--horizontal .v-input__append {
+  //   margin-inline-start: 0;
+  // }
   
   .v-text-field {
     min-width: 150px;

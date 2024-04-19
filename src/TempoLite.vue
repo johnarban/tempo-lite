@@ -72,7 +72,7 @@
             id="play-pause"
             :fa-icon="playing ? 'pause' : 'play'"
             fa-size="sm"
-            @activate="playOrPause"
+            @activate="playing = !playing"
           ></icon-button>
         </div>
 
@@ -88,9 +88,9 @@
         </div>
 
        <div id="user-options">
-         <div>
+         <div id="date-radio">
            <!-- make a v-radio-group with 3 options -->
-          <h2>Sample Scenarios</h2>
+          <h2>Featured Dates</h2>
           <v-radio-group
             v-model="radio"
             row
@@ -112,26 +112,19 @@
 
         <hr style="border-color: grey;">
         
-        <div id="sample-text">
-          <div v-if="radio===0">
-            <h3>November 1, 2023</h3>
-            <p>
-              We see the effects of traffic along California's central corridor and small-scale fires in Arizona. 
-              <br> Additionally we can see an interesting lack of diurnal variation in Las Vegas. 
-            </p>
-          </div>
-          <div v-else-if="radio===1">
-            <h3>November 3, 2023</h3>
-            <p>
-              We can see the effects of small-scale fires around Arizona, along with traffic along the I-10 brweetn Phoenix and Tucson.
-            </p>
-          </div>
-          <div v-else-if="radio===2">
-            <h3>March 28, 2024</h3>
-            <p>
-              We can see...
-            </p>
-          </div>
+        <div id="locations-of-interest">
+          <h3>Locations</h3>
+          <v-radio-group
+            v-model="sublocationRadio"
+            row
+          >
+            <v-radio
+              v-for="(loi, index) in locationsOfInterest[radio]"
+              v-bind:key="index"
+              :label="loi.text"
+              :value="index"
+            ></v-radio>
+          </v-radio-group>
         </div>
 
         <hr style="border-color: grey;">
@@ -320,6 +313,13 @@ const timestamps = [
   1711668240000,
 ];
 
+interface LocationOfInterest {
+  latlng: L.LatLngExpression;
+  zoom: number;
+  text: string;
+  index: number;
+}
+
 export default defineComponent({
   data() {
     const showSplashScreen = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
@@ -340,6 +340,12 @@ export default defineComponent({
       }
     ) as L.Layer;
 
+    const locationsOfInterest = [
+      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic + Wildfires", index: 3}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: 3}],  // Nov 1
+      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic + Wildfires (SE of Sacramento)", index: 18}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: 15}],  // Nov 3
+      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Urban + Transport Pollution; Wildfires in NE", index: 31}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Wildfires", index: 36}],  // Mar 28
+    ] as LocationOfInterest[][];
+
     return {
       showSplashScreen,
       sheet: null as SheetType,
@@ -351,6 +357,7 @@ export default defineComponent({
       buttonColor: "#ffffff",
 
       radio: 0,
+      sublocationRadio: null as number | null,
 
       touchscreen: false,
       playInterval: null as Timeout | null,
@@ -362,6 +369,7 @@ export default defineComponent({
         new L.LatLng(72.99, -13.01)
       ),
       fieldOfRegardLayer,
+      locationsOfInterest,
 
       timezoneOptions: [
         { tz: 'US/Eastern', name: 'Eastern Daylight' },
@@ -541,39 +549,44 @@ export default defineComponent({
           }).addTo(this.map as Map);
         });
     },
-    playOrPause() {
-      if (this.playing && this.playInterval) {
-        clearInterval(this.playInterval);
-        this.playInterval = null;
-      } else if (!this.playing) {
-        this.playInterval = setInterval(() => {
-          if (this.timeIndex >= this.maxIndex) {
-            if (this.playInterval) {
-              // clearInterval(this.playInterval);
-              // this.playInterval = null;
-              // let it loop
-              this.timeIndex = this.minIndex;
-            }
-          } else {
-            this.timeIndex += 1;
-          }
-        }, 200);
-      }
-      this.playing = !this.playing;
-    },
     async geocodingInfoForSearch(searchText: string): Promise<MapBoxFeatureCollection | null> {
       return geocodingInfoForSearch(searchText, { countries: ["US", "CA", "MX", "CU", "BM", "HT", "DO"] }).catch(_err => null);
     },
     resetMapBounds() {
       this.map?.setView([40.044, -98.789], 4);
+    },
+    play() {
+      this.playInterval = setInterval(() => {
+        if (this.timeIndex >= this.maxIndex) {
+          if (this.playInterval) {
+            // clearInterval(this.playInterval);
+            // this.playInterval = null;
+            // let it loop
+            this.timeIndex = this.minIndex;
+          }
+        } else {
+          this.timeIndex += 1;
+        }
+      }, 1000);
+    },
+    pause() {
+      if (this.playInterval) {
+        clearInterval(this.playInterval);
+      }
     }
   },
 
   watch: {
+    playing(play: boolean) {
+      if (play) {
+        this.play();
+      } else {
+        this.pause();
+      }
+    },
     imageUrl(url: string) {
       this.imageOverlay.setUrl(url);
     },
-
     showFieldOfRegard (show: boolean) {
       if (show) {
         this.fieldOfRegardLayer.addTo(this.map as Map);
@@ -589,7 +602,16 @@ export default defineComponent({
       const bounds = value < 2 ? this.novDecBounds : this.marchBounds;
       this.imageOverlay.setBounds(bounds);
       this.resetMapBounds();
+      this.sublocationRadio = null;
     },
+    sublocationRadio(value: number | null) {
+      if (value !== null) {
+        const loi = this.locationsOfInterest[this.radio][value];
+        this.map?.setView(loi.latlng, loi.zoom);
+        this.timeIndex = loi.index;
+        this.playing = true;
+      }
+    }
   }
 });
 </script>
@@ -728,8 +750,6 @@ a {
     align-self: end;
     justify-self: end;
   }
-  
-  
 }
 
 //  style the content 
@@ -794,10 +814,18 @@ a {
   display: grid;
 }
 
-#sample-text {
+#date-radio {
+  padding-bottom: 1rem;
+}
+
+#locations-of-interest {
   border: 1px solid black;
   padding: 1rem;
   overflow-y: scroll;
+
+  h3 {
+    font-weight: 500;
+  }
 }
 
 .big-label {
@@ -1048,6 +1076,10 @@ video {
 }
 
 #icons-container > a[href="https://worldwidetelescope.org/home/"] {
+  display: none;
+}
+
+.v-radio-group .v-input__details {
   display: none;
 }
 

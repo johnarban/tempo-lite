@@ -165,7 +165,7 @@
             >
               <v-card class="dialog-card">
                 <font-awesome-icon
-                    style="position:absolute;right:16px;cursor:pointer;padding:1em;margin:-1em"
+                    style="position:absolute;right:16px;cursor:pointer;padding:0.5em;margin:-0.5em"
                     icon="square-xmark"
                     size="xl"
                     @click="showCredits = false"
@@ -173,15 +173,35 @@
                     :color="accentColor2"
                     tabindex="0"
                   ></font-awesome-icon>
-                <v-card-title tabindex="0"><h3>TEMPO Data Story Credits</h3></v-card-title>
+                <v-card-title tabindex="0"><h3>Credits</h3></v-card-title>
                 <v-card-text>
+                  <h4 class="mb-2"><a href="https://tempo.si.edu/" target="_blank" rel="noopener noreferrer">TEMPO</a> Team Acknowledgments:</h4>
                   <p>
-                    Data provided to the CosmicDS team through a cooperative agreement with TEMPO Collaboration. <br><br>
-                    TEMPO field of regard courtesy Heesung Chong. <br><br>
-                    TEMPO L3 version 2 data courtesy Caroline Nowland. <br><br>
-                    Data processing Jonathan Foster (glue-solutions) <br>
+                    Caroline Nowlan, Aaron Naeger, and Erika Wright provided dates and locations for events of interest in the TEMPO data.
                   </p>
-                  </v-card-text>
+                  <p>
+                    Xiong Liu provided the L3 version 2 TEMPO data files.
+                  </p>
+                  <p>
+                    Heesung Chong provided the shape file for the TEMPO field of regard.
+                  </p>
+
+                  <p class="my-3">NASA's Scientific Visualization Studio provided the TEMPO NO<sub>2</sub> colormap.</p>
+
+                  <h4 class="mb-2"><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Team:</h4> 
+
+                  Jonathan Foster<br>
+                  Jon Carifio<br>
+                  John Lewis<br>
+                  Pat Udomprasert<br>
+                  Alyssa Goodman<br>
+                  Erika Wright<br>
+                  Mary Dussault<br>
+                  Harry Houghton<br>
+                  Evaluator: Sue Sunbury<br>
+
+                  <funding-acknowledgment class="my-3"></funding-acknowledgment>
+                </v-card-text>
               </v-card>
             </v-dialog>
           </a>
@@ -370,7 +390,7 @@ export default defineComponent({
 
       showControls: true,
       showFieldOfRegard: true,
-      showCredits: true,
+      showCredits: false,
     };
   },
 
@@ -615,6 +635,11 @@ body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
+a {
+  text-decoration: none;
+  color: #068ede;
+}
+
 #main-content {
   position: fixed;
   width: 100%;
@@ -757,10 +782,6 @@ body {
 #credits-dialog {
   display: flex;
   width: calc(100% - 1rem);
-  // width: 100%;
-
-
-  // border-bottom: solid #212121 0.5em;
 }
 
 .dialog-card {
@@ -974,79 +995,6 @@ video {
   overflow: hidden;
   padding: 0px;
   z-index: 10;
-}
-
-.bottom-sheet {
-  .v-overlay__content {
-    align-self: flex-end;
-    padding: 0;
-    margin: 0;
-    max-width: 100%;
-    height: 34%;
-  }
-
-  #tabs {
-    width: calc(100% - 3em);
-    align-self: left;
-  }
-  
-  .info-text {
-    height: 33vh;
-    padding-bottom: 25px;
-  
-    & a {
-      text-decoration: none;
-    }
-  }
-  
-  .close-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 15;
-  
-    &:hover {
-      cursor: pointer;
-    }
-  
-    &:focus {
-      color: white;
-      border: 2px solid white;
-    }
-  }
-  
-  .scrollable {
-    overflow-y: auto;
-  }
-  
-  #tab-items {
-    // padding-bottom: 2px !important;
-  
-    .v-card-text {
-      font-size: ~"max(14px, calc(0.7em + 0.3vw))";
-      padding-top: ~"max(2vw, 16px)";
-      padding-left: ~"max(4vw, 16px)";
-      padding-right: ~"max(4vw, 16px)";
-  
-      .end-spacer {
-        height: 25px;
-      }
-    }
-  
-  }
-  
-  #close-text-icon {
-    position: absolute;
-    top: 0.25em;
-    right: calc((3em - 0.6875em) / 3); // font-awesome-icons have width 0.6875em
-    color: white;
-  }
-
-  // This prevents the tabs from having some extra space to the left when the screen is small
-  // (around 400px or less)
-  .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
-    display: none;
-  }
 }
 
 .v-slider-thumb__surface::after {

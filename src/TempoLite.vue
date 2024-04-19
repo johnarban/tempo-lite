@@ -197,6 +197,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import L, { Map } from "leaflet";
+import "leaflet.zoomhome";
 import { getTimezoneOffset } from "date-fns-tz";
 import  { cividis } from "./cividis";
 import  { svs } from "./svs_cmap";
@@ -356,11 +357,14 @@ export default defineComponent({
 
   mounted() {
     this.showSplashScreen = false;
-    this.map = L.map("map").setView([40.044, -98.789], 4, {
+    this.map = L.map("map", { zoomControl: false }).setView([40.044, -98.789], 4, {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       crs: L.CRS.EPSG4326
     });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    L.Control.zoomHome().addTo(this.map);
     this.addCoastlines();
 
     this.basemap = new L.TileLayer.WMS('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
@@ -547,7 +551,6 @@ export default defineComponent({
       this.timeIndex = minIndex;
       const bounds = value < 2 ? this.novDecBounds : this.marchBounds;
       this.imageOverlay.setBounds(bounds);
-      this.resetMapBounds();
       this.sublocationRadio = null;
     },
     sublocationRadio(value: number | null) {

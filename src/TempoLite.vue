@@ -154,35 +154,38 @@
           TEMPO, a collaboration between the Smithsonian and NASA, is the first space-based probe to measure air pollution hourly over North America at neighborhood scales. NO<sub>2</sub> (nitrogen dioxide) is one of the pollutants detected by TEMPO. It is produced by wildfires and the burning of fossil fuels. NO<sub>2</sub> contributes to the formation of harmful ground-level ozone and toxic particulates in the air we breathe.
         </p>
         <p>
-          <a id="credit-link">
+          <a id="credits-link">
             Credits
             <v-dialog
+              id="credits-dialog"
+              v-model="showCredits"
               activator="parent"
               :scrim="false"
               location="center center"
-              >
-              <template v-slot:default="{ isActive }">
-                <v-card max-width="fit-content">
-                  <v-card-text>
-                    <p>
-                      Data provided to the CosmicDS team through a cooperative agreement with TEMPO Collaboration. <br><br>
-                      TEMPO field of regard courtesy Heesung Chong. <br><br>
-                      TEMPO L3 version 2 data courtesy Caroline Nowland. <br><br>
-                      Data processing Jonathan Foster (glue-solutions) <br>
-                    </p>
-                    </v-card-text>
-                    <v-card-actions>
-                      <v-btn
-                        class="ml-auto"
-                        text="Close"
-                        @click="isActive.value = false"
-                      ></v-btn>
-                    </v-card-actions>
-                </v-card>
-              </template>
+            >
+              <v-card class="dialog-card">
+                <font-awesome-icon
+                    style="position:absolute;right:16px;cursor:pointer;padding:1em;margin:-1em"
+                    icon="square-xmark"
+                    size="xl"
+                    @click="showCredits = false"
+                    @keyup.enter="showCredits = false"
+                    :color="accentColor2"
+                    tabindex="0"
+                  ></font-awesome-icon>
+                <v-card-title tabindex="0"><h3>TEMPO Data Story Credits</h3></v-card-title>
+                <v-card-text>
+                  <p>
+                    Data provided to the CosmicDS team through a cooperative agreement with TEMPO Collaboration. <br><br>
+                    TEMPO field of regard courtesy Heesung Chong. <br><br>
+                    TEMPO L3 version 2 data courtesy Caroline Nowland. <br><br>
+                    Data processing Jonathan Foster (glue-solutions) <br>
+                  </p>
+                  </v-card-text>
+              </v-card>
             </v-dialog>
-        </a>
-      </p>
+          </a>
+        </p>
       </article>
       </div>
       <div id="body-logos">
@@ -367,6 +370,7 @@ export default defineComponent({
 
       showControls: true,
       showFieldOfRegard: true,
+      showCredits: true,
     };
   },
 
@@ -731,10 +735,37 @@ body {
   // margin-right: 200px;
 }
 
-#credit-link {
+#credits-link {
   text-decoration: underline;
   font-weight: bold;
   color: var(--accent-color-2);
+}
+
+.v-dialog > .v-overlay__content > .v-card {
+  padding: 1rem;
+}
+
+.v-overlay__content {
+    align-self: center;
+    margin: unset;
+  }
+
+  .v-card-text {
+    height: 40vh;
+  }
+
+#credits-dialog {
+  display: flex;
+  width: calc(100% - 1rem);
+  // width: 100%;
+
+
+  // border-bottom: solid #212121 0.5em;
+}
+
+.dialog-card {
+  align-self: center;
+  max-width: 80%;
 }
 
 // prevent overflows of the content

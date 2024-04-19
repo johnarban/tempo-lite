@@ -17,6 +17,7 @@ import {
   faVideo,
   faMagnifyingGlass,
   faCircleXmark,
+  faSquareXmark,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faBookOpen);
@@ -26,6 +27,7 @@ library.add(faTimes);
 library.add(faVideo);
 library.add(faMagnifyingGlass);
 library.add(faCircleXmark);
+library.add(faSquareXmark);
 
 
 

@@ -59,7 +59,7 @@ createApp(TempoLite, {})
   // Components
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('icon-button', IconButton)
-  .component('funding-acknowledgement', FundingAcknowledgment)
+  .component('funding-acknowledgment', FundingAcknowledgment)
   .component('credit-logos', CreditLogos)
   .component('colorbar', Colorbar)
   .component('location-search', LocationSearch)

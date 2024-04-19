@@ -113,7 +113,7 @@
         <hr style="border-color: grey;">
         
         <div id="locations-of-interest">
-          <h3>Locations</h3>
+          <h3 class="mb-1">Locations</h3>
           <v-radio-group
             v-model="sublocationRadio"
             row
@@ -815,12 +815,13 @@ a {
 }
 
 #date-radio {
-  padding-bottom: 1rem;
+  padding-bottom: 0.5rem;
 }
 
 #locations-of-interest {
   border: 1px solid black;
-  padding: 1rem;
+  padding-block: 0.5rem;
+  padding-inline: 1rem;
   overflow-y: scroll;
 
   h3 {

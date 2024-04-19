@@ -111,6 +111,30 @@
         </div>
 
         <hr style="border-color: grey;">
+        
+        <div id="sample-text">
+          <div v-if="radio===0">
+            <h3>November 1, 2023</h3>
+            <p>
+              We see the effects of traffic along California's central corridor and small-scale fires in Arizona. 
+              <br> Additionally we can see an interesting lack of diurnal variation in Las Vegas. 
+            </p>
+          </div>
+          <div v-else-if="radio===1">
+            <h3>November 3, 2023</h3>
+            <p>
+              We can see the effects of small-scale fires around Arizona, along with traffic along the I-10 brweetn Phoenix and Tucson.
+            </p>
+          </div>
+          <div v-else-if="radio===2">
+            <h3>March 28, 2024</h3>
+            <p>
+              We can see...
+            </p>
+          </div>
+        </div>
+
+        <hr style="border-color: grey;">
 
         <div id="control-checkboxes">
           <v-checkbox
@@ -628,6 +652,7 @@ body {
   }
 
   #timezone-select {
+    margin-left: 1.5rem;
     grid-column: 3 / 4;
     grid-row: 3 / 4;
   }
@@ -675,6 +700,11 @@ body {
   margin-top: 1rem;
 }
 
+
+#sample-text {
+  border: 1px solid black;
+  padding: 1rem;
+}
 
 .big-label {
   font-size: 2rem;

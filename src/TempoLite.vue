@@ -26,7 +26,11 @@
           :cmap="svs"
           start-value="1"
           end-value="150"
-          />
+          >
+          <template v-slot:label>
+              <div style="text-align: center;">Amount of NO<sub>2</sub> <br> (10<sup>14</sup> molecules/<span>cm^2</span>)</div>
+          </template>
+        </colorbar>
           <location-search
             v-model="searchOpen"
             small

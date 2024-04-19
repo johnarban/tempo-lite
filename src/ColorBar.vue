@@ -217,7 +217,7 @@ export default defineComponent({
   top: 50%;
   /* right: -1.5ch; */
   transform-origin: top center;
-  transform: rotate(180deg) translate(-150%,-50%);
+  transform: rotate(180deg) translate(-75%,-50%);
   writing-mode: vertical-rl;
   
   display: flex;

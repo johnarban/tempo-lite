@@ -154,8 +154,8 @@
           TEMPO, a collaboration between the Smithsonian and NASA, is the first space-based probe to measure air pollution hourly over North America at neighborhood scales. NO<sub>2</sub> (nitrogen dioxide) is one of the pollutants detected by TEMPO. It is produced by wildfires and the burning of fossil fuels. NO<sub>2</sub> contributes to the formation of harmful ground-level ozone and toxic particulates in the air we breathe.
         </p>
         <p>
-          <a style="text-decoration: underline;">
-            Data Credits
+          <a id="credit-link">
+            Credits
             <v-dialog
               activator="parent"
               :scrim="false"
@@ -688,6 +688,7 @@ body {
   }
   
   #information {
+    padding: 1rem;
     grid-column: 2 / 3;
     grid-row: 4 / 5;
   }
@@ -728,6 +729,12 @@ body {
   border-radius: 10px;
   padding-inline: 1rem;
   // margin-right: 200px;
+}
+
+#credit-link {
+  text-decoration: underline;
+  font-weight: bold;
+  color: var(--accent-color-2);
 }
 
 // prevent overflows of the content

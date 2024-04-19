@@ -800,7 +800,7 @@ body {
   > #map-legend {
     position: absolute;
     top: 0;
-    right: 58px;
+    right: 65px;
     width: fit-content;
     z-index: 1000;
     

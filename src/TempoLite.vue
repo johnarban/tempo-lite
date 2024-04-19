@@ -72,7 +72,7 @@
             id="play-pause"
             :fa-icon="playing ? 'pause' : 'play'"
             fa-size="sm"
-            @activate="playOrPause"
+            @activate="playing = !playing"
           ></icon-button>
         </div>
 
@@ -115,17 +115,14 @@
         <div id="locations-of-interest">
           <h3>Locations</h3>
           <v-radio-group
+            v-model="sublocationRadio"
             row
           >
             <v-radio
               v-for="(loi, index) in locationsOfInterest[radio]"
               v-bind:key="index"
               :label="loi.text"
-              @click="() => { 
-                map?.setView(loi.latlng, loi.zoom); 
-                timeIndex = loi.index;
-                playOrPause(); 
-                }"
+              :value="index"
             ></v-radio>
           </v-radio-group>
         </div>
@@ -307,6 +304,7 @@ export default defineComponent({
       buttonColor: "#ffffff",
 
       radio: 0,
+      sublocationRadio: null as number | null,
 
       touchscreen: false,
       playInterval: null as Timeout | null,
@@ -497,39 +495,44 @@ export default defineComponent({
           }).addTo(this.map as Map);
         });
     },
-    playOrPause() {
-      if (this.playing && this.playInterval) {
-        clearInterval(this.playInterval);
-        this.playInterval = null;
-      } else if (!this.playing) {
-        this.playInterval = setInterval(() => {
-          if (this.timeIndex >= this.maxIndex) {
-            if (this.playInterval) {
-              // clearInterval(this.playInterval);
-              // this.playInterval = null;
-              // let it loop
-              this.timeIndex = this.minIndex;
-            }
-          } else {
-            this.timeIndex += 1;
-          }
-        }, 1000);
-      }
-      this.playing = !this.playing;
-    },
     async geocodingInfoForSearch(searchText: string): Promise<MapBoxFeatureCollection | null> {
       return geocodingInfoForSearch(searchText, { countries: ["US", "CA", "MX", "CU", "BM", "HT", "DO"] }).catch(_err => null);
     },
     resetMapBounds() {
       this.map?.setView([40.044, -98.789], 4);
+    },
+    play() {
+      this.playInterval = setInterval(() => {
+        if (this.timeIndex >= this.maxIndex) {
+          if (this.playInterval) {
+            // clearInterval(this.playInterval);
+            // this.playInterval = null;
+            // let it loop
+            this.timeIndex = this.minIndex;
+          }
+        } else {
+          this.timeIndex += 1;
+        }
+      }, 1000);
+    },
+    pause() {
+      if (this.playInterval) {
+        clearInterval(this.playInterval);
+      }
     }
   },
 
   watch: {
+    playing(play: boolean) {
+      if (play) {
+        this.play();
+      } else {
+        this.pause();
+      }
+    },
     imageUrl(url: string) {
       this.imageOverlay.setUrl(url);
     },
-
     showFieldOfRegard (show: boolean) {
       if (show) {
         this.fieldOfRegardLayer.addTo(this.map as Map);
@@ -545,7 +548,16 @@ export default defineComponent({
       const bounds = value < 2 ? this.novDecBounds : this.marchBounds;
       this.imageOverlay.setBounds(bounds);
       this.resetMapBounds();
+      this.sublocationRadio = null;
     },
+    sublocationRadio(value: number | null) {
+      if (value !== null) {
+        const loi = this.locationsOfInterest[this.radio][value];
+        this.map?.setView(loi.latlng, loi.zoom);
+        this.timeIndex = loi.index;
+        this.playing = true;
+      }
+    }
   }
 });
 </script>

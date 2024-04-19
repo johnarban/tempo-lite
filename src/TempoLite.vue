@@ -118,8 +118,10 @@
   
       <div id="information">
       <article>
-        <h2>TEMPO Data</h2>
-        <p>Some descriptive text about TEMPO and the data we are showing here.</p>
+        <h2>TEMPO NO<sub>2</sub> Data</h2>
+        <p>
+          TEMPO, a collaboration between the Smithsonian and NASA, is the first space-based probe to measure air pollution hourly over North America at neighborhood scales. NO<sub>2</sub> (nitrogen dioxide) is one of the pollutants detected by TEMPO. It is produced by wildfires and the burning of fossil fuels. NO<sub>2</sub> contributes to the formation of harmful ground-level ozone and toxic particulates in the air we breathe.
+        </p>
       </article>
       </div>
     </div>
@@ -638,7 +640,7 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  font-size: 11pt;
+  font-size: 12pt;
 }
 
 #map {

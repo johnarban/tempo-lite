@@ -114,9 +114,9 @@
         
         <div id="locations-of-interest">
           <v-btn
-            v-for="loi in locationsOfInterest[radio]"
-            v-bind:key="loi.text"
-            @click="map?.setView(loi.latlng, loi.zoom)"
+            v-for="(loi, index) in locationsOfInterest[radio]"
+            v-bind:key="index"
+            @click="() => { map?.setView(loi.latlng, loi.zoom); timeIndex = loi.index; }"
           >
             {{ loi.text }}
           </v-btn>
@@ -259,6 +259,7 @@ interface LocationOfInterest {
   latlng: L.LatLngExpression;
   zoom: number;
   text: string;
+  index: number;
 }
 
 export default defineComponent({
@@ -282,7 +283,7 @@ export default defineComponent({
     ) as L.Layer;
 
     const locationsOfInterest = [
-      [{ latlng: [42, -71], zoom: 7, text: "Something cool"}],  // Nov 1
+      [{ latlng: [42, -71], zoom: 7, text: "Something cool", index: 3}],  // Nov 1
       [],  // Nov 3
       [],  // Mar 28
     ] as LocationOfInterest[][];

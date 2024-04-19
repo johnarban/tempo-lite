@@ -112,26 +112,14 @@
 
         <hr style="border-color: grey;">
         
-        <div id="sample-text">
-          <div v-if="radio===0">
-            <h3>November 1, 2023</h3>
-            <p>
-              We see the effects of traffic along California's central corridor and small-scale fires in Arizona. 
-              <br> Additionally we can see an interesting lack of diurnal variation in Las Vegas. 
-            </p>
-          </div>
-          <div v-else-if="radio===1">
-            <h3>November 3, 2023</h3>
-            <p>
-              We can see the effects of small-scale fires around Arizona, along with traffic along the I-10 brweetn Phoenix and Tucson.
-            </p>
-          </div>
-          <div v-else-if="radio===2">
-            <h3>March 28, 2024</h3>
-            <p>
-              We can see...
-            </p>
-          </div>
+        <div id="locations-of-interest">
+          <v-btn
+            v-for="loi in locationsOfInterest[radio]"
+            v-bind:key="loi.text"
+            @click="map?.setView(loi.latlng, loi.zoom)"
+          >
+            {{ loi.text }}
+          </v-btn>
         </div>
 
         <hr style="border-color: grey;">
@@ -267,6 +255,12 @@ const timestamps = [
   1711668240000,
 ];
 
+interface LocationOfInterest {
+  latlng: L.LatLngExpression;
+  zoom: number;
+  text: string;
+}
+
 export default defineComponent({
   data() {
     const showSplashScreen = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
@@ -286,6 +280,12 @@ export default defineComponent({
         },
       }
     ) as L.Layer;
+
+    const locationsOfInterest = [
+      [{ latlng: [42, -71], zoom: 7, text: "Something cool"}],  // Nov 1
+      [],  // Nov 3
+      [],  // Mar 28
+    ] as LocationOfInterest[][];
 
     return {
       showSplashScreen,
@@ -309,6 +309,7 @@ export default defineComponent({
         new L.LatLng(72.99, -13.01)
       ),
       fieldOfRegardLayer,
+      locationsOfInterest,
 
       timezoneOptions: [
         { tz: 'US/Eastern', name: 'Eastern Daylight' },
@@ -701,7 +702,7 @@ body {
 }
 
 
-#sample-text {
+#locations-of-interest {
   border: 1px solid black;
   padding: 1rem;
 }

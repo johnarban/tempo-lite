@@ -728,6 +728,10 @@ body {
 #locations-of-interest {
   border: 1px solid black;
   padding: 1rem;
+
+  h3 {
+    font-weight: 500;
+  }
 }
 
 .big-label {

@@ -205,7 +205,13 @@ export default defineComponent({
       }
       console.log('setting location');
       if (feature === null) { return; }
-      this.locationUpdatedText = feature.place_name.split(',').slice(0, 2).join(', ');
+      const name = this.textForMapboxFeature(feature);
+      if ( name !== undefined) {
+        this.locationUpdatedText = name;
+      } else {
+        this.locationUpdatedText = feature.place_name.split(',').slice(0, 2).join(', ');
+      }
+      
       // blur (defocus) the v-combobox
       this.blurCombobox();
       this.timedJustUpdatedLocation();

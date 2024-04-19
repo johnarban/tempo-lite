@@ -6,8 +6,8 @@
       v-model="searchText"
       :items="searchResults ? searchResults.features : []"
       item-title="place_name"
-      :label="locationJustUpdated ? (comboFocused ? 'Enter a location' : locationUpdatedText) : (searchErrorMessage ?? 'Enter a location')"
       :bg-color="bgColor"
+      :label="locationLabel"
       :density="small ? 'compact' : 'default'"
       hide-details
       solo
@@ -18,8 +18,10 @@
       @keydown.esc="searchResults = null"
       :error-messages="searchErrorMessage"
       @click:append="focusCombobox"
-      @update:focused="comboFocused = $event"
+      @update:focused="onFocusChange($event)"
       ref="searchInput"
+      :menu="menuOpen"
+      @update:menu="menuOpen = $event"
     >
     <template v-slot:append>
       <font-awesome-icon
@@ -48,7 +50,7 @@
       icon="magnifying-glass"
       :size="searchOpen ? 'xl' : buttonSize"
       :color="!searchOpen || (searchText && searchText.length > 2) ? accentColor : 'gray'"
-      @click="toggleSearch"
+      @click.prevent="toggleSearch"
     ></font-awesome-icon>
   </div>
 </template>
@@ -119,6 +121,7 @@ export default defineComponent({
       locationJustUpdated: false,
       locationUpdatedText: 'Location updated',
       comboFocused: false,
+      menuOpen: false,
     };
   },
 
@@ -131,6 +134,18 @@ export default defineComponent({
         '--border-radius': this.searchOpen ? '7px' : '20px',
       };
     },
+    
+    locationLabel(): string {
+      if (this.locationJustUpdated) {
+        if (this.comboFocused || this.searchResults !== null || this.searchText !== null) {
+          return 'Enter a location';
+        } else {
+          return this.locationUpdatedText;
+        }
+      } else {
+        return this.searchErrorMessage ?? 'Enter a location';
+      }
+    }
   },
   
   
@@ -139,6 +154,7 @@ export default defineComponent({
   
   methods: {
     performForwardGeocodingSearch() {
+      console.log('performForwardGeocodingSearch', this.searchText);
       if (this.searchText === null || this.searchText.length < 3) {
         return;
       }
@@ -155,6 +171,14 @@ export default defineComponent({
       });
     },
     
+    onFocusChange(focused: boolean) {
+      console.log('focus change', focused);
+      this.comboFocused = focused;
+      // if (!focused && this.searchResults === null) {
+      //   this.searchText = null;
+      // }
+    },
+    
     blurCombobox() {
       console.log('blurring');
       const input = this.$refs.searchInput as HTMLInputElement;
@@ -169,7 +193,6 @@ export default defineComponent({
     
     setLocationFromSearchFeature(feature: MapBoxFeature | string) {
       // if it's a  string do nothing
-      console.log('setLocationFromSearchFeature', feature);
       if (typeof feature === 'string') {
         return;
       }
@@ -184,9 +207,11 @@ export default defineComponent({
     },
 
     toggleSearch() {
+      console.log('toggleSearch', this.searchOpen, this.searchText);
       if (this.searchOpen) {
         this.performForwardGeocodingSearch();
-        this.focusCombobox();
+        // this.$nextTick(() => this.focusCombobox());
+        this.menuOpen = true;
       } else {
         this.searchOpen = true;
       }

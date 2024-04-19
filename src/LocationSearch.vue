@@ -28,7 +28,7 @@
         class="geocoding-search-icon"
         icon="magnifying-glass"
         :size="searchOpen ? 'xl' : buttonSize"
-        :color="!searchOpen || (searchText && searchText.length > 2) ? accentColor : 'gray'"
+        color="gray"
         @click="toggleSearch"
       ></font-awesome-icon>
 
@@ -49,7 +49,7 @@
       class="geocoding-search-icon"
       icon="magnifying-glass"
       :size="searchOpen ? 'xl' : buttonSize"
-      :color="!searchOpen || (searchText && searchText.length > 2) ? accentColor : 'gray'"
+      color="gray"
       @click.prevent="toggleSearch"
     ></font-awesome-icon>
   </div>
@@ -178,6 +178,15 @@ export default defineComponent({
       return textForMapboxFeature(feature);
     },
     
+       
+    onFocusChange(focused: boolean) {
+      console.log('focus change', focused);
+      this.comboFocused = focused;
+      // if (!focused && this.searchResults === null) {
+      //   this.searchText = null;
+      // }
+    },
+    
     blurCombobox() {
       console.log('blurring');
       const input = this.$refs.searchInput as HTMLInputElement;
@@ -217,6 +226,7 @@ export default defineComponent({
         this.performForwardGeocodingSearch();
         // this.$nextTick(() => this.focusCombobox());
         this.menuOpen = true;
+        this.focusCombobox();
       } else {
         this.searchOpen = true;
       }
@@ -284,13 +294,14 @@ export default defineComponent({
     background-color: transparent !important;
   }
 
-  .v-label.v-field-label:not(.text-white) {
+  // there are two separate labels, we want the 2nd one to be large. the first is the small floating label
+  .v-field > .v-field__field > .v-label.v-field-label:nth-child(2) {
     font-size: 1.2rem;
   }
 
-  .v-input--horizontal .v-input__append {
-    margin-inline-start: 0;
-  }
+  // .v-input--horizontal .v-input__append {
+  //   margin-inline-start: 0;
+  // }
   
   .v-text-field {
     min-width: 150px;

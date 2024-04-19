@@ -370,7 +370,7 @@ export default defineComponent({
 
       showControls: true,
       showFieldOfRegard: true,
-      showCredits: true,
+      showCredits: false,
     };
   },
 

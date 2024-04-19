@@ -279,10 +279,11 @@ export default defineComponent({
       fieldOfRegardLayer,
 
       timezoneOptions: [
-        { tz: 'US/Eastern', name: 'Eastern' },
-        { tz: 'US/Central', name: 'Central' },
-        { tz: 'US/Mountain', name: 'Mountain' },
-        { tz: 'US/Pacific', name: 'Pacific' }
+        { tz: 'US/Eastern', name: 'Eastern Daylight' },
+        { tz: 'US/Central', name: 'Central Daylight' },
+        { tz: 'US/Mountain', name: 'Mountain Daylight' },
+        { tz: 'US/Arizona', name: 'Mountain Standard' },
+        { tz: 'US/Pacific', name: 'Pacific Daylight' },
       ] as TimezoneInfo[],
       selectedTimezone: "US/Eastern",
 

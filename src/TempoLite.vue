@@ -90,7 +90,7 @@
        <div id="user-options">
          <div>
            <!-- make a v-radio-group with 3 options -->
-          <h2>Sample Scenarios</h2>
+          <h2>Featured Dates</h2>
           <v-radio-group
             v-model="radio"
             row
@@ -113,13 +113,21 @@
         <hr style="border-color: grey;">
         
         <div id="locations-of-interest">
-          <v-btn
-            v-for="(loi, index) in locationsOfInterest[radio]"
-            v-bind:key="index"
-            @click="() => { map?.setView(loi.latlng, loi.zoom); timeIndex = loi.index; }"
+          <h3>Locations</h3>
+          <v-radio-group
+            row
           >
-            {{ loi.text }}
-          </v-btn>
+            <v-radio
+              v-for="(loi, index) in locationsOfInterest[radio]"
+              v-bind:key="index"
+              :label="loi.text"
+              @click="() => { 
+                map?.setView(loi.latlng, loi.zoom); 
+                timeIndex = loi.index;
+                playOrPause(); 
+                }"
+            ></v-radio>
+          </v-radio-group>
         </div>
 
         <hr style="border-color: grey;">
@@ -283,9 +291,9 @@ export default defineComponent({
     ) as L.Layer;
 
     const locationsOfInterest = [
-      [{ latlng: [42, -71], zoom: 7, text: "Something cool", index: 3}],  // Nov 1
+      [],  // Nov 1
       [],  // Nov 3
-      [],  // Mar 28
+      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Urban + Transport Pollution; Wildfires in NE", index: 31}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Wildfires", index: 36}],  // Mar 28
     ] as LocationOfInterest[][];
 
     return {
@@ -505,7 +513,7 @@ export default defineComponent({
           } else {
             this.timeIndex += 1;
           }
-        }, 200);
+        }, 1000);
       }
       this.playing = !this.playing;
     },

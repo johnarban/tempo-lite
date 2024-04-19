@@ -178,14 +178,6 @@ export default defineComponent({
       return textForMapboxFeature(feature);
     },
     
-    onFocusChange(focused: boolean) {
-      console.log('focus change', focused);
-      this.comboFocused = focused;
-      // if (!focused && this.searchResults === null) {
-      //   this.searchText = null;
-      // }
-    },
-    
     blurCombobox() {
       console.log('blurring');
       const input = this.$refs.searchInput as HTMLInputElement;

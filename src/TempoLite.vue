@@ -26,38 +26,45 @@
           label="Amount of NO2"
           backgroundColor="transparent"
           :nsteps="10"
-          :cmap="cividis"/>
-          <location-search
-            v-model="searchOpen"
-            small
-            stay-open
-            buttonSize="xl"
-            persist-selected
-            :search-provider="geocodingInfoForSearch"
-            @set-location="(feature: MapBoxFeature) => {
-              if (feature !== null) {
-                map?.setView([feature.center[1], feature.center[0]], 6);
-              }
-            }"
-            @error="(error: string) => searchErrorMessage = error"
-          ></location-search>
+          :cmap="svs"
+          start-value="1"
+          end-value="150"
+          >
+          <template v-slot:label>
+              <div style="text-align: center;">Amount of NO&#x2082;<br><span class="unit-label">(10&sup1;&#x2074; molecules/cm&sup2;)</span></div>
+          </template>
+        </colorbar>
+
+        <location-search
+          v-model="searchOpen"
+          small
+          stay-open
+          buttonSize="xl"
+          persist-selected
+          :search-provider="geocodingInfoForSearch"
+          @set-location="(feature: MapBoxFeature) => {
+            if (feature !== null) {
+              map?.setView([feature.center[1], feature.center[0]], 6);
+            }
+          }"
+          @error="(error: string) => searchErrorMessage = error"
+        ></location-search>
       </div>
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
           <v-slider
             v-model="timeIndex"
-            :min="0"
+            :min="minIndex"
             :max="maxIndex"
             :step="1"
             color="#068ede95"
             thumb-label="always"
             :track-size="10"
             hide-details
-            
           >
-            <template v-slot:thumb-label="{ modelValue }">
+            <template v-slot:thumb-label>
               <div class="thumb-label">
-                {{ datetimes[modelValue] }}
+                {{ thumbLabel }}
               </div>
             </template>
           </v-slider>
@@ -68,38 +75,37 @@
             @activate="playOrPause"
           ></icon-button>
         </div>
-      
-      <div id="user-options">
-        <div>
-          <!-- make a v-radio-group with 3 options -->
+
+
+        <div id="timezone-select">
+          <v-select
+            v-model="selectedTimezone"
+            label="Timezone"
+            :items="timezoneOptions"
+            item-title="name"
+            item-value="tz"
+          ></v-select>
+        </div>
+
+       <div id="user-options">
+         <div>
+           <!-- make a v-radio-group with 3 options -->
           <h2>Sample Scenarios</h2>
           <v-radio-group
-            v-model="tab"
+            v-model="radio"
             row
           >
             <v-radio
-              label="Option 1"
-              value="0"
-              @click="() => {
-              map?.fitBounds(bounds);
-              timeIndex = 0;
-            }"
+              label="November 1, 2023"
+              :value="0"
             ></v-radio>
             <v-radio
-              label="Option 2"
-              value="1"
-              @click="() => {
-              map?.fitBounds(texasBounds);
-              timeIndex = 10;
-            }"
+              label="November 3, 2023"
+              :value="1"
             ></v-radio>
             <v-radio
-              label="August 2023 - This is a really long option"
-              value="2"
-              @click="() => {
-              map?.fitBounds(northeastBounds);
-              timeIndex = 72;
-            }"
+              label="March 28, 2024"
+              :value="2"
             ></v-radio>
           </v-radio-group>
         </div>
@@ -196,8 +202,9 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import L, { Map } from "leaflet";
-
+import { getTimezoneOffset } from "date-fns-tz";
 import  { cividis } from "./cividis";
+import  { svs } from "./svs_cmap";
 import fieldOfRegard from "./assets/TEMPO_FOR.json";
 // We DO use MapBoxFeature in the template, but eslint isn't picking this up for some reason
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -206,189 +213,66 @@ import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "
 type SheetType = "text" | "video" | null;
 type Timeout = ReturnType<typeof setTimeout>;
 
-const datetimes = [
-  'Sun, Dec 17, 2023 -- 12:24 (UTC)',
-  'Sun, Dec 17, 2023 -- 13:04 (UTC)',
-  'Sun, Dec 17, 2023 -- 13:44 (UTC)',
-  'Sun, Dec 17, 2023 -- 14:24 (UTC)',
-  'Sun, Dec 17, 2023 -- 15:04 (UTC)',
-  'Sun, Dec 17, 2023 -- 16:04 (UTC)',
-  'Sun, Dec 17, 2023 -- 17:04 (UTC)',
-  'Sun, Dec 17, 2023 -- 18:04 (UTC)',
-  'Sun, Dec 17, 2023 -- 19:04 (UTC)',
-  'Sun, Dec 17, 2023 -- 20:04 (UTC)',
-  'Sun, Dec 17, 2023 -- 21:04 (UTC)',
-  'Sun, Dec 17, 2023 -- 21:44 (UTC)',
-  'Sun, Dec 17, 2023 -- 22:24 (UTC)',
-  'Sun, Dec 17, 2023 -- 23:04 (UTC)',
-  'Mon, Dec 18, 2023 -- 12:24 (UTC)',
-  'Mon, Dec 18, 2023 -- 13:04 (UTC)',
-  'Mon, Dec 18, 2023 -- 13:45 (UTC)',
-  'Mon, Dec 18, 2023 -- 14:25 (UTC)',
-  'Mon, Dec 18, 2023 -- 15:05 (UTC)',
-  'Mon, Dec 18, 2023 -- 16:05 (UTC)',
-  'Mon, Dec 18, 2023 -- 17:05 (UTC)',
-  'Mon, Dec 18, 2023 -- 18:05 (UTC)',
-  'Mon, Dec 18, 2023 -- 19:05 (UTC)',
-  'Mon, Dec 18, 2023 -- 20:05 (UTC)',
-  'Mon, Dec 18, 2023 -- 21:05 (UTC)',
-  'Mon, Dec 18, 2023 -- 21:45 (UTC)',
-  'Mon, Dec 18, 2023 -- 22:25 (UTC)',
-  'Mon, Dec 18, 2023 -- 23:05 (UTC)',
-  'Tue, Dec 19, 2023 -- 12:25 (UTC)',
-  'Tue, Dec 19, 2023 -- 13:05 (UTC)',
-  'Tue, Dec 19, 2023 -- 13:45 (UTC)',
-  'Tue, Dec 19, 2023 -- 14:25 (UTC)',
-  'Tue, Dec 19, 2023 -- 15:05 (UTC)',
-  'Tue, Dec 19, 2023 -- 16:05 (UTC)',
-  'Tue, Dec 19, 2023 -- 17:05 (UTC)',
-  'Tue, Dec 19, 2023 -- 18:05 (UTC)',
-  'Tue, Dec 19, 2023 -- 19:05 (UTC)',
-  'Tue, Dec 19, 2023 -- 20:05 (UTC)',
-  'Tue, Dec 19, 2023 -- 21:05 (UTC)',
-  'Tue, Dec 19, 2023 -- 21:45 (UTC)',
-  'Tue, Dec 19, 2023 -- 22:25 (UTC)',
-  'Tue, Dec 19, 2023 -- 23:05 (UTC)',
-  'Wed, Dec 20, 2023 -- 12:25 (UTC)',
-  'Wed, Dec 20, 2023 -- 13:05 (UTC)',
-  'Wed, Dec 20, 2023 -- 13:46 (UTC)',
-  'Wed, Dec 20, 2023 -- 14:26 (UTC)',
-  'Wed, Dec 20, 2023 -- 15:06 (UTC)',
-  'Wed, Dec 20, 2023 -- 16:06 (UTC)',
-  'Wed, Dec 20, 2023 -- 17:06 (UTC)',
-  'Wed, Dec 20, 2023 -- 18:06 (UTC)',
-  'Wed, Dec 20, 2023 -- 19:06 (UTC)',
-  'Wed, Dec 20, 2023 -- 20:06 (UTC)',
-  'Wed, Dec 20, 2023 -- 21:06 (UTC)',
-  'Wed, Dec 20, 2023 -- 21:46 (UTC)',
-  'Wed, Dec 20, 2023 -- 22:26 (UTC)',
-  'Wed, Dec 20, 2023 -- 23:06 (UTC)',
-  'Thu, Dec 21, 2023 -- 12:46 (UTC)',
-  'Thu, Dec 21, 2023 -- 13:26 (UTC)',
-  'Thu, Dec 21, 2023 -- 14:06 (UTC)',
-  'Thu, Dec 21, 2023 -- 15:06 (UTC)',
-  'Thu, Dec 21, 2023 -- 16:06 (UTC)',
-  'Thu, Dec 21, 2023 -- 17:06 (UTC)',
-  'Thu, Dec 21, 2023 -- 18:06 (UTC)',
-  'Thu, Dec 21, 2023 -- 19:06 (UTC)',
-  'Thu, Dec 21, 2023 -- 20:06 (UTC)',
-  'Thu, Dec 21, 2023 -- 21:06 (UTC)',
-  'Thu, Dec 21, 2023 -- 22:06 (UTC)',
-  'Thu, Dec 21, 2023 -- 22:46 (UTC)',
-  'Fri, Dec 22, 2023 -- 12:47 (UTC)',
-  'Fri, Dec 22, 2023 -- 13:27 (UTC)',
-  'Fri, Dec 22, 2023 -- 14:07 (UTC)',
-  'Fri, Dec 22, 2023 -- 15:07 (UTC)',
-  'Fri, Dec 22, 2023 -- 16:07 (UTC)',
-  'Fri, Dec 22, 2023 -- 17:07 (UTC)',
-  'Fri, Dec 22, 2023 -- 18:07 (UTC)',
-  'Fri, Dec 22, 2023 -- 19:07 (UTC)',
-  'Fri, Dec 22, 2023 -- 20:07 (UTC)',
-  'Fri, Dec 22, 2023 -- 21:07 (UTC)',
-  'Fri, Dec 22, 2023 -- 22:07 (UTC)',
-  'Fri, Dec 22, 2023 -- 22:47 (UTC)',
-  'Sat, Dec 23, 2023 -- 12:54 (UTC)',
-  'Sat, Dec 23, 2023 -- 13:27 (UTC)',
-  'Sat, Dec 23, 2023 -- 14:07 (UTC)',
-  'Sat, Dec 23, 2023 -- 15:07 (UTC)',
-  'Sat, Dec 23, 2023 -- 16:07 (UTC)',
-  'Sat, Dec 23, 2023 -- 17:07 (UTC)',
-  'Sat, Dec 23, 2023 -- 18:07 (UTC)',
-  'Sat, Dec 23, 2023 -- 19:07 (UTC)',
-  'Sat, Dec 23, 2023 -- 20:07 (UTC)',
-  'Sat, Dec 23, 2023 -- 21:07 (UTC)',
-  'Sat, Dec 23, 2023 -- 22:07 (UTC)',
-  'Sat, Dec 23, 2023 -- 22:47 (UTC)',
-  'Sun, Dec 24, 2023 -- 12:48 (UTC)',
-  'Sun, Dec 24, 2023 -- 13:28 (UTC)',
-  'Sun, Dec 24, 2023 -- 14:08 (UTC)',
-  'Sun, Dec 24, 2023 -- 15:08 (UTC)',
-  'Sun, Dec 24, 2023 -- 16:08 (UTC)',
-  'Sun, Dec 24, 2023 -- 17:08 (UTC)',
-  'Sun, Dec 24, 2023 -- 18:08 (UTC)',
-  'Sun, Dec 24, 2023 -- 19:08 (UTC)',
-  'Sun, Dec 24, 2023 -- 20:08 (UTC)',
-  'Sun, Dec 24, 2023 -- 21:08 (UTC)',
-  'Sun, Dec 24, 2023 -- 22:08 (UTC)',
-  'Sun, Dec 24, 2023 -- 22:48 (UTC)',
-  'Mon, Dec 25, 2023 -- 12:48 (UTC)',
-  'Mon, Dec 25, 2023 -- 13:28 (UTC)',
-  'Mon, Dec 25, 2023 -- 14:08 (UTC)',
-  'Mon, Dec 25, 2023 -- 15:08 (UTC)',
-  'Mon, Dec 25, 2023 -- 16:08 (UTC)',
-  'Mon, Dec 25, 2023 -- 17:08 (UTC)',
-  'Mon, Dec 25, 2023 -- 18:08 (UTC)',
-  'Mon, Dec 25, 2023 -- 19:08 (UTC)',
-  'Mon, Dec 25, 2023 -- 20:08 (UTC)',
-  'Mon, Dec 25, 2023 -- 21:08 (UTC)',
-  'Mon, Dec 25, 2023 -- 22:08 (UTC)',
-  'Mon, Dec 25, 2023 -- 22:48 (UTC)',
-  'Tue, Dec 26, 2023 -- 14:57 (UTC)',
-  'Tue, Dec 26, 2023 -- 15:09 (UTC)',
-  'Tue, Dec 26, 2023 -- 16:09 (UTC)',
-  'Tue, Dec 26, 2023 -- 17:09 (UTC)',
-  'Tue, Dec 26, 2023 -- 18:09 (UTC)',
-  'Tue, Dec 26, 2023 -- 19:09 (UTC)',
-  'Tue, Dec 26, 2023 -- 20:09 (UTC)',
-  'Tue, Dec 26, 2023 -- 21:09 (UTC)',
-  'Tue, Dec 26, 2023 -- 22:09 (UTC)',
-  'Tue, Dec 26, 2023 -- 22:49 (UTC)',
-  'Wed, Dec 27, 2023 -- 12:49 (UTC)',
-  'Wed, Dec 27, 2023 -- 13:29 (UTC)',
-  'Wed, Dec 27, 2023 -- 14:09 (UTC)',
-  'Wed, Dec 27, 2023 -- 15:09 (UTC)',
-  'Wed, Dec 27, 2023 -- 16:09 (UTC)',
-  'Wed, Dec 27, 2023 -- 17:09 (UTC)',
-  'Wed, Dec 27, 2023 -- 18:09 (UTC)',
-  'Wed, Dec 27, 2023 -- 19:09 (UTC)',
-  'Wed, Dec 27, 2023 -- 20:09 (UTC)',
-  'Wed, Dec 27, 2023 -- 21:09 (UTC)',
-  'Wed, Dec 27, 2023 -- 22:09 (UTC)',
-  'Wed, Dec 27, 2023 -- 22:49 (UTC)',
-  'Thu, Dec 28, 2023 -- 12:50 (UTC)',
-  'Thu, Dec 28, 2023 -- 13:30 (UTC)',
-  'Thu, Dec 28, 2023 -- 14:10 (UTC)',
-  'Thu, Dec 28, 2023 -- 15:10 (UTC)',
-  'Thu, Dec 28, 2023 -- 16:10 (UTC)',
-  'Thu, Dec 28, 2023 -- 17:10 (UTC)',
-  'Thu, Dec 28, 2023 -- 18:10 (UTC)',
-  'Thu, Dec 28, 2023 -- 19:10 (UTC)',
-  'Thu, Dec 28, 2023 -- 20:10 (UTC)',
-  'Thu, Dec 28, 2023 -- 21:10 (UTC)',
-  'Thu, Dec 28, 2023 -- 22:10 (UTC)',
-  'Thu, Dec 28, 2023 -- 22:50 (UTC)',
-  'Fri, Dec 29, 2023 -- 12:50 (UTC)',
-  'Fri, Dec 29, 2023 -- 13:30 (UTC)',
-  'Fri, Dec 29, 2023 -- 14:10 (UTC)',
-  'Fri, Dec 29, 2023 -- 15:10 (UTC)',
-  'Fri, Dec 29, 2023 -- 16:10 (UTC)',
-  'Fri, Dec 29, 2023 -- 17:10 (UTC)',
-  'Fri, Dec 29, 2023 -- 18:10 (UTC)',
-  'Fri, Dec 29, 2023 -- 19:10 (UTC)',
-  'Fri, Dec 29, 2023 -- 20:10 (UTC)',
-  'Fri, Dec 29, 2023 -- 21:10 (UTC)',
-  'Fri, Dec 29, 2023 -- 22:10 (UTC)',
-  'Fri, Dec 29, 2023 -- 22:50 (UTC)',
-  'Sat, Dec 30, 2023 -- 12:50 (UTC)',
-  'Sat, Dec 30, 2023 -- 13:31 (UTC)',
-  'Sat, Dec 30, 2023 -- 14:11 (UTC)',
-  'Sat, Dec 30, 2023 -- 15:11 (UTC)',
-  'Sat, Dec 30, 2023 -- 16:11 (UTC)',
-  'Sat, Dec 30, 2023 -- 18:19 (UTC)',
-  'Sat, Dec 30, 2023 -- 19:11 (UTC)',
-  'Sat, Dec 30, 2023 -- 20:11 (UTC)',
-  'Sat, Dec 30, 2023 -- 21:11 (UTC)',
-  'Sat, Dec 30, 2023 -- 22:11 (UTC)',
-  'Sat, Dec 30, 2023 -- 22:51 (UTC)',
+interface TimezoneInfo {
+  tz: string;
+  name: string;
+}
+
+const timestamps = [
+  1698838920000,
+  1698841320000,
+  1698843720000,
+  1698846120000,
+  1698848520000,
+  1698852120000,
+  1698855720000,
+  1698859320000,
+  1698862920000,
+  1698866520000,
+  1698870120000,
+  1698873720000,
+  1698876120000,
+  1698878520000,
+  1698880920000,
+  1699011720000,
+  1699014120000,
+  1699016520000,
+  1699018920000,
+  1699021320000,
+  1699024920000,
+  1699028520000,
+  1699032120000,
+  1699035720000,
+  1699039320000,
+  1699042920000,
+  1699046520000,
+  1699048920000,
+  1699051320000,
+  1699053720000,
+  1711626180000,
+  1711628640000,
+  1711631040000,
+  1711633440000,
+  1711637040000,
+  1711640640000,
+  1711644240000,
+  1711647840000,
+  1711651440000,
+  1711655040000,
+  1711658640000,
+  1711662240000,
+  1711665840000,
+  1711668240000,
 ];
 
 export default defineComponent({
   data() {
     const showSplashScreen = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
-    const bounds = new L.LatLngBounds(
-      new L.LatLng(17.025, -129.975),
-      new L.LatLng(63.975, -54.475)
+    const novDecBounds = new L.LatLngBounds(
+      new L.LatLng(17.025, -154.975),
+      new L.LatLng(63.975, -24.475)
     );
+
     const fieldOfRegardLayer = L.geoJSON(
       fieldOfRegard as GeoJSON.GeometryCollection,
       {
@@ -411,34 +295,40 @@ export default defineComponent({
       accentColor2: "#ffd302",
       buttonColor: "#ffffff",
 
-      tab: 0,
+      radio: 0,
 
       touchscreen: false,
       playInterval: null as Timeout | null,
       map: null as Map | null,
       basemap: null as L.TileLayer.WMS | null,
-      bounds,
-      texasBounds: new L.LatLngBounds(
-        new L.LatLng(25.72, -108.23),
-        new L.LatLng(36.69, -92.9)
-      ),
-      
-      northeastBounds: new L.LatLngBounds(
-        new L.LatLng(40.3, -74.5),
-        new L.LatLng(43.5, -69.6)
+      novDecBounds,
+      marchBounds: new L.LatLngBounds(
+        new L.LatLng(14.01, -167.99),
+        new L.LatLng(72.99, -13.01)
       ),
       fieldOfRegardLayer,
 
+      timezoneOptions: [
+        { tz: 'US/Eastern', name: 'Eastern Daylight' },
+        { tz: 'US/Central', name: 'Central Daylight' },
+        { tz: 'US/Mountain', name: 'Mountain Daylight' },
+        { tz: 'US/Arizona', name: 'Mountain Standard' },
+        { tz: 'US/Pacific', name: 'Pacific Daylight' },
+        { tz: 'US/Alaska', name: 'Alaska Daylight' },
+      ] as TimezoneInfo[],
+      selectedTimezone: "US/Eastern",
+
       timestep: 0,
       timeIndex: 0,
-      maxIndex: datetimes.length,
-      timeValues: [...Array(datetimes.length).keys()],
+      minIndex: 0,
+      maxIndex: 14,
+      timeValues: [...Array(timestamps.length).keys()],
       playing: false,
-      imageOverlay: new L.ImageOverlay("", bounds, {
+      imageOverlay: new L.ImageOverlay("", novDecBounds, {
         opacity: 1,
         interactive: false,
       }),
-      datetimes,
+      timestamps,
 
       searchOpen: true,
       searchErrorMessage: null as string | null,
@@ -456,7 +346,7 @@ export default defineComponent({
 
   mounted() {
     this.showSplashScreen = false;
-    this.map = L.map("map").setView([40, -50], 3, {
+    this.map = L.map("map").setView([40.044, -98.789], 4, {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       crs: L.CRS.EPSG4326
@@ -466,7 +356,6 @@ export default defineComponent({
     this.basemap = new L.TileLayer.WMS('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
       crs: L.CRS.EPSG4326
     }).addTo(this.map as Map);
-    this.map.fitBounds(this.bounds);
 
     const labelPane = this.map.createPane("labels");
     labelPane.style.zIndex = "650";
@@ -533,8 +422,26 @@ export default defineComponent({
         }
       }
     },
+    timestamp(): number {
+      return this.timestamps[this.timeIndex];
+    },
+    date() {
+      return new Date(this.timestamp);
+    },
+    // TODO: Maybe there's a built-in Date function to get this formatting?
+    thumbLabel(): string {
+      const offset = getTimezoneOffset(this.selectedTimezone, this.date);
+      const date = new Date(this.timestamp + offset); 
+      const hours = date.getUTCHours();
+      const amPm = hours >= 12 ? "PM" : "AM";
+      let hourValue = hours % 12;
+      if (hourValue === 0) {
+        hourValue = 12;
+      }
+      return `${this.date.getUTCMonth()+1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${hourValue}:${date.getUTCMinutes().toString().padStart(2, '0')} ${amPm}`;
+    },
     imageUrl(): string {
-      return `https://tempo-demo-images.s3.amazonaws.com/img_${this.timeValues[this.timeIndex]}_cividis_stretch.png`;
+      return `https://tempo-demo-images.s3.amazonaws.com/tempo_${this.date.getUTCFullYear()}-${(this.date.getUTCMonth()+1).toString().padStart(2, '0')}-${this.date.getUTCDate().toString().padStart(2, '0')}T${this.date.getUTCHours()}h${this.date.getUTCMinutes().toString().padStart(2, '0')}m.png`;
     },
   },
 
@@ -542,6 +449,10 @@ export default defineComponent({
     
     cividis(x: number): string {
       return cividis(x);
+    },
+    
+    svs(x: number): string {
+      return svs(x);
     },
     
     blurActiveElement() {
@@ -585,7 +496,7 @@ export default defineComponent({
               // clearInterval(this.playInterval);
               // this.playInterval = null;
               // let it loop
-              this.timeIndex = 0;
+              this.timeIndex = this.minIndex;
             }
           } else {
             this.timeIndex += 1;
@@ -596,6 +507,9 @@ export default defineComponent({
     },
     async geocodingInfoForSearch(searchText: string): Promise<MapBoxFeatureCollection | null> {
       return geocodingInfoForSearch(searchText, { countries: ["US", "CA", "MX", "CU", "BM", "HT", "DO"] }).catch(_err => null);
+    },
+    resetMapBounds() {
+      this.map?.setView([40.044, -98.789], 4);
     }
   },
 
@@ -610,7 +524,16 @@ export default defineComponent({
       } else if (this.map) {
         this.map.removeLayer(this.fieldOfRegardLayer as L.Layer);
       }
-    }  
+    },
+    radio(value: number) {
+      const minIndex = 15 * value;
+      this.minIndex = minIndex;
+      this.maxIndex = Math.min(15 * (value + 1) - 1, this.timestamps.length - 1);
+      this.timeIndex = minIndex;
+      const bounds = value < 2 ? this.novDecBounds : this.marchBounds;
+      this.imageOverlay.setBounds(bounds);
+      this.resetMapBounds();
+    },
   }
 });
 </script>
@@ -696,7 +619,7 @@ body {
   }
   
   #user-options {
-    margin-left: 1rem;
+    margin-left: 1.5rem;
     grid-column: 3 / 4;
     grid-row: 2 / 3;
   }
@@ -723,6 +646,11 @@ body {
   
   #slider-row {
     grid-column: 2 / 3;
+    grid-row: 3 / 4;
+  }
+
+  #timezone-select {
+    grid-column: 3 / 4;
     grid-row: 3 / 4;
   }
   
@@ -815,7 +743,7 @@ body {
   > #map-legend {
     position: absolute;
     top: 0;
-    right: 58px;
+    right: 65px;
     width: fit-content;
     z-index: 1000;
     
@@ -835,16 +763,18 @@ body {
       border: 0.5px solid #c10124;
       width: 3rem;
     }
-    
-
   }
 
   > .colorbar-container {
     flex-grow: 0;
     flex-shrink: 1;
-    
+
     .colorbar-label {
       transform: rotate(180deg) translate(-110%,-50%)
+    }
+
+    .unit-label {
+      font-size: 11pt;
     }
   }
 }

@@ -123,6 +123,9 @@
       </article>
       </div>
       <div id="body-logos">
+        <a class="mr-1" href="https://www.si.edu/" target="_blank" rel="noopener noreferrer"
+        ><img alt="Smithsonian Logo" src="./assets/smithsonian.png"
+         /></a>
         <credit-logos/>
       </div>
     </div>
@@ -1051,6 +1054,8 @@ video {
 }
 
 #body-logos {
+  display: flex;
+  flex-direction: row;
   img {
     height: 35px;
     vertical-align: middle;

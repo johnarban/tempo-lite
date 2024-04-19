@@ -316,7 +316,7 @@ export default defineComponent({
 
   mounted() {
     this.showSplashScreen = false;
-    this.map = L.map("map").setView([40, -50], 3, {
+    this.map = L.map("map").setView([40.044, -98.789], 4, {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       crs: L.CRS.EPSG4326
@@ -326,7 +326,6 @@ export default defineComponent({
     this.basemap = new L.TileLayer.WMS('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
       crs: L.CRS.EPSG4326
     }).addTo(this.map as Map);
-    this.map.fitBounds(this.novDecBounds);
 
     const labelPane = this.map.createPane("labels");
     labelPane.style.zIndex = "650";
@@ -474,6 +473,9 @@ export default defineComponent({
     },
     async geocodingInfoForSearch(searchText: string): Promise<MapBoxFeatureCollection | null> {
       return geocodingInfoForSearch(searchText, { countries: ["US", "CA", "MX", "CU", "BM", "HT", "DO"] }).catch(_err => null);
+    },
+    resetMapBounds() {
+      this.map?.setView([40.044, -98.789], 4);
     }
   },
 
@@ -495,8 +497,8 @@ export default defineComponent({
       this.maxIndex = Math.min(15 * (value + 1) - 1, this.timestamps.length - 1);
       this.timeIndex = minIndex;
       const bounds = value < 2 ? this.novDecBounds : this.marchBounds;
-      this.map?.fitBounds(bounds);
       this.imageOverlay.setBounds(bounds);
+      this.resetMapBounds();
     },
   }
 });

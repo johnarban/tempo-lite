@@ -113,8 +113,6 @@
           />       
         </div>
       </div>
-
-
   
       <div id="information">
       <article>
@@ -123,6 +121,9 @@
           TEMPO, a collaboration between the Smithsonian and NASA, is the first space-based probe to measure air pollution hourly over North America at neighborhood scales. NO<sub>2</sub> (nitrogen dioxide) is one of the pollutants detected by TEMPO. It is produced by wildfires and the burning of fossil fuels. NO<sub>2</sub> contributes to the formation of harmful ground-level ozone and toxic particulates in the air we breathe.
         </p>
       </article>
+      </div>
+      <div id="body-logos">
+        <credit-logos/>
       </div>
     </div>
 
@@ -698,8 +699,15 @@ body {
   }
   
   #information {
-    grid-column: 2 / 4;
+    grid-column: 2 / 3;
     grid-row: 4 / 5;
+  }
+
+  #body-logos { 
+    grid-column: 3 / 4;
+    grid-row: 4 / 5;
+    align-self: end;
+    justify-self: end;
   }
   
   
@@ -1040,4 +1048,17 @@ video {
 #control-checkboxes {
   margin-top: 0.5em;
 }
+
+#body-logos {
+  img {
+    height: 35px;
+    vertical-align: middle;
+    margin: 2px;
+  }
+}
+
+#icons-container > a[href="https://worldwidetelescope.org/home/"] {
+  display: none;
+}
+
 </style>

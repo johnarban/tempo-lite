@@ -254,7 +254,7 @@ export default defineComponent({
     background-color: transparent !important;
   }
 
-  .v-label.v-field-label {
+  .v-label.v-field-label:not(.text-white) {
     font-size: 1.2rem;
   }
 

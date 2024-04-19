@@ -18,7 +18,7 @@
       <div id="where" class="big-label">where</div>
       <div id="map-container">
         <div id="map"></div>
-        <div id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
+        <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
         <colorbar 
           label="Amount of NO2"
           backgroundColor="transparent"
@@ -41,11 +41,6 @@
       </div>
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
-        <icon-button
-          v-if="false"
-          :fa-icon="playing ? 'pause' : 'play'"
-          @activate="playOrPause"
-        ></icon-button>
           <v-slider
             v-model="timeIndex"
             :min="0"
@@ -63,6 +58,12 @@
               </div>
             </template>
           </v-slider>
+          <icon-button
+            id="play-pause"
+            :fa-icon="playing ? 'pause' : 'play'"
+            fa-size="sm"
+            @activate="playOrPause"
+          ></icon-button>
         </div>
       
       <div id="user-options">
@@ -107,8 +108,8 @@
             v-model="showFieldOfRegard"
             @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
             label="TEMPO Field of Regard"
+            color="#c10124"
             hide-details
-            density="compact"
           />       
         </div>
       </div>
@@ -361,7 +362,7 @@ export default defineComponent({
       fieldOfRegard as GeoJSON.GeometryCollection,
       {
         style: {
-          color: "red",
+          color: "#c10124",
           fillColor: "transparent",
           weight: 1,
           opacity: 0.8,
@@ -375,7 +376,8 @@ export default defineComponent({
       layersLoaded: false,
       positionSet: false,
       
-      accentColor: "#ffffff",
+      accentColor: "#068ede",
+      accentColor2: "#ffd302",
       buttonColor: "#ffffff",
 
       tab: 0,
@@ -469,6 +471,7 @@ export default defineComponent({
     cssVars() {
       return {
         '--accent-color': this.accentColor,
+        '--accent-color-2': this.accentColor2,
         '--app-content-height': this.showTextSheet ? '66%' : '100%',
       };
     },
@@ -548,8 +551,10 @@ export default defineComponent({
         this.playInterval = setInterval(() => {
           if (this.timeIndex >= this.maxIndex) {
             if (this.playInterval) {
-              clearInterval(this.playInterval);
-              this.playInterval = null;
+              // clearInterval(this.playInterval);
+              // this.playInterval = null;
+              // let it loop
+              this.timeIndex = 0;
             }
           } else {
             this.timeIndex += 1;
@@ -728,8 +733,9 @@ body {
 
 
 .big-label {
-  font-size: 40px;
+  font-size: 2rem;
   text-align: right;
+  margin-right: 0.5rem;
   align-self: end;
   color: var(--smithsonian-blue);
 }
@@ -739,7 +745,7 @@ body {
 }
 
 #slider-row, #when {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
 #map-container {
@@ -782,7 +788,7 @@ body {
     
     hr.line-legend {
       display: inline-block;
-      border: 0.5px solid red;
+      border: 0.5px solid #c10124;
       width: 3rem;
     }
     
@@ -802,7 +808,20 @@ body {
 #slider-row {
   display: flex;
   flex-direction: row;
-  padding-left: 1rem;
+  padding-left: 0;
+  
+  > #play-pause-button {
+    height: fit-content;
+    align-self: center;
+    padding-inline: 0.5em;
+    width: 2.5rem;
+    color: var(--accent-color);
+    border: 2px solid var(--accent-color);
+  }
+
+  .icon-wrapper {
+    padding-inline: 0.5em !important;
+  }
 }
 
 #splash-overlay {
@@ -988,15 +1007,14 @@ video {
 }
 
 .v-slider-thumb__label {
-  background-color: #ffd302;
-  border: 0.25rem solid #068ede;
+  background-color: var(--accent-color-2);
+  border: 0.25rem solid var(--accent-color);
   width: max-content;
   height: 2.5rem;
   font-size: 1rem;
 
-
   &::before {
-    color: #068ede;
+    color: var(--accent-color);
   }
 }
 
@@ -1018,6 +1036,6 @@ video {
 }
 
 #control-checkboxes {
-  margin-top: 1em;
+  margin-top: 0.5em;
 }
 </style>

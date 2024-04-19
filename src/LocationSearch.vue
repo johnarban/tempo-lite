@@ -245,6 +245,8 @@ export default defineComponent({
   color: var(--accent-color);
   background-color: rgba(255, 255, 255, 0.4);
   border-radius: var(--border-radius);
+  margin-left: 0.25rem;
+  margin-bottom: 0.25rem;
   padding: var(--fg-container-padding);
   backdrop-filter: blur(2px);
 

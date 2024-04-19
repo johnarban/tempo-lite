@@ -288,8 +288,8 @@ export default defineComponent({
     ) as L.Layer;
 
     const locationsOfInterest = [
-      [],  // Nov 1
-      [],  // Nov 3
+      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic + Wildfires", index: 3}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: 3}],  // Nov 1
+      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic + Wildfires (SE of Sacramento)", index: 18}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: 15}],  // Nov 3
       [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Urban + Transport Pollution; Wildfires in NE", index: 31}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Wildfires", index: 36}],  // Mar 28
     ] as LocationOfInterest[][];
 

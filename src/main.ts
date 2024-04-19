@@ -17,6 +17,7 @@ import {
   faVideo,
   faMagnifyingGlass,
   faCircleXmark,
+  faSquareXmark,
   faHome,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -27,6 +28,7 @@ library.add(faTimes);
 library.add(faVideo);
 library.add(faMagnifyingGlass);
 library.add(faCircleXmark);
+library.add(faSquareXmark);
 library.add(faHome);
 
 
@@ -58,7 +60,7 @@ createApp(TempoLite, {})
   // Components
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('icon-button', IconButton)
-  .component('funding-acknowledgement', FundingAcknowledgment)
+  .component('funding-acknowledgment', FundingAcknowledgment)
   .component('credit-logos', CreditLogos)
   .component('colorbar', Colorbar)
   .component('location-search', LocationSearch)

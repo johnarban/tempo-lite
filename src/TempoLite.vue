@@ -113,7 +113,7 @@
         <hr style="border-color: grey;">
         
         <div id="locations-of-interest">
-          <h3>Locations</h3>
+          <h3 class="mb-1">Locations</h3>
           <v-radio-group
             v-model="sublocationRadio"
             row
@@ -145,6 +145,59 @@
         <h2>TEMPO NO<sub>2</sub> Data</h2>
         <p>
           TEMPO, a collaboration between the Smithsonian and NASA, is the first space-based probe to measure air pollution hourly over North America at neighborhood scales. NO<sub>2</sub> (nitrogen dioxide) is one of the pollutants detected by TEMPO. It is produced by wildfires and the burning of fossil fuels. NO<sub>2</sub> contributes to the formation of harmful ground-level ozone and toxic particulates in the air we breathe.
+        </p>
+        <p>
+          <a id="credits-link">
+            Credits
+            <v-dialog
+              id="credits-dialog"
+              v-model="showCredits"
+              activator="parent"
+              :scrim="false"
+              location="center center"
+            >
+              <v-card class="dialog-card">
+                <font-awesome-icon
+                    style="position:absolute;right:16px;cursor:pointer;padding:0.5em;margin:-0.5em"
+                    icon="square-xmark"
+                    size="xl"
+                    @click="showCredits = false"
+                    @keyup.enter="showCredits = false"
+                    :color="accentColor2"
+                    tabindex="0"
+                  ></font-awesome-icon>
+                <v-card-title tabindex="0"><h3>Credits</h3></v-card-title>
+                <v-card-text>
+                  <h4 class="mb-2"><a href="https://tempo.si.edu/" target="_blank" rel="noopener noreferrer">TEMPO</a> Team Acknowledgments:</h4>
+                  <p>
+                    Caroline Nowlan, Aaron Naeger, and Erika Wright provided dates and locations for events of interest in the TEMPO data.
+                  </p>
+                  <p>
+                    Xiong Liu provided the L3 version 2 TEMPO data files.
+                  </p>
+                  <p>
+                    Heesung Chong provided the shape file for the TEMPO field of regard.
+                  </p>
+
+                  <p class="my-3">NASA's Scientific Visualization Studio provided the TEMPO NO<sub>2</sub> colormap.</p>
+
+                  <h4 class="mb-2"><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Team:</h4> 
+
+                  Jonathan Foster<br>
+                  Jon Carifio<br>
+                  John Lewis<br>
+                  Pat Udomprasert<br>
+                  Alyssa Goodman<br>
+                  Erika Wright<br>
+                  Mary Dussault<br>
+                  Harry Houghton<br>
+                  Evaluator: Sue Sunbury<br>
+
+                  <funding-acknowledgment class="my-3"></funding-acknowledgment>
+                </v-card-text>
+              </v-card>
+            </v-dialog>
+          </a>
         </p>
       </article>
       </div>
@@ -346,6 +399,7 @@ export default defineComponent({
 
       showControls: true,
       showFieldOfRegard: true,
+      showCredits: false,
     };
   },
 
@@ -601,16 +655,21 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: auto;
 
   font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: #068ede;
 }
 
 #main-content {
   position: fixed;
   width: 100%;
   height: var(--app-content-height);
-  overflow: hidden;
+  overflow: auto;
   transition: height 0.1s ease-in-out;
 }
 
@@ -634,7 +693,7 @@ body {
   
   display: grid;
   grid-template-columns: .08fr .8fr .3fr;
-  grid-template-rows: 50px auto auto auto;
+  grid-template-rows: 50px var(--map-height) 78px 1fr;
   gap: 20px 10px;
   
   > * {
@@ -683,6 +742,7 @@ body {
   }
   
   #information {
+    padding: 1rem;
     grid-column: 2 / 3;
     grid-row: 4 / 5;
   }
@@ -719,18 +779,53 @@ body {
 #information {
   background-color: var(--info-background);
   border-radius: 10px;
-  padding: 1rem;
-  margin-top: 1rem;
+  padding-inline: 1rem;
+  // margin-right: 200px;
 }
 
+#credits-link {
+  text-decoration: underline;
+  font-weight: bold;
+  color: var(--accent-color-2);
+}
+
+.v-dialog > .v-overlay__content > .v-card {
+  padding: 1rem;
+}
+
+.v-overlay__content {
+    align-self: center;
+    margin: unset;
+  }
+
+  .v-card-text {
+    height: 40vh;
+  }
+
+#credits-dialog {
+  display: flex;
+  width: calc(100% - 1rem);
+}
+
+.dialog-card {
+  align-self: center;
+  max-width: 80%;
+}
+
+// prevent overflows of the content
+#user-options {
+  display: grid;
+}
 
 #date-radio {
-  padding-bottom: 1rem;
+  padding-bottom: 0.5rem;
 }
 
 #locations-of-interest {
   border: 1px solid black;
-  padding: 1rem;
+  padding-block: 0.5rem;
+  padding-inline: 1rem;
+  overflow-y: scroll;
 
   h3 {
     font-weight: 500;
@@ -932,79 +1027,6 @@ video {
   overflow: hidden;
   padding: 0px;
   z-index: 10;
-}
-
-.bottom-sheet {
-  .v-overlay__content {
-    align-self: flex-end;
-    padding: 0;
-    margin: 0;
-    max-width: 100%;
-    height: 34%;
-  }
-
-  #tabs {
-    width: calc(100% - 3em);
-    align-self: left;
-  }
-  
-  .info-text {
-    height: 33vh;
-    padding-bottom: 25px;
-  
-    & a {
-      text-decoration: none;
-    }
-  }
-  
-  .close-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 15;
-  
-    &:hover {
-      cursor: pointer;
-    }
-  
-    &:focus {
-      color: white;
-      border: 2px solid white;
-    }
-  }
-  
-  .scrollable {
-    overflow-y: auto;
-  }
-  
-  #tab-items {
-    // padding-bottom: 2px !important;
-  
-    .v-card-text {
-      font-size: ~"max(14px, calc(0.7em + 0.3vw))";
-      padding-top: ~"max(2vw, 16px)";
-      padding-left: ~"max(4vw, 16px)";
-      padding-right: ~"max(4vw, 16px)";
-  
-      .end-spacer {
-        height: 25px;
-      }
-    }
-  
-  }
-  
-  #close-text-icon {
-    position: absolute;
-    top: 0.25em;
-    right: calc((3em - 0.6875em) / 3); // font-awesome-icons have width 0.6875em
-    color: white;
-  }
-
-  // This prevents the tabs from having some extra space to the left when the screen is small
-  // (around 400px or less)
-  .v-tabs:not(.v-tabs--vertical).v-tabs--right>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__next, .v-tabs:not(.v-tabs--vertical):not(.v-tabs--right)>.v-slide-group--is-overflowing.v-tabs-bar--is-mobile:not(.v-slide-group--has-affixes) .v-slide-group__prev {
-    display: none;
-  }
 }
 
 .v-slider-thumb__surface::after {

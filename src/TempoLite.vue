@@ -113,7 +113,7 @@
         <hr style="border-color: grey;">
         
         <div id="locations-of-interest">
-          <h3 class="mb-1">Locations</h3>
+          <h3 class="mb-1">Locations for {{ radio==0 ? 'Nov 1' : radio==1 ? 'Nov 3' : 'Mar 28' }}</h3>
           <v-radio-group
             v-model="sublocationRadio"
             row

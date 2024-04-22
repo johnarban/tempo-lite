@@ -418,7 +418,13 @@ export default defineComponent({
     });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    L.Control.zoomHome().addTo(this.map);
+    const zoomHome = L.Control.zoomHome();
+    const originalZH = zoomHome._zoomHome.bind(zoomHome);
+    zoomHome._zoomHome = (_e: Event) => {
+      originalZH();
+      this.sublocationRadio = null;
+    };
+    zoomHome.addTo(this.map);
     this.addCoastlines();
 
     this.basemap = new L.TileLayer.WMS('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {

@@ -25,16 +25,16 @@
         <colorbar 
           label="Amount of NO2"
           backgroundColor="transparent"
-          :nsteps="10"
-          :cmap="svs"
+          :nsteps="255"
+          :cmap="cbarNO2"
           start-value="1"
           end-value="150"
+          :extend="true"
           >
           <template v-slot:label>
               <div style="text-align: center;">Amount of NO&#x2082;<br><span class="unit-label">(10&sup1;&#x2074; molecules/cm&sup2;)</span></div>
           </template>
         </colorbar>
-
         <location-search
           v-model="searchOpen"
           small
@@ -254,6 +254,7 @@ import "leaflet.zoomhome";
 import { getTimezoneOffset } from "date-fns-tz";
 import  { cividis } from "./cividis";
 import  { svs } from "./svs_cmap";
+import { cbarNO2, cbarNO2ColorsRevised2023 } from "./revised_cmap";
 import fieldOfRegard from "./assets/TEMPO_FOR.json";
 // We DO use MapBoxFeature in the template, but eslint isn't picking this up for some reason
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -527,6 +528,16 @@ export default defineComponent({
     
     svs(x: number): string {
       return svs(x);
+    },
+    
+    cbarNO2(x: number): string {
+      const rgb = cbarNO2(0, 1, x);
+      return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]},1)`;
+    },
+    
+    cbarNO2ColorsRevised2023(x: number): string {
+      const rgb = cbarNO2ColorsRevised2023(0, 1, x);
+      return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]},1)`;
     },
     
     blurActiveElement() {

@@ -22,6 +22,7 @@ import { defineComponent, PropType } from 'vue';
 
 // type for a function that maps to either a  (color, opacity) pair or just a color
 type ColorFunction = (x: number) => string;
+type ExtendType = boolean | 'start' | 'end' | 'both';
 
 export default defineComponent({
   name: 'ColorBar',
@@ -51,11 +52,6 @@ export default defineComponent({
       default: '#5c5229'
     },
     
-    triangles: {
-      type: Boolean,
-      default: true
-    },
-    
     startValue: {
       type: String,
       default: '0%'
@@ -64,6 +60,11 @@ export default defineComponent({
     endValue: {
       type: String,
       default: '100%'
+    },
+    
+    extend: {
+      type: (Boolean || String) as PropType<ExtendType>,
+      default: () => 'both'
     }
     
   },
@@ -76,6 +77,18 @@ export default defineComponent({
   computed: {
     id() {
       return this.name ? `colorbar-${this.name}` : `colorbar-${Math.random().toString(36).slice(2)}`;
+    },
+    
+    triangles() {
+      return this.extend !== false;
+    },
+    
+    showStartTriangle() {
+      return this.extend === 'both' || this.extend === 'start' || this.extend;
+    },
+    
+    showEndTriangle() {
+      return this.extend === 'both' || this.extend === 'end' || this.extend;
     }
   },
   
@@ -118,11 +131,11 @@ export default defineComponent({
         colorbar.appendChild(div);
         colorbar.appendChild(start);
       
-        if (start) {
+        if (start && this.showStartTriangle) {
           start.style.backgroundColor = this.cmap(0);
           this.styleDownTriangle(start as HTMLDivElement);
         }
-        if (end) {
+        if (end && this.showEndTriangle) {
           end.style.backgroundColor = this.cmap(1);
           this.styleUpTriangle(end as HTMLDivElement);
         }

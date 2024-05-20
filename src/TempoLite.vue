@@ -3,10 +3,107 @@
   id="app"
   :style="cssVars"
 >
+<v-overlay
+  :model-value="inIntro"
+  :style="cssVars"
+  id="intro-background"
+>
+
+<v-dialog 
+  v-model="inIntro"
+        >
+        <div v-if="inIntro" id="introduction-overlay" class="elevation-10 gradient-background">
+          <v-window v-model="introSlide">
+            <template v-slot:additional>
+              <div id="intro-window-close-button">
+              <font-awesome-icon
+                size="xl"
+                class="ma-1"
+                color="#b3d5e6"
+                icon='square-xmark'
+                @click="inIntro = !inIntro"
+                @keyup.enter="inIntro = !inIntro"
+                tabindex="0"
+                tooltip-location="start"
+              /> 
+            </div>
+            </template>
+            <v-window-item :value="1">
+              <div class="intro-text">
+                <p class="mb-5">
+                  The TEMPO satellite mission (Tropospheric Emissions: Monitoring Pollution), launched in April 2023, is the first space-based instrument to monitor major air pollutants across the North American continent every daylight hour at high spatial resolution. A collaboration between NASA and the Smithsonian Astrophysical Observatory, the TEMPO instrument gathers hourly daytime scans of the atmosphere over North America from the Atlantic Ocean to the Pacific Coast and from roughly Mexico City to central Canada.
+                </p>
+              </div>
+            </v-window-item>
+            
+            <v-window-item :value="2">
+              <div class="intro-text mb-3">
+                <p class="mb-3">
+                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO<sub>2</sub>) data from several different dates. NO<sub>2</sub> is produced by the burning of fossil fuels – for example from vehicles, power plants, manufacturing sites, oil refineries, and wildfires. For each date, you can see the scans beginning on the East Coast in the morning, and ending on the West Coast as the Sun sets.
+                </p> 
+              </div>
+            </v-window-item>
+            <v-window-item :value="3">
+              <div class="intro-text mb-3">      
+                <p class="mb-3">
+                  In this interactive page you can:
+                </p>
+                <ul>
+                  <li>
+                    Select a date and press the “Play” button or scroll the time slider to view the changing concentrations of NO<sub>2</sub> over North America on those dates. 
+                  </li>
+                  <li>
+                    Press the “Info” button next to each Featured Date to get an overview of what to look for on that date
+                  </li>
+                  <li>
+                    For each date, select one of two zoomed-in Locations to investigate specific pollution events.
+                  </li>
+                  <li>
+                    You can use the “Timezone” setting to investigate how pollution evolves over the day, for example as rush hour progresses in large cities.
+                  </li>
+                </ul>
+                <!-- add do not show introduction again button -->
+                <v-checkbox
+                  v-model="dontShowIntro"
+                  @keyup.enter="dontShowIntro = !dontShowIntro"
+                  label="Don't show this introduction again"
+                  color="#c10124"
+                  hide-details
+                />
+              </div>
+            </v-window-item>
+          </v-window>
+
+          <div id="intro-bottom-controls">
+            <div>
+              <v-btn
+                v-if="(introSlide > 1)"
+                id="intro-next-button"
+                :color="accentColor"
+                @click="introSlide--"
+                @keyup.enter="introSlide--"
+                elevation="0"
+                >
+                Back
+              </v-btn>
+            </div>
+            
+            <v-btn
+              id="intro-next-button"
+              :color="accentColor"
+              @click="introSlide++"
+              @keyup.enter="introSlide++"
+              elevation="0"
+              >
+              {{ introSlide < 3 ? 'Next' : 'Get Started' }}
+            </v-btn>
+          </div>
+        </div>
+      </v-dialog>
+    </v-overlay>
   <div
     id="main-content"
-  >
-    
+  > 
     <div class="content-with-sidebars">
       <!-- tempo logo -->
       <a href="https://tempo.si.edu" target="_blank" rel="noopener noreferrer" >
@@ -17,7 +114,7 @@
       >
       </a>
 
-      <h1 id="title">How much NO<sub>2</sub>&hellip;</h1>
+      <h1 id="title">What is in the Air You Breathe?</h1>
       <div id="where" class="big-label">where</div>
       <div id="map-container">
         <div id="map"></div>
@@ -95,18 +192,51 @@
             v-model="radio"
             row
           >
-            <v-radio
-              label="November 1, 2023"
-              :value="0"
-            ></v-radio>
-            <v-radio
-              label="November 3, 2023"
-              :value="1"
-            ></v-radio>
-            <v-radio
-              label="March 28, 2024"
-              :value="2"
-            ></v-radio>
+            <div class="d-flex flex-row align-center">
+              <v-radio
+                label="November 1, 2023"
+                :value="0"
+              >
+              </v-radio>
+              <info-button>
+                <p>
+                  Because the TEMPO instrument measures sunlight reflected and scattered from Earth’s 
+                surface and atmosphere, it can’t “see” through the clouds&mdash;so these
+                areas appear blank on the map.
+                </p>
+                <p>
+                  But right away you’ll see that there 
+                are high concentrations of NO<sub>2</sub> around many urban centers, 
+                and sometimes along major highways.
+                </p>
+              </info-button>
+            </div>
+            <div class="d-flex flex-row align-center">
+              <v-radio
+                label="November 3, 2023"
+                :value="1"
+              ></v-radio>
+              <info-button>
+                Levels of NO<sub>2</sub> change quickly from day to day, 
+                and even from hour to hour as wind transports 
+                plumes of pollution.
+              </info-button>
+            </div>
+            <div class="d-flex flex-row align-center">
+              <v-radio
+                label="March 28, 2024"
+                :value="2"
+              ></v-radio>
+              <info-button>
+                Breathing air with a high concentration of NO<sub>2</sub>, 
+                and the resulting smog it forms when it reacts with other pollutants, 
+                can irritate human respiratory systems. 
+                People with asthma, as well as children and the elderly, 
+                are generally at greater risk for the health effects of air pollution. 
+                TEMPO data can help communities make informed 
+                decisions and take action to improve air quality.
+              </info-button>
+            </div>
           </v-radio-group>
         </div>
 
@@ -118,12 +248,19 @@
             v-model="sublocationRadio"
             row
           >
+          <div
+            v-for="(loi, index) in locationsOfInterest[radio]" 
+            v-bind:key="index" 
+            class="sublocation-radio-wrapper d-flex flex-row align-center space-between">
             <v-radio
-              v-for="(loi, index) in locationsOfInterest[radio]"
-              v-bind:key="index"
+              class="sublocation-radio"
               :label="loi.text"
               :value="index"
             ></v-radio>
+            <info-button>
+              <p v-html="locationsOfInterestText[radio][index]"></p>
+            </info-button>
+          </div>
           </v-radio-group>
         </div>
 
@@ -144,10 +281,12 @@
       <article>
         <h2>TEMPO NO<sub>2</sub> Data</h2>
         <p>
-          TEMPO, a collaboration between the Smithsonian and NASA, is the first space-based probe to measure air pollution hourly over North America at neighborhood scales. NO<sub>2</sub> (nitrogen dioxide) is one of the pollutants detected by TEMPO. It is produced by wildfires and the burning of fossil fuels. NO<sub>2</sub> contributes to the formation of harmful ground-level ozone and toxic particulates in the air we breathe.
+          <a href="https://tempo.si.edu" target="_blank" rel="noopener noreferrer" >
+          TEMPO</a>, a collaboration between the Smithsonian and NASA, is the first space-based probe to measure air pollution hourly over North America at neighborhood scales. NO<sub>2</sub> (nitrogen dioxide) is one of the pollutants detected by TEMPO. It is produced by wildfires and the burning of fossil fuels. NO<sub>2</sub> contributes to the formation of harmful ground-level ozone and toxic particulates in the air we breathe.
         </p>
-        <p>
-          <a id="credits-link">
+
+          <div class="d-flex flex-row justify-space-between">
+          <a>
             Credits
             <v-dialog
               id="credits-dialog"
@@ -198,7 +337,12 @@
               </v-card>
             </v-dialog>
           </a>
-        </p>
+          <!-- make small inline show introduction link button -->
+          <a href="#" @click="inIntro = true" @keyup.enter="inIntro = true" style="right: 0;">
+            Show Introduction
+          </a>
+        </div>
+
       </article>
       </div>
       <div id="body-logos">
@@ -208,41 +352,6 @@
         <credit-logos/>
       </div>
     </div>
-
-    
-
-    <!-- This contains the splash screen content -->
-
-    <v-overlay
-      :model-value="showSplashScreen"
-      absolute
-      opacity="0.6"
-      :style="cssVars"
-      id="splash-overlay"
-    >
-      <div
-        id="splash-screen"
-        v-click-outside="closeSplashScreen"
-        :style="cssVars"
-      >
-        <div
-          id="close-splash-button"
-          @click="closeSplashScreen"
-          >&times;
-        </div>
-        <div id="splash-screen-text">
-          <p>Splash Screen Content</p>
-        </div>
-        <div id="splash-screen-acknowledgements" class="small">
-          This Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a>.
-          
-          <div id="splash-screen-logos">
-            <credit-logos logo-size="5vmin"/>
-          </div>
-        </div>
-      </div>
-    </v-overlay>
-
   </div>
 </v-app>
 </template>
@@ -321,6 +430,8 @@ interface LocationOfInterest {
   index: number;
 }
 
+const WINDOW_DONTSHOWINTRO = window.localStorage.getItem("dontShowIntro") === 'true';
+
 export default defineComponent({
   data() {
     const showSplashScreen = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
@@ -342,11 +453,25 @@ export default defineComponent({
     ) as L.Layer;
 
     const locationsOfInterest = [
-      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic + Wildfires", index: 4}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: 4}],  // Nov 1
-      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic + Wildfires (SE of Sacramento)", index: 19}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: 16}],  // Nov 3
-      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Urban + Transport Pollution; Wildfires in NE", index: 32}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Wildfires", index: 36}],  // Mar 28
+      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: 4}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: 4}],  // Nov 1
+      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: 19}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: 16}],  // Nov 3
+      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Oil and Gas Production", index: 32}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Fires", index: 36}],  // Mar 28
     ] as LocationOfInterest[][];
-
+    
+    const locationsOfInterestText = [
+      [
+        '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly. As the smoke from the fires builds up, it becomes so thick that it becomes difficult for the TEMPO instrument to &lsquo;see through.&rsquo; </p>', 
+        '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
+      ],  // Nov 1
+      [
+        '<p>Los Angeles clearly stands out. NO<sub>2</sub> values are even higher than the maximum of our color bar. You can clearly see the highways including Route 10 between San Bernardino and Mexicali and Route 15 leading from San Bernardino towards Las Vegas. A significant amount of NO<sub>2</sub> in California&rsquo;s central valley is a byproduct of agricultural activity there. Excess fertilizer in the soil gets broken down by microbes to produce nitrogen oxides which are very reactive. Emissions that don&rsquo;t come from combustion are typically much harder to see, but the Central Valley is an area where TEMPO data reveal this agricultural source of pollution.</p>',
+        '<p>Air pollution is often transported, or moved, over great distances. In this data set large plumes can be seen over the Northeast. If you look closely you can see that many of these plumes appear to originate out of cities in the midwest including Nashville, St. Louis, and Memphis.</p>'
+      ],  // Nov 3
+      [
+        '<p>The Permian basin, near Odessa, has two large plumes of NO2. This is the largest oil and gas producing area in the USA. You can also see here how pollution from a source in one state (Texas) can be transported across state lines to New Mexico.</p>',
+        '<p>Two fires can be seen popping up south and east of Alexandria. These are most easily identified as hot spots of NO2 that appear quickly. As the smoke from the fires build up it becomes so thick that it becomes difficult for the TEMPO instrument to &lsquo;see through.&rsquo;</p>'
+      ],  // Mar 28
+    ];
     return {
       showSplashScreen,
       sheet: null as SheetType,
@@ -356,6 +481,11 @@ export default defineComponent({
       accentColor: "#068ede",
       accentColor2: "#ffd302",
       buttonColor: "#ffffff",
+      introSlide: 1,
+      
+
+      inIntro: !WINDOW_DONTSHOWINTRO,
+      dontShowIntro: WINDOW_DONTSHOWINTRO,
 
       radio: 0,
       sublocationRadio: null as number | null,
@@ -371,6 +501,7 @@ export default defineComponent({
       ),
       fieldOfRegardLayer,
       locationsOfInterest,
+      locationsOfInterestText,
 
       timezoneOptions: [
         { tz: 'US/Eastern', name: 'Eastern Daylight' },
@@ -484,6 +615,7 @@ export default defineComponent({
         this.selectSheet('text');
       }
     },
+
     showVideoSheet: {
       get(): boolean {
         return this.sheet === "video";
@@ -587,6 +719,20 @@ export default defineComponent({
   },
 
   watch: {
+
+    introSlide(val: number) {
+      this.inIntro = val < 4;
+      return;
+    },
+    
+    dontShowIntro(val: boolean) {
+      window.localStorage.setItem("dontShowIntro", val.toString());
+      if (!val) {
+        this.inIntro = true;
+      }
+    },
+    
+
     playing(play: boolean) {
       if (play) {
         this.play();
@@ -634,7 +780,8 @@ export default defineComponent({
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
 
 :root {
-  --default-font-size: clamp(0.7rem, min(1.7vh, 1.7vw), 1.1rem);
+  font-size: clamp(0.7rem, min(1.7vh, 1.7vw), 1.1rem);
+  --default-font-size: 1em;
   --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem);
   --smithsonian-blue: #009ade;
   --smithsonian-yellow: #ffcc33;
@@ -667,7 +814,106 @@ body {
 
 a {
   text-decoration: none;
-  color: #068ede;
+  color: var(--smithsonian-yellow);
+}
+
+ul {
+  margin-left: 1rem;
+}
+
+#intro-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.7); 
+  z-index: 100;
+}
+
+.gradient-background {
+    // rotated translucent background gradient
+    background: linear-gradient(45deg,
+                              rgb(14, 30, 40), 
+                              rgb(22, 50, 65), 
+                              rgb(30 70 90));
+  }
+
+#introduction-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  height: fit-content;
+  // outline: 5px solid var(--accent-color);
+  border-radius: 1em;
+  z-index: 1000;
+
+  @media (max-width: 700px) {
+    width: 95%;
+    padding: 1em;
+  }
+
+  @media (min-width: 701px) {
+    width: 75%;
+    padding: 2em;
+  }
+
+  .span-accent {
+    color: var(--accent-color);
+  }
+
+
+  
+  //font-size: calc(1.1 * var(--default-font-size));
+  // line-height: var(--default-line-height);
+
+  .v-list-item {
+    color: #eee;
+  }
+  
+  .intro-text {
+    color: white;
+    font-size: 1em;
+    line-height: 1.5em;
+  }
+  
+  strong {
+    color: white;
+  }
+  
+  div#intro-bottom-controls {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 1em;
+    margin-top:0.5em;
+
+    .v-btn.v-btn--density-default {
+        max-height: calc(1.6 * var(--default-line-height));
+      }  
+
+    .v-btn--size-default {
+      font-size: calc(0.9 * var(--default-font-size));
+    }    
+    
+    #intro-next-button {
+      background-color: rgba(18, 18, 18,.5);
+    }
+  }
+}
+
+#intro-window-close-button {
+    position: absolute;
+    top: 0.25em;
+    right: 0.25em;
+
+    &:hover {
+      cursor: pointer;
+    }
 }
 
 #main-content {
@@ -710,6 +956,7 @@ a {
   }
   
   #user-options {
+    min-width: 200px;
     margin-left: 1.5rem;
     grid-column: 3 / 4;
     grid-row: 2 / 3;
@@ -788,7 +1035,7 @@ a {
   // margin-right: 200px;
 }
 
-#credits-link {
+a {
   text-decoration: underline;
   font-weight: bold;
   color: var(--accent-color-2);
@@ -830,7 +1077,7 @@ a {
   border: 1px solid black;
   padding-block: 0.5rem;
   padding-inline: 1rem;
-  overflow-y: scroll;
+  height: fit-content;
 
   h3 {
     font-weight: 500;
@@ -932,107 +1179,6 @@ a {
   }
 }
 
-#splash-overlay {
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-#splash-screen {
-  color: #FFFFFF;
-  background-color: #000000;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  align-content: center;
-  justify-content: space-around;
-
-  font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
-  font-size: min(8vw, 7vh);
-
-  border-radius: 10%;
-  border: min(1.2vw, 0.9vh) solid var(--accent-color);
-  overflow: auto;
-  padding-top: 4rem;
-  padding-bottom: 1rem;
-
-  @media (max-width: 699px) {
-    max-height: 80vh;
-    max-width: 90vw;
-  }
-
-  @media (min-width: 700px) {
-    max-height: 85vh;
-    max-width: min(70vw, 800px);
-  }
-
-  div {
-    margin-inline: auto;
-    text-align: center;
-  }
-
-  .small {
-    font-size: var(--default-font-size);
-    font-weight: bold;
-  }
-
-  #close-splash-button {
-    position: absolute;
-    top: 0.5rem;
-    right: 1.75rem;
-    text-align: end;
-    color: var(--accent-color);
-    font-size: min(8vw, 5vh);
-
-    &:hover {
-      cursor: pointer;
-    }
-  }
-}
-
-.video-wrapper {
-  height: 100%;
-  background: black;
-  text-align: center;
-  z-index: 1000;
-
-  #video-close-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 15;
-    
-    &:hover {
-      cursor: pointer;
-    }
-
-    &:focus {
-      color: white;
-      border: 2px solid white;
-    }
-  }
-}
-
-video {
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-}
-
-#info-video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  padding: 0px;
-  z-index: 10;
-}
 
 .v-slider-thumb__surface::after {
   background-image: url("./assets/smithsonian.png");

@@ -1,8 +1,11 @@
 <template>
   <v-dialog v-model="dialogVisible" max-width="500">
     <template v-slot:activator="{ props: activatorProps }">
-        <v-icon v-bind="activatorProps" style="margin-left: 1em;font-size: 1.3em; color: var(--accent-color);" elevation="1">mdi-information-variant-circle-outline</v-icon>
-
+      <v-tooltip :text="tooltipTextValue" :disabled="showTooltip">
+        <template v-slot:activator=" { props} ">
+        <v-icon v-bind="{...activatorProps, ...props}" style="margin-left: 1em;font-size: 1.3em; color: var(--accent-color);" elevation="1">mdi-information-variant-circle-outline</v-icon>
+        </template>
+      </v-tooltip>
     </template>
     <v-card>
       <div class="info-button-close-icon">
@@ -23,11 +26,25 @@ export default defineComponent({
     helpText: {
       type: String,
       required: false
+    },
+    showTooltip: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    tooltipText: {
+      type: String,
+      required: false,
+      default: undefined
     }
   },
+  
+
+  
   data() {
     return {
-      dialogVisible: false
+      dialogVisible: false,
+      tooltipTextValue: this.tooltipText ?? this.showTooltip ? 'Learn More' : undefined,
     };
   }
 });

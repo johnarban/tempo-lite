@@ -1072,7 +1072,7 @@ ul {
   border: 1px solid black;
   padding-block: 0.5rem;
   padding-inline: 1rem;
-  overflow-y: scroll;
+  height: fit-content;
 
   h3 {
     font-weight: 500;

@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialogVisible" max-width="500">
     <template v-slot:activator="{ props: activatorProps }">
-        <v-icon v-bind="activatorProps" style="margin-left: 1em;font-size: 1em;" elevation="1">mdi-help-circle</v-icon>
+        <v-icon v-bind="activatorProps" style="margin-left: 1em;font-size: 1em; color: var(--accent-color);" elevation="1">mdi-information-variant-circle-outline</v-icon>
 
     </template>
     <v-card>

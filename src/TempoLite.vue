@@ -62,6 +62,14 @@
                     You can use the “Timezone” setting to investigate how pollution evolves over the day, for example as rush hour progresses in large cities.
                   </li>
                 </ul>
+                <!-- add do not show introduction again button -->
+                <v-checkbox
+                  v-model="dontShowIntro"
+                  @keyup.enter="dontShowIntro = !dontShowIntro"
+                  label="Don't show this introduction again"
+                  color="#c10124"
+                  hide-details
+                />
               </div>
             </v-window-item>
           </v-window>
@@ -184,18 +192,51 @@
             v-model="radio"
             row
           >
-            <v-radio
-              label="November 1, 2023"
-              :value="0"
-            ></v-radio>
-            <v-radio
-              label="November 3, 2023"
-              :value="1"
-            ></v-radio>
-            <v-radio
-              label="March 28, 2024"
-              :value="2"
-            ></v-radio>
+            <div class="d-flex flex-row align-center">
+              <v-radio
+                label="November 1, 2023"
+                :value="0"
+              >
+              </v-radio>
+              <info-button>
+                <p>
+                  Because the TEMPO instrument measures sunlight reflected and scattered from Earth’s 
+                surface and atmosphere, it can’t “see” through the clouds&mdash;so these
+                areas appear blank on the map.
+                </p>
+                <p>
+                  But right away you’ll see that there 
+                are high concentrations of NO<sub>2</sub> around many urban centers, 
+                and sometimes along major highways.
+                </p>
+              </info-button>
+            </div>
+            <div class="d-flex flex-row align-center">
+              <v-radio
+                label="November 3, 2023"
+                :value="1"
+              ></v-radio>
+              <info-button>
+                Levels of NO<sub>2</sub> change quickly from day to day, 
+                and even from hour to hour as wind transports 
+                plumes of pollution.
+              </info-button>
+            </div>
+            <div class="d-flex flex-row align-center">
+              <v-radio
+                label="March 28, 2024"
+                :value="2"
+              ></v-radio>
+              <info-button>
+                Breathing air with a high concentration of NO2, 
+                and the resulting smog it forms when it reacts with other pollutants, 
+                can irritate human respiratory systems. 
+                People with asthma, as well as children and the elderly 
+                are generally at greater risk for the health effects of air pollution. 
+                TEMPO data can help communities make informed 
+                decisions and take action to improve air quality
+              </info-button>
+            </div>
           </v-radio-group>
         </div>
 
@@ -375,6 +416,8 @@ interface LocationOfInterest {
   index: number;
 }
 
+const WINDOW_DONTSHOWINTRO = window.localStorage.getItem("dontShowIntro") === 'true';
+
 export default defineComponent({
   data() {
     const showSplashScreen = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
@@ -411,8 +454,10 @@ export default defineComponent({
       accentColor2: "#ffd302",
       buttonColor: "#ffffff",
       introSlide: 1,
+      
 
-      inIntro: true,
+      inIntro: !WINDOW_DONTSHOWINTRO,
+      dontShowIntro: WINDOW_DONTSHOWINTRO,
 
       radio: 0,
       sublocationRadio: null as number | null,
@@ -541,6 +586,7 @@ export default defineComponent({
         this.selectSheet('text');
       }
     },
+
     showVideoSheet: {
       get(): boolean {
         return this.sheet === "video";
@@ -649,6 +695,11 @@ export default defineComponent({
       this.inIntro = val < 4;
       return;
     },
+    
+    dontShowIntro(val: boolean) {
+      window.localStorage.setItem("dontShowIntro", val.toString());
+    },
+    
 
     playing(play: boolean) {
       if (play) {
@@ -1242,4 +1293,7 @@ video {
   display: none;
 }
 
+.v-radio-group .v-label {
+  min-width: 100%;
+}
 </style>

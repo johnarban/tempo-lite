@@ -114,7 +114,7 @@
       >
       </a>
 
-      <h1 id="title">What’s in the Air You Breathe?</h1>
+      <h1 id="title">What is in the Air You Breathe?</h1>
       <div id="where" class="big-label">where</div>
       <div id="map-container">
         <div id="map"></div>

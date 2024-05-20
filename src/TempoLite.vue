@@ -39,7 +39,7 @@
             <v-window-item :value="2">
               <div class="intro-text mb-3">
                 <p class="mb-3">
-                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO2) data from several different dates. NO2 is produced by the burning of fossil fuels – for example from vehicles, power plants, manufacturing sites, oil refineries, and wildfires. For each date, you can see the scans beginning on the East Coast in the morning, and ending on the West Coast as the Sun sets.
+                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO<sub>2</sub>) data from several different dates. NO<sub>2</sub> is produced by the burning of fossil fuels – for example from vehicles, power plants, manufacturing sites, oil refineries, and wildfires. For each date, you can see the scans beginning on the East Coast in the morning, and ending on the West Coast as the Sun sets.
                 </p> 
               </div>
             </v-window-item>
@@ -50,7 +50,7 @@
                 </p>
                 <ul>
                   <li>
-                    Select a date and press the “Play” button or scroll the time slider to view the changing concentrations of NO2 over North America on those dates. 
+                    Select a date and press the “Play” button or scroll the time slider to view the changing concentrations of NO<sub>2</sub> over North America on those dates. 
                   </li>
                   <li>
                     Press the “Info” button next to each Featured Date to get an overview of what to look for on that date
@@ -228,7 +228,7 @@
                 :value="2"
               ></v-radio>
               <info-button>
-                Breathing air with a high concentration of NO2, 
+                Breathing air with a high concentration of NO<sub>2</sub>, 
                 and the resulting smog it forms when it reacts with other pollutants, 
                 can irritate human respiratory systems. 
                 People with asthma, as well as children and the elderly 
@@ -248,12 +248,19 @@
             v-model="sublocationRadio"
             row
           >
+          <div
+            v-for="(loi, index) in locationsOfInterest[radio]" 
+            v-bind:key="index" 
+            class="sublocation-radio-wrapper d-flex flex-row align-center space-between">
             <v-radio
-              v-for="(loi, index) in locationsOfInterest[radio]"
-              v-bind:key="index"
+              class="sublocation-radio"
               :label="loi.text"
               :value="index"
             ></v-radio>
+            <info-button>
+              <p v-html="locationsOfInterestText[radio][index]"></p>
+            </info-button>
+          </div>
           </v-radio-group>
         </div>
 
@@ -443,7 +450,21 @@ export default defineComponent({
       [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: 19}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: 16}],  // Nov 3
       [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Oil and Gas Production", index: 32}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Fires", index: 36}],  // Mar 28
     ] as LocationOfInterest[][];
-
+    
+    const locationsOfInterestText = [
+      [
+        '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly. As the smoke from the fires build up it becomes so thick that it becomes difficult for the TEMPO instrument to &lsquo;see through.&rsquo; </p>', 
+        '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
+      ],  // Nov 1
+      [
+        '<p>Los Angeles clearly stands out. NO<sub>2</sub> values are even higher than the maximum of our color bar. You can clearly see the highways including Route 10 between San Bernardino and Mexicali and Route 15 leading from San Bernardino towards Las Vegas. A significant amount of NO<sub>2</sub> in California&rsquo;s central valley is a byproduct of agricultural activity there. Excess fertilizer in the soil gets broken down by microbes to produce nitrogen oxides which are very reactive. Emissions that don&rsquo;t come from combustion are typically much harder to see, but the Central Valley is an area where TEMPO data reveal this agricultural source of pollution.</p>',
+        '<p>Air pollution is often transported, or moved, over great distances. In this data set large plumes can be seen over the Northeast. If you look closely you can see that many of these plumes appear to originate out of cities in the midwest including Nashville, St. Louis, and Memphis.</p>'
+      ],  // Nov 3
+      [
+        '<p>The Permian basin, near Odessa, has two large plumes of NO2. This is the largest oil and gas producing area in the USA. You can also see here how pollution from a source in one state (Texas) can be transported across state lines to New Mexico.</p>',
+        '<p>Two fires can be seen popping up south and east of Alexandria. These are most easily identified as hot spots of NO2 that appear quickly. As the smoke from the fires build up it becomes so thick that it becomes difficult for the TEMPO instrument to &lsquo;see through.&rsquo;</p>'
+      ],  // Mar 28
+    ];
     return {
       showSplashScreen,
       sheet: null as SheetType,
@@ -473,6 +494,7 @@ export default defineComponent({
       ),
       fieldOfRegardLayer,
       locationsOfInterest,
+      locationsOfInterestText,
 
       timezoneOptions: [
         { tz: 'US/Eastern', name: 'Eastern Daylight' },
@@ -1141,99 +1163,6 @@ ul {
   }
 }
 
-#splash-screen {
-  color: #FFFFFF;
-  background-color: #000000;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  align-content: center;
-  justify-content: space-around;
-
-  font-family: 'Highway Gothic Narrow', 'Roboto', sans-serif;
-  font-size: min(8vw, 7vh);
-
-  border-radius: 10%;
-  border: min(1.2vw, 0.9vh) solid var(--accent-color);
-  overflow: auto;
-  padding-top: 4rem;
-  padding-bottom: 1rem;
-
-  @media (max-width: 699px) {
-    max-height: 80vh;
-    max-width: 90vw;
-  }
-
-  @media (min-width: 700px) {
-    max-height: 85vh;
-    max-width: min(70vw, 800px);
-  }
-
-  div {
-    margin-inline: auto;
-    text-align: center;
-  }
-
-  .small {
-    font-size: var(--default-font-size);
-    font-weight: bold;
-  }
-
-  #close-splash-button {
-    position: absolute;
-    top: 0.5rem;
-    right: 1.75rem;
-    text-align: end;
-    color: var(--accent-color);
-    font-size: min(8vw, 5vh);
-
-    &:hover {
-      cursor: pointer;
-    }
-  }
-}
-
-.video-wrapper {
-  height: 100%;
-  background: black;
-  text-align: center;
-  z-index: 1000;
-
-  #video-close-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 15;
-    
-    &:hover {
-      cursor: pointer;
-    }
-
-    &:focus {
-      color: white;
-      border: 2px solid white;
-    }
-  }
-}
-
-video {
-  height: 100%;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-}
-
-#info-video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  overflow: hidden;
-  padding: 0px;
-  z-index: 10;
-}
 
 .v-slider-thumb__surface::after {
   background-image: url("./assets/smithsonian.png");
@@ -1293,7 +1222,4 @@ video {
   display: none;
 }
 
-.v-radio-group .v-label {
-  min-width: 100%;
-}
 </style>

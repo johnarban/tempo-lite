@@ -3,10 +3,99 @@
   id="app"
   :style="cssVars"
 >
+<v-overlay
+  :model-value="inIntro"
+  :style="cssVars"
+  id="intro-background"
+>
+
+<v-dialog 
+  v-model="inIntro"
+        >
+        <div v-if="inIntro" id="introduction-overlay" class="elevation-10">
+          <v-window v-model="introSlide">
+            <template v-slot:additional>
+              <div id="intro-window-close-button">
+              <font-awesome-icon
+                size="xl"
+                class="ma-1"
+                color="#b3d5e6"
+                icon='square-xmark'
+                @click="inIntro = !inIntro"
+                @keyup.enter="inIntro = !inIntro"
+                tabindex="0"
+                tooltip-location="start"
+              /> 
+            </div>
+            </template>
+            <v-window-item :value="1">
+              <div class="intro-text">
+                <p class="mb-5">
+                  The TEMPO satellite mission (Tropospheric Emissions: Monitoring Pollution), launched in April 2023, is the first space-based instrument to monitor major air pollutants across the North American continent every daylight hour at high spatial resolution. A collaboration between NASA and the Smithsonian Astrophysical Observatory, the TEMPO instrument gathers hourly daytime scans of the atmosphere over North America from the Atlantic Ocean to the Pacific Coast and from roughly Mexico City to central Canada.
+                </p>
+              </div>
+            </v-window-item>
+            
+            <v-window-item :value="2">
+              <div class="intro-text mb-3">
+                <p class="mb-3">
+                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO2) data from several different dates. NO2 is produced by the burning of fossil fuels – for example from vehicles, power plants, manufacturing sites, oil refineries, and wildfires. For each date, you can see the scans beginning on the East Coast in the morning, and ending on the West Coast as the Sun sets.
+                </p> 
+              </div>
+            </v-window-item>
+            <v-window-item :value="3">
+              <div class="intro-text mb-3">      
+                <p class="mb-3">
+                  In this interactive page you can:
+                </p>
+                <ul>
+                  <li>
+                    Select a date and press the “Play” button or scroll the time slider to view the changing concentrations of NO2 over North America on those dates. 
+                  </li>
+                  <li>
+                    Press the “Info” button next to each Featured Date to get an overview of what to look for on that date
+                  </li>
+                  <li>
+                    For each date, select one of two zoomed-in Locations to investigate specific pollution events.
+                  </li>
+                  <li>
+                    You can use the “Timezone” setting to investigate how pollution evolves over the day, for example as rush hour progresses in large cities.
+                  </li>
+                </ul>
+              </div>
+            </v-window-item>
+          </v-window>
+
+          <div id="intro-bottom-controls">
+            <div>
+              <v-btn
+                v-if="(introSlide > 1)"
+                id="intro-next-button"
+                :color="accentColor"
+                @click="introSlide--"
+                @keyup.enter="introSlide--"
+                elevation="0"
+                >
+                Back
+              </v-btn>
+            </div>
+            
+            <v-btn
+              id="intro-next-button"
+              :color="accentColor"
+              @click="introSlide++"
+              @keyup.enter="introSlide++"
+              elevation="0"
+              >
+              {{ introSlide < 3 ? 'Next' : 'Get Started' }}
+            </v-btn>
+          </div>
+        </div>
+      </v-dialog>
+    </v-overlay>
   <div
     id="main-content"
-  >
-    
+  > 
     <div class="content-with-sidebars">
       <!-- tempo logo -->
       <a href="https://tempo.si.edu" target="_blank" rel="noopener noreferrer" >
@@ -17,7 +106,7 @@
       >
       </a>
 
-      <h1 id="title">How much NO<sub>2</sub>&hellip;</h1>
+      <h1 id="title">What’s in the Air You Breathe?</h1>
       <div id="where" class="big-label">where</div>
       <div id="map-container">
         <div id="map"></div>
@@ -208,41 +297,6 @@
         <credit-logos/>
       </div>
     </div>
-
-    
-
-    <!-- This contains the splash screen content -->
-
-    <v-overlay
-      :model-value="showSplashScreen"
-      absolute
-      opacity="0.6"
-      :style="cssVars"
-      id="splash-overlay"
-    >
-      <div
-        id="splash-screen"
-        v-click-outside="closeSplashScreen"
-        :style="cssVars"
-      >
-        <div
-          id="close-splash-button"
-          @click="closeSplashScreen"
-          >&times;
-        </div>
-        <div id="splash-screen-text">
-          <p>Splash Screen Content</p>
-        </div>
-        <div id="splash-screen-acknowledgements" class="small">
-          This Data Story is brought to you by <a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">Cosmic Data Stories</a> and <a href="https://www.worldwidetelescope.org/home/" target="_blank" rel="noopener noreferrer">WorldWide Telescope</a>.
-          
-          <div id="splash-screen-logos">
-            <credit-logos logo-size="5vmin"/>
-          </div>
-        </div>
-      </div>
-    </v-overlay>
-
   </div>
 </v-app>
 </template>
@@ -356,6 +410,9 @@ export default defineComponent({
       accentColor: "#068ede",
       accentColor2: "#ffd302",
       buttonColor: "#ffffff",
+      introSlide: 1,
+
+      inIntro: true,
 
       radio: 0,
       sublocationRadio: null as number | null,
@@ -587,6 +644,12 @@ export default defineComponent({
   },
 
   watch: {
+
+    introSlide(val: number) {
+      this.inIntro = val < 4;
+      return;
+    },
+
     playing(play: boolean) {
       if (play) {
         this.play();
@@ -668,6 +731,101 @@ body {
 a {
   text-decoration: none;
   color: #068ede;
+}
+
+ul {
+  margin-left: 1rem;
+}
+
+#intro-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.7); 
+  z-index: 100;
+}
+
+
+#introduction-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  height: fit-content;
+  // outline: 5px solid var(--accent-color);
+  border-radius: 1em;
+  z-index: 1000;
+
+  @media (max-width: 700px) {
+    width: 95%;
+    padding: 1em;
+  }
+
+  @media (min-width: 701px) {
+    width: 75%;
+    padding: 2em;
+  }
+
+  .span-accent {
+    color: var(--accent-color);
+  }
+
+  // rotated translucent background gradient
+  background: linear-gradient(45deg,
+                            rgb(14, 30, 40), 
+                            rgb(22, 50, 65), 
+                            rgb(30 70 90));
+
+  
+  font-size: calc(1.1 * var(--default-font-size));
+  line-height: var(--default-line-height);
+  
+  .v-list-item {
+    color: #eee;
+  }
+  
+  .intro-text {
+    color: white;
+  }
+  
+  strong {
+    color: white;
+  }
+  
+  div#intro-bottom-controls {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 1em;
+    margin-top:0.5em;
+
+    .v-btn.v-btn--density-default {
+        max-height: calc(1.6 * var(--default-line-height));
+      }  
+
+    .v-btn--size-default {
+      font-size: calc(0.9 * var(--default-font-size));
+    }    
+    
+    #intro-next-button {
+      background-color: rgba(18, 18, 18,.5);
+    }
+  }
+}
+
+#intro-window-close-button {
+    position: absolute;
+    top: 0.25em;
+    right: 0.25em;
+
+    &:hover {
+      cursor: pointer;
+    }
 }
 
 #main-content {
@@ -930,14 +1088,6 @@ a {
   .icon-wrapper {
     padding-inline: 0.5rem !important;
   }
-}
-
-#splash-overlay {
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 
 #splash-screen {

@@ -122,16 +122,16 @@
         <colorbar 
           label="Amount of NO2"
           backgroundColor="transparent"
-          :nsteps="10"
-          :cmap="svs"
+          :nsteps="255"
+          :cmap="cbarNO2"
           start-value="1"
           end-value="150"
+          :extend="true"
           >
           <template v-slot:label>
               <div style="text-align: center;">Amount of NO&#x2082;<br><span class="unit-label">(10&sup1;&#x2074; molecules/cm&sup2;)</span></div>
           </template>
         </colorbar>
-
         <location-search
           v-model="searchOpen"
           small
@@ -363,6 +363,7 @@ import "leaflet.zoomhome";
 import { getTimezoneOffset } from "date-fns-tz";
 import  { cividis } from "./cividis";
 import  { svs } from "./svs_cmap";
+import { cbarNO2, cbarNO2ColorsRevised2023 } from "./revised_cmap";
 import fieldOfRegard from "./assets/TEMPO_FOR.json";
 // We DO use MapBoxFeature in the template, but eslint isn't picking this up for some reason
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -647,7 +648,9 @@ export default defineComponent({
       return `${this.date.getUTCMonth()+1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${hourValue}:${date.getUTCMinutes().toString().padStart(2, '0')} ${amPm}`;
     },
     imageUrl(): string {
-      return `https://tempo-demo-images.s3.amazonaws.com/tempo_${this.date.getUTCFullYear()}-${(this.date.getUTCMonth()+1).toString().padStart(2, '0')}-${this.date.getUTCDate().toString().padStart(2, '0')}T${this.date.getUTCHours()}h${this.date.getUTCMinutes().toString().padStart(2, '0')}m.png`;
+      const url =  'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/tempo_';
+      // const url = 'tempo-lite-images.s3.us-east-1.amazonaws.com';
+      return `${url}${this.date.getUTCFullYear()}-${(this.date.getUTCMonth()+1).toString().padStart(2, '0')}-${this.date.getUTCDate().toString().padStart(2, '0')}T${this.date.getUTCHours()}h${this.date.getUTCMinutes().toString().padStart(2, '0')}m.png`;
     },
   },
 
@@ -659,6 +662,16 @@ export default defineComponent({
     
     svs(x: number): string {
       return svs(x);
+    },
+    
+    cbarNO2(x: number): string {
+      const rgb = cbarNO2(0, 1, x);
+      return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]},1)`;
+    },
+    
+    cbarNO2ColorsRevised2023(x: number): string {
+      const rgb = cbarNO2ColorsRevised2023(0, 1, x);
+      return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]},1)`;
     },
     
     blurActiveElement() {

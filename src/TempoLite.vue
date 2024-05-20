@@ -770,7 +770,8 @@ export default defineComponent({
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
 
 :root {
-  --default-font-size: clamp(0.7rem, min(1.7vh, 1.7vw), 1.1rem);
+  font-size: clamp(0.7rem, min(1.7vh, 1.7vw), 1.1rem);
+  --default-font-size: 1em;
   --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem);
   --smithsonian-blue: #009ade;
   --smithsonian-yellow: #ffcc33;
@@ -941,6 +942,7 @@ ul {
   }
   
   #user-options {
+    min-width: 200px;
     margin-left: 1.5rem;
     grid-column: 3 / 4;
     grid-row: 2 / 3;

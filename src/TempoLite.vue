@@ -396,9 +396,9 @@ export default defineComponent({
     ) as L.Layer;
 
     const locationsOfInterest = [
-      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic + Wildfires", index: 4}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: 4}],  // Nov 1
-      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic + Wildfires (SE of Sacramento)", index: 19}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: 16}],  // Nov 3
-      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Urban + Transport Pollution; Wildfires in NE", index: 32}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Wildfires", index: 36}],  // Mar 28
+      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: 4}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: 4}],  // Nov 1
+      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: 19}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: 16}],  // Nov 3
+      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Oil and Gas Production", index: 32}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Fires", index: 36}],  // Mar 28
     ] as LocationOfInterest[][];
 
     return {

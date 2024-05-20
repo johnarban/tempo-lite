@@ -30,7 +30,7 @@ export default defineComponent({
     showTooltip: {
       type: Boolean,
       required: false,
-      default: false
+      default: true
     },
     tooltipText: {
       type: String,

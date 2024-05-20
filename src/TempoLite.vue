@@ -648,7 +648,7 @@ export default defineComponent({
       return `${this.date.getUTCMonth()+1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${hourValue}:${date.getUTCMinutes().toString().padStart(2, '0')} ${amPm}`;
     },
     imageUrl(): string {
-      const url =  'https://johnarban.github.io/wwt_interactives/images/tempo/tempo_';
+      const url =  'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/tempo_';
       // const url = 'tempo-lite-images.s3.us-east-1.amazonaws.com';
       return `${url}${this.date.getUTCFullYear()}-${(this.date.getUTCMonth()+1).toString().padStart(2, '0')}-${this.date.getUTCDate().toString().padStart(2, '0')}T${this.date.getUTCHours()}h${this.date.getUTCMinutes().toString().padStart(2, '0')}m.png`;
     },

@@ -7,7 +7,7 @@
         </template>
       </v-tooltip>
     </template>
-    <v-card>
+    <v-card class="gradient-background">
       <div class="info-button-close-icon">
         <v-icon class="info-button-close-icon__icon" @click="dialogVisible = false">mdi-close</v-icon>
       </div>
@@ -55,6 +55,10 @@ export default defineComponent({
   font-size: 1em;
   line-height: 1.5em;
   
+  p {
+    margin-block: 0.5em;
+  }
+
 }
 
 .v-card-info-text > p {

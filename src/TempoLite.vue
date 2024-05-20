@@ -12,7 +12,7 @@
 <v-dialog 
   v-model="inIntro"
         >
-        <div v-if="inIntro" id="introduction-overlay" class="elevation-10">
+        <div v-if="inIntro" id="introduction-overlay" class="elevation-10 gradient-background">
           <v-window v-model="introSlide">
             <template v-slot:additional>
               <div id="intro-window-close-button">
@@ -830,6 +830,13 @@ ul {
   z-index: 100;
 }
 
+.gradient-background {
+    // rotated translucent background gradient
+    background: linear-gradient(45deg,
+                              rgb(14, 30, 40), 
+                              rgb(22, 50, 65), 
+                              rgb(30 70 90));
+  }
 
 #introduction-overlay {
   position: absolute;
@@ -855,22 +862,19 @@ ul {
     color: var(--accent-color);
   }
 
-  // rotated translucent background gradient
-  background: linear-gradient(45deg,
-                            rgb(14, 30, 40), 
-                            rgb(22, 50, 65), 
-                            rgb(30 70 90));
 
   
-  font-size: calc(1.1 * var(--default-font-size));
-  line-height: var(--default-line-height);
-  
+  //font-size: calc(1.1 * var(--default-font-size));
+  // line-height: var(--default-line-height);
+
   .v-list-item {
     color: #eee;
   }
   
   .intro-text {
     color: white;
+    font-size: 1em;
+    line-height: 1.5em;
   }
   
   strong {

@@ -231,10 +231,10 @@
                 Breathing air with a high concentration of NO<sub>2</sub>, 
                 and the resulting smog it forms when it reacts with other pollutants, 
                 can irritate human respiratory systems. 
-                People with asthma, as well as children and the elderly 
+                People with asthma, as well as children and the elderly, 
                 are generally at greater risk for the health effects of air pollution. 
                 TEMPO data can help communities make informed 
-                decisions and take action to improve air quality
+                decisions and take action to improve air quality.
               </info-button>
             </div>
           </v-radio-group>
@@ -459,7 +459,7 @@ export default defineComponent({
     
     const locationsOfInterestText = [
       [
-        '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly. As the smoke from the fires build up it becomes so thick that it becomes difficult for the TEMPO instrument to &lsquo;see through.&rsquo; </p>', 
+        '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly. As the smoke from the fires builds up, it becomes so thick that it becomes difficult for the TEMPO instrument to &lsquo;see through.&rsquo; </p>', 
         '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
       ],  // Nov 1
       [

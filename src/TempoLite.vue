@@ -192,7 +192,7 @@
           item-title="title"
           item-value="value"
           label="Select a Date"
-          @update:model-value="setNearestDate($event)"
+          @update:model-value="(e) => {radio = undefined; setNearestDate(e);}"
           hide-details
         ></v-select>
          <div id="date-radio">
@@ -247,6 +247,12 @@
                 decisions and take action to improve air quality.
               </info-button>
             </div>
+            <div class="d-flex flex-row align-center">
+              <v-radio
+                label="All Dates"
+                :value="3"
+              ></v-radio>
+            </div>
           </v-radio-group>
         </div>
 
@@ -255,6 +261,7 @@
         <div id="locations-of-interest">
           <h3 class="mb-1">Locations for {{ radio==0 ? 'Nov 1' : radio==1 ? 'Nov 3' : 'Mar 28' }}</h3>
           <v-radio-group
+            v-if="radio !== undefined"
             v-model="sublocationRadio"
             row
           >
@@ -476,7 +483,12 @@ export default defineComponent({
         },
       }
     ) as L.Layer;
-
+      
+    const datesOfInterest = [
+      new Date(2023, 10, 1), // Nov 1
+      new Date(2023, 10, 3), // Nov 3
+      new Date(2024, 2, 28), // Mar 28
+    ];
     const locationsOfInterest = [
       [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: 4}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: 4}],  // Nov 1
       [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: 19}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: 16}],  // Nov 3
@@ -512,7 +524,7 @@ export default defineComponent({
       inIntro: !WINDOW_DONTSHOWINTRO,
       dontShowIntro: WINDOW_DONTSHOWINTRO,
 
-      radio: 0,
+      radio: undefined as number | undefined,
       sublocationRadio: null as number | null,
 
       touchscreen: false,
@@ -528,6 +540,7 @@ export default defineComponent({
       fieldOfRegardLayer,
       locationsOfInterest,
       locationsOfInterestText,
+      datesOfInterest,
 
       timezoneOptions: [
         { tz: 'US/Eastern', name: 'Eastern Daylight' },
@@ -878,18 +891,22 @@ export default defineComponent({
     },
     
     radio(value: number) {
-      const minIndex = 15 * value;
-      // this.minIndex = minIndex;
-      // this.maxIndex = Math.min(15 * (value + 1) - 1, this.timestamps.length - 1);
-      this.minIndex = 0;
-      this.maxIndex = this.timestamps.length - 1;
-      this.timeIndex = minIndex;
+      if (value === undefined) {
+        return;
+      }
+      if (value == 3) {
+        this.minIndex = 0;
+        this.maxIndex = this.timestamps.length - 1;
+        this.sublocationRadio = null;
+        return;
+      }
+      this.setNearestDate(this.datesOfInterest[value].getTime());
       this.sublocationRadio = null;
     },
     
     
     sublocationRadio(value: number | null) {
-      if (value !== null) {
+      if (value !== null && this.radio !== undefined) {
         const loi = this.locationsOfInterest[this.radio][value];
         this.map?.setView(loi.latlng, loi.zoom);
         this.timeIndex = loi.index;

@@ -185,6 +185,16 @@
         </div>
 
        <div id="user-options">
+        {{ whichDataSet }} Data
+        <!-- create a list of the uniqueDays -->
+        <v-select
+          :items="uniqueDays"
+          item-title="title"
+          item-value="value"
+          label="Select a Date"
+          @update:model-value="setNearestDate($event)"
+          hide-details
+        ></v-select>
          <div id="date-radio">
            <!-- make a v-radio-group with 3 options -->
           <h2>Featured Dates</h2>
@@ -369,6 +379,7 @@ import fieldOfRegard from "./assets/TEMPO_FOR.json";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
 
+
 type SheetType = "text" | "video" | null;
 type Timeout = ReturnType<typeof setTimeout>;
 
@@ -377,7 +388,9 @@ interface TimezoneInfo {
   name: string;
 }
 
-const timestamps = [
+import { erdTimestamps, newTimestamps } from "./timestamps";
+
+const fosterTimestamps = [
   1698838920000,
   1698841320000,
   1698843720000,
@@ -424,6 +437,12 @@ const timestamps = [
   1711668240000,
 ];
 
+// combine the timestamps from the two sources
+const timestamps = erdTimestamps.concat(fosterTimestamps).concat(newTimestamps);
+// sort the timestamps
+timestamps.sort();
+
+
 interface LocationOfInterest {
   latlng: L.LatLngExpression;
   zoom: number;
@@ -439,6 +458,11 @@ export default defineComponent({
     const novDecBounds = new L.LatLngBounds(
       new L.LatLng(17.025, -154.975),
       new L.LatLng(63.975, -24.475)
+    );
+    
+    const marchBounds = new L.LatLngBounds(
+      new L.LatLng(14.01, -167.99),
+      new L.LatLng(72.99, -13.01)
     );
 
     const fieldOfRegardLayer = L.geoJSON(
@@ -500,6 +524,7 @@ export default defineComponent({
         new L.LatLng(14.01, -167.99),
         new L.LatLng(72.99, -13.01)
       ),
+      bounds: marchBounds.toBBoxString().split(",").map(parseFloat),
       fieldOfRegardLayer,
       locationsOfInterest,
       locationsOfInterestText,
@@ -511,13 +536,14 @@ export default defineComponent({
         { tz: 'US/Arizona', name: 'Mountain Standard' },
         { tz: 'US/Pacific', name: 'Pacific Daylight' },
         { tz: 'US/Alaska', name: 'Alaska Daylight' },
+        { tz: 'UTC', name: 'UTC' },
       ] as TimezoneInfo[],
       selectedTimezone: "US/Eastern",
 
       timestep: 0,
       timeIndex: 0,
       minIndex: 0,
-      maxIndex: 14,
+      maxIndex: timestamps.length - 1,
       timeValues: [...Array(timestamps.length).keys()],
       playing: false,
       imageOverlay: new L.ImageOverlay("", novDecBounds, {
@@ -525,6 +551,9 @@ export default defineComponent({
         interactive: false,
       }),
       timestamps,
+      erdTimestamps,
+      newTimestamps,
+      fosterTimestamps,
 
       searchOpen: true,
       searchErrorMessage: null as string | null,
@@ -647,11 +676,74 @@ export default defineComponent({
       }
       return `${this.date.getUTCMonth()+1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${hourValue}:${date.getUTCMinutes().toString().padStart(2, '0')} ${amPm}`;
     },
-    imageUrl(): string {
-      const url =  'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/tempo_';
-      // const url = 'tempo-lite-images.s3.us-east-1.amazonaws.com';
-      return `${url}${this.date.getUTCFullYear()}-${(this.date.getUTCMonth()+1).toString().padStart(2, '0')}-${this.date.getUTCDate().toString().padStart(2, '0')}T${this.date.getUTCHours()}h${this.date.getUTCMinutes().toString().padStart(2, '0')}m.png`;
+    
+    imageName(): string {
+      const fname = `tempo_${this.date.getUTCFullYear()}-${(this.date.getUTCMonth()+1).toString().padStart(2, '0')}-${this.date.getUTCDate().toString().padStart(2, '0')}T${this.date.getUTCHours()}h${this.date.getUTCMinutes().toString().padStart(2, '0')}m.png`;
+      return fname;
     },
+    
+    imageUrl(): string {
+      let url = '';
+      if (this.fosterTimestamps.includes(this.timestamp)) {
+        url = 'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/';
+      }
+      
+      if (this.erdTimestamps.includes(this.timestamp)) {
+        url = 'https://tempo-images-bucket.s3.amazonaws.com/early_release_v01/';
+      }
+      
+      if (this.newTimestamps.includes(this.timestamp)) {
+        url = 'https://tempo-images-bucket.s3.amazonaws.com/level3_version3/';
+      }
+    
+      return url + this.imageName;
+    },
+    
+    whichDataSet(): string {
+      if (this.fosterTimestamps.includes(this.timestamp)) {
+        return 'TEMPO-lite';
+      }
+      
+      if (this.erdTimestamps.includes(this.timestamp)) {
+        return 'Early Release (V01)';
+      }
+      
+      if (this.newTimestamps.includes(this.timestamp)) {
+        return 'Level 3 (V03)';
+      }
+      
+      return 'Unknown';
+    },
+    
+    newBounds() {
+      return new L.LatLngBounds(
+        new L.LatLng(this.bounds[1], this.bounds[0]),
+        new L.LatLng(this.bounds[3], this.bounds[2])
+      );
+    },
+    
+    imageBounds() {
+      // currently the 2023 data is all V01
+      if (this.date.getUTCFullYear() === 2023) {
+        return this.novDecBounds;
+      } else if (this.date.getUTCFullYear() === 2024 && this.date.getUTCMonth() === 2) {
+        return this.marchBounds;
+      } else {
+        return this.newBounds;
+      }
+    },
+    
+    uniqueDays() {
+      // eastern time
+      const offset = (date: Date) => getTimezoneOffset("US/Eastern", date);
+      const easternDates = this.timestamps.map(ts => new Date(ts + offset(new Date(ts))));
+      const days = easternDates.map(date => new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())).map(date => date.getTime());
+      const unique =  Array.from(new Set(days));
+      const stamps = unique.map(day => new Date(day)).map(date => date.toDateString());
+      // create an object with keys for timestamp and value
+      return stamps.map((stamp, index) => ({ value: unique[index], title: stamp }));
+    }
+    
   },
 
   methods: {
@@ -728,6 +820,21 @@ export default defineComponent({
       if (this.playInterval) {
         clearInterval(this.playInterval);
       }
+    },
+    updateBounds() {
+      this.imageOverlay.setBounds(this.imageBounds);
+    },
+    
+    setNearestDate(date: number | null) {
+      if (date == null) {
+        return;
+      }
+      const onedayinms = 1000 * 60 * 60 * 24;
+      const mod = this.timestamps.filter(ts => ((ts - date) < onedayinms) && (ts - date) > 0);
+      // set minIndex and maxIndex to the first and last index of the mod array
+      this.minIndex = this.timestamps.indexOf(mod[0]);
+      this.maxIndex = this.timestamps.indexOf(mod[mod.length - 1]);
+      this.timeIndex = this.minIndex;
     }
   },
 
@@ -754,8 +861,14 @@ export default defineComponent({
       }
     },
     imageUrl(url: string) {
+      this.updateBounds();
       this.imageOverlay.setUrl(url);
     },
+    
+    imageBounds(bounds: L.LatLngBounds) {
+      console.log(this.whichDataSet, bounds.toBBoxString());
+    },
+    
     showFieldOfRegard (show: boolean) {
       if (show) {
         this.fieldOfRegardLayer.addTo(this.map as Map);
@@ -763,15 +876,18 @@ export default defineComponent({
         this.map.removeLayer(this.fieldOfRegardLayer as L.Layer);
       }
     },
+    
     radio(value: number) {
       const minIndex = 15 * value;
-      this.minIndex = minIndex;
-      this.maxIndex = Math.min(15 * (value + 1) - 1, this.timestamps.length - 1);
+      // this.minIndex = minIndex;
+      // this.maxIndex = Math.min(15 * (value + 1) - 1, this.timestamps.length - 1);
+      this.minIndex = 0;
+      this.maxIndex = this.timestamps.length - 1;
       this.timeIndex = minIndex;
-      const bounds = value < 2 ? this.novDecBounds : this.marchBounds;
-      this.imageOverlay.setBounds(bounds);
       this.sublocationRadio = null;
     },
+    
+    
     sublocationRadio(value: number | null) {
       if (value !== null) {
         const loi = this.locationsOfInterest[this.radio][value];
@@ -1249,6 +1365,10 @@ a {
 
 .v-radio-group .v-input__details {
   display: none;
+}
+
+.leaflet-image-layer {
+  border: 1px solid blue;
 }
 
 </style>

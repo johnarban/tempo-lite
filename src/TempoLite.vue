@@ -840,7 +840,7 @@ export default defineComponent({
         } else {
           this.timeIndex += 1;
         }
-      }, 1000);
+      }, 250);
     },
     pause() {
       if (this.playInterval) {

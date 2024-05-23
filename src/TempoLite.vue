@@ -713,11 +713,13 @@ export default defineComponent({
       }
       
       if (this.erdTimestamps.includes(this.timestamp)) {
-        url = 'https://tempo-images-bucket.s3.amazonaws.com/early_release_v01/';
+        // url = 'https://tempo-images-bucket.s3.amazonaws.com/early_release_v01/';
+        url = "https://johnarban.github.io/wwt_interactives/images/tempo-data/erd/";
       }
       
       if (this.newTimestamps.includes(this.timestamp)) {
-        url = 'https://tempo-images-bucket.s3.amazonaws.com/level3_version3/';
+        // url = 'https://tempo-images-bucket.s3.amazonaws.com/level3_version3/';
+        url = "https://johnarban.github.io/wwt_interactives/images/tempo-data/new/";
       }
     
       return url + this.imageName;

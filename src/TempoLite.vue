@@ -39,7 +39,15 @@
             <v-window-item :value="2">
               <div class="intro-text mb-3">
                 <p class="mb-3">
-                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO<sub>2</sub>) data from several different dates. NO<sub>2</sub> is produced by the burning of fossil fuels – for example from vehicles, power plants, manufacturing sites, oil refineries, and wildfires. For each date, you can see the scans beginning on the East Coast in the morning, and ending on the West Coast as the Sun sets.
+                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO<sub>2</sub>) data from several different dates. NO<sub>2</sub> is produced by:
+                </p> 
+                <ul>
+                  <li>burning of fossil fuels&#8212;for example from vehicles, power plants, manufacturing sites, oil refineries</li>
+                  <li>wildfires</li>
+                  <li>agricultural use of nitrogen-based fertilizers (which are broken down into NO<sub>2</sub> by microbes in soil)</li>
+                </ul>
+                <p class="mt-3">
+                For each date, you can see the scans beginning on the East Coast in the morning, and ending on the West Coast as the Sun sets.
                 </p> 
               </div>
             </v-window-item>
@@ -465,7 +473,7 @@ export default defineComponent({
         '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
       ],  // Nov 1
       [
-        '<p>Los Angeles clearly stands out. NO<sub>2</sub> values are even higher than the maximum of our color bar. You can clearly see the highways including Route 10 between San Bernardino and Mexicali and Route 15 leading from San Bernardino towards Las Vegas. A significant amount of NO<sub>2</sub> in California&rsquo;s central valley is a byproduct of agricultural activity there. Excess fertilizer in the soil gets broken down by microbes to produce nitrogen oxides which are very reactive. Emissions that don&rsquo;t come from combustion are typically much harder to see, but the Central Valley is an area where TEMPO data reveal this agricultural source of pollution.</p>',
+        '<p>Los Angeles clearly stands out. NO<sub>2</sub> values are even higher than the maximum of our color bar. You can clearly see the highways including Route 10 between San Bernardino and Mexicali and Route 15 leading from San Bernardino towards Las Vegas. A significant amount of NO<sub>2</sub> in California&rsquo;s central valley is a byproduct of agricultural activity there. Excess fertilizer in the soil gets broken down by microbes to produce nitrogen oxides which are very reactive. Emissions that don&rsquo;t come from combustion are typically much harder to see, but the Central Valley is an area where TEMPO data may reveal this agricultural source of pollution.</p>',
         '<p>Air pollution is often transported, or moved, over great distances. In this data set large plumes can be seen over the Northeast. If you look closely you can see that many of these plumes appear to originate out of cities in the midwest including Nashville, St. Louis, and Memphis.</p>'
       ],  // Nov 3
       [

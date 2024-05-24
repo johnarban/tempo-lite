@@ -184,11 +184,11 @@
 
         <div id="timezone-select">
                   <!-- add text box that allows manually setting the custom image url -->
-          <v-text-field
+          <!-- <v-text-field
             v-model="customImageUrl"
             label="Custom Image URL"
             hide-details
-          ></v-text-field>
+          ></v-text-field> -->
           <br>
           <v-select
             v-model="selectedTimezone"
@@ -200,16 +200,29 @@
         </div>
 
        <div id="user-options">
-        {{ whichDataSet }} Data
-        <!-- create a list of the uniqueDays -->
-        <v-select
-          :items="uniqueDays"
-          item-title="title"
-          item-value="value"
-          label="Select a Date"
-          @update:model-value="(e) => {radio = undefined; setNearestDate(e);}"
-          hide-details
-        ></v-select>
+        <!-- {{ whichDataSet }} Data -->
+        <div id="all-dates">
+          <h2>Date Picker</h2>  
+          <div class="d-flex flex-row align-center">
+            <v-radio-group v-model="radio">
+              <v-radio
+                label="All Available Dates"
+                :value="0"
+              ></v-radio>
+            </v-radio-group>
+          </div>        
+          <!-- create a list of the uniqueDays -->
+          <v-select
+            :items="uniqueDays"
+            item-title="title"
+            item-value="value"
+            label="Select a Date"
+            @update:model-value="(e) => {radio = undefined; setNearestDate(e);}"
+            hide-details
+          ></v-select>
+        </div>
+
+
          <div id="date-radio">
            <!-- make a v-radio-group with 3 options -->
           <h2>Featured Dates</h2>
@@ -220,7 +233,7 @@
             <div class="d-flex flex-row align-center">
               <v-radio
                 label="November 1, 2023"
-                :value="0"
+                :value="1"
               >
               </v-radio>
               <info-button>
@@ -239,7 +252,7 @@
             <div class="d-flex flex-row align-center">
               <v-radio
                 label="November 3, 2023"
-                :value="1"
+                :value="2"
               ></v-radio>
               <info-button>
                 Levels of NO<sub>2</sub> change quickly from day to day, 
@@ -250,7 +263,7 @@
             <div class="d-flex flex-row align-center">
               <v-radio
                 label="March 28, 2024"
-                :value="2"
+                :value="3"
               ></v-radio>
               <info-button>
                 Breathing air with a high concentration of NO<sub>2</sub>, 
@@ -262,19 +275,13 @@
                 decisions and take action to improve air quality.
               </info-button>
             </div>
-            <div class="d-flex flex-row align-center">
-              <v-radio
-                label="All Dates"
-                :value="3"
-              ></v-radio>
-            </div>
           </v-radio-group>
         </div>
 
-        <hr style="border-color: grey;">
+        <hr style="border-color: grey;"  v-if="radio>0">
         
-        <div id="locations-of-interest">
-          <h3 class="mb-1">Locations for {{ radio==0 ? 'Nov 1' : radio==1 ? 'Nov 3' : 'Mar 28' }}</h3>
+        <div id="locations-of-interest" v-if="radio>0">
+          <h3 class="mb-1">Locations for {{ dateStrings[radio] }}</h3>
           <v-radio-group
             v-if="radio !== undefined"
             v-model="sublocationRadio"
@@ -500,17 +507,27 @@ export default defineComponent({
     ) as L.Layer;
       
     const datesOfInterest = [
+      null,
       new Date(2023, 10, 1), // Nov 1
       new Date(2023, 10, 3), // Nov 3
       new Date(2024, 2, 28), // Mar 28
     ];
+
+    const dateStrings = {
+      1: 'Nov 1',
+      2: 'Nov 3',
+      3: 'Mar 28'
+    };
+
     const locationsOfInterest = [
-      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: 4}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: 4}],  // Nov 1
-      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: 19}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: 16}],  // Nov 3
-      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Oil and Gas Production", index: 32}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Fires", index: 36}],  // Mar 28
+      null,
+      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: timestamps.indexOf(1698848520000)}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: timestamps.indexOf(1698848520000)}],  // Nov 1
+      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: timestamps.indexOf(1699021320000)}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: timestamps.indexOf(1699014120000)}],  // Nov 3
+      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Oil and Gas Production", index: timestamps.indexOf(1711631040000)}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Fires", index: timestamps.indexOf(1711644240000)}],  // Mar 28
     ] as LocationOfInterest[][];
     
     const locationsOfInterestText = [
+      ['',''],
       [
         '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly. As the smoke from the fires builds up, it becomes so thick that it becomes difficult for the TEMPO instrument to &lsquo;see through.&rsquo; </p>', 
         '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
@@ -539,7 +556,7 @@ export default defineComponent({
       inIntro: !WINDOW_DONTSHOWINTRO,
       dontShowIntro: WINDOW_DONTSHOWINTRO,
 
-      radio: undefined as number | undefined,
+      radio: 0 as number | undefined,
       sublocationRadio: null as number | null,
 
       touchscreen: false,
@@ -556,6 +573,8 @@ export default defineComponent({
       locationsOfInterest,
       locationsOfInterestText,
       datesOfInterest,
+      dateStrings,
+
       customImageUrl: "",
 
       timezoneOptions: [
@@ -915,7 +934,7 @@ export default defineComponent({
       if (value === undefined) {
         return;
       }
-      if (value == 3) {
+      if (value == 0) {
         this.minIndex = 0;
         this.maxIndex = this.timestamps.length - 1;
         this.sublocationRadio = null;

@@ -39,7 +39,15 @@
             <v-window-item :value="2">
               <div class="intro-text mb-3">
                 <p class="mb-3">
-                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO<sub>2</sub>) data from several different dates. NO<sub>2</sub> is produced by the burning of fossil fuels – for example from vehicles, power plants, manufacturing sites, oil refineries, and wildfires. For each date, you can see the scans beginning on the East Coast in the morning, and ending on the West Coast as the Sun sets.
+                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO<sub>2</sub>) data from several different dates. NO<sub>2</sub> is produced by:
+                </p> 
+                <ul>
+                  <li>burning of fossil fuels&#8212;for example from vehicles, power plants, manufacturing sites, oil refineries</li>
+                  <li>wildfires</li>
+                  <li>agricultural use of nitrogen-based fertilizers (which are broken down into NO<sub>2</sub> by microbes in soil)</li>
+                </ul>
+                <p class="mt-3">
+                For each date, you can see the scans beginning on the East Coast in the morning, and ending on the West Coast as the Sun sets.
                 </p> 
               </div>
             </v-window-item>

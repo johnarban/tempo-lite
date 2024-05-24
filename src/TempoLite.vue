@@ -377,6 +377,8 @@ import fieldOfRegard from "./assets/TEMPO_FOR.json";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
 
+
+
 type SheetType = "text" | "video" | null;
 type Timeout = ReturnType<typeof setTimeout>;
 
@@ -439,7 +441,10 @@ interface LocationOfInterest {
   index: number;
 }
 
-const WINDOW_DONTSHOWINTRO = window.localStorage.getItem("dontShowIntro") === 'true';
+const urlParams = new URLSearchParams(window.location.search);
+const hideIntro = urlParams.get("hideintro") === "true";
+const WINDOW_DONTSHOWINTRO = hideIntro ? true: window.localStorage.getItem("dontShowIntro") === 'true';
+
 
 export default defineComponent({
   data() {

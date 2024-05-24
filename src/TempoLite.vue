@@ -182,7 +182,7 @@
         </div>
 
 
-        <div id="timezone-select">
+        <div id="bottom-options">
 
           <div id="control-checkboxes">
             <v-checkbox
@@ -1174,7 +1174,7 @@ ul {
     grid-row: 3 / 4;
   }
 
-  #timezone-select {
+  #bottom-options {
     margin-left: 1.5rem;
     grid-column: 3 / 4;
     grid-row: 3 / 5;

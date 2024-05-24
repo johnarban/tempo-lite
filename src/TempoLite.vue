@@ -940,7 +940,7 @@ export default defineComponent({
         this.sublocationRadio = null;
         return;
       }
-      this.setNearestDate(this.datesOfInterest[value].getTime());
+      this.setNearestDate(this.datesOfInterest[value]?.getTime() ?? null);
       this.sublocationRadio = null;
     },
     

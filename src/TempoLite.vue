@@ -1252,7 +1252,10 @@ a {
 
 // prevent overflows of the content
 #user-options {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 5px; 
 }
 
 #date-radio {

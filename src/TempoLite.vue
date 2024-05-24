@@ -183,6 +183,16 @@
 
 
         <div id="timezone-select">
+
+          <div id="control-checkboxes">
+            <v-checkbox
+              v-model="showFieldOfRegard"
+              @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
+              label="TEMPO Field of Regard"
+              color="#c10124"
+              hide-details
+            />       
+          </div>
                   <!-- add text box that allows manually setting the custom image url -->
           <!-- <v-text-field
             v-model="customImageUrl"
@@ -305,15 +315,6 @@
 
         <hr style="border-color: grey;">
 
-        <div id="control-checkboxes">
-          <v-checkbox
-            v-model="showFieldOfRegard"
-            @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
-            label="TEMPO Field of Regard"
-            color="#c10124"
-            hide-details
-          />       
-        </div>
       </div>
   
       <div id="information">

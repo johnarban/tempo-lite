@@ -183,7 +183,14 @@
 
 
         <div id="bottom-options">
-
+          <br>
+          <v-select
+            v-model="selectedTimezone"
+            label="Timezone"
+            :items="timezoneOptions"
+            item-title="name"
+            item-value="tz"
+          ></v-select>
           <div id="control-checkboxes">
             <v-checkbox
               v-model="showFieldOfRegard"
@@ -199,14 +206,8 @@
             label="Custom Image URL"
             hide-details
           ></v-text-field> -->
-          <br>
-          <v-select
-            v-model="selectedTimezone"
-            label="Timezone"
-            :items="timezoneOptions"
-            item-title="name"
-            item-value="tz"
-          ></v-select>
+
+          
         </div>
 
        <div id="user-options">
@@ -1407,7 +1408,6 @@ a {
 }
 
 #control-checkboxes {
-  margin-top: 0.5em;
 }
 
 #body-logos {

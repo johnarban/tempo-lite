@@ -175,6 +175,13 @@
 
 
         <div id="timezone-select">
+                  <!-- add text box that allows manually setting the custom image url -->
+          <v-text-field
+            v-model="customImageUrl"
+            label="Custom Image URL"
+            hide-details
+          ></v-text-field>
+          <br>
           <v-select
             v-model="selectedTimezone"
             label="Timezone"
@@ -185,6 +192,16 @@
         </div>
 
        <div id="user-options">
+        {{ whichDataSet }} Data
+        <!-- create a list of the uniqueDays -->
+        <v-select
+          :items="uniqueDays"
+          item-title="title"
+          item-value="value"
+          label="Select a Date"
+          @update:model-value="(e) => {radio = undefined; setNearestDate(e);}"
+          hide-details
+        ></v-select>
          <div id="date-radio">
            <!-- make a v-radio-group with 3 options -->
           <h2>Featured Dates</h2>
@@ -237,6 +254,12 @@
                 decisions and take action to improve air quality.
               </info-button>
             </div>
+            <div class="d-flex flex-row align-center">
+              <v-radio
+                label="All Dates"
+                :value="3"
+              ></v-radio>
+            </div>
           </v-radio-group>
         </div>
 
@@ -245,6 +268,7 @@
         <div id="locations-of-interest">
           <h3 class="mb-1">Locations for {{ radio==0 ? 'Nov 1' : radio==1 ? 'Nov 3' : 'Mar 28' }}</h3>
           <v-radio-group
+            v-if="radio !== undefined"
             v-model="sublocationRadio"
             row
           >
@@ -369,6 +393,7 @@ import fieldOfRegard from "./assets/TEMPO_FOR.json";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
 
+
 type SheetType = "text" | "video" | null;
 type Timeout = ReturnType<typeof setTimeout>;
 
@@ -377,7 +402,9 @@ interface TimezoneInfo {
   name: string;
 }
 
-const timestamps = [
+import { erdTimestamps, newTimestamps } from "./timestamps";
+
+const fosterTimestamps = [
   1698838920000,
   1698841320000,
   1698843720000,
@@ -424,6 +451,12 @@ const timestamps = [
   1711668240000,
 ];
 
+// combine the timestamps from the two sources
+const timestamps = erdTimestamps.concat(fosterTimestamps).concat(newTimestamps);
+// sort the timestamps
+timestamps.sort();
+
+
 interface LocationOfInterest {
   latlng: L.LatLngExpression;
   zoom: number;
@@ -440,6 +473,11 @@ export default defineComponent({
       new L.LatLng(17.025, -154.975),
       new L.LatLng(63.975, -24.475)
     );
+    
+    const marchBounds = new L.LatLngBounds(
+      new L.LatLng(14.01, -167.99),
+      new L.LatLng(72.99, -13.01)
+    );
 
     const fieldOfRegardLayer = L.geoJSON(
       fieldOfRegard as GeoJSON.GeometryCollection,
@@ -452,7 +490,12 @@ export default defineComponent({
         },
       }
     ) as L.Layer;
-
+      
+    const datesOfInterest = [
+      new Date(2023, 10, 1), // Nov 1
+      new Date(2023, 10, 3), // Nov 3
+      new Date(2024, 2, 28), // Mar 28
+    ];
     const locationsOfInterest = [
       [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: 4}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: 4}],  // Nov 1
       [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: 19}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: 16}],  // Nov 3
@@ -488,7 +531,7 @@ export default defineComponent({
       inIntro: !WINDOW_DONTSHOWINTRO,
       dontShowIntro: WINDOW_DONTSHOWINTRO,
 
-      radio: 0,
+      radio: undefined as number | undefined,
       sublocationRadio: null as number | null,
 
       touchscreen: false,
@@ -500,9 +543,12 @@ export default defineComponent({
         new L.LatLng(14.01, -167.99),
         new L.LatLng(72.99, -13.01)
       ),
+      bounds: marchBounds.toBBoxString().split(",").map(parseFloat),
       fieldOfRegardLayer,
       locationsOfInterest,
       locationsOfInterestText,
+      datesOfInterest,
+      customImageUrl: "",
 
       timezoneOptions: [
         { tz: 'US/Eastern', name: 'Eastern Daylight' },
@@ -511,13 +557,14 @@ export default defineComponent({
         { tz: 'US/Arizona', name: 'Mountain Standard' },
         { tz: 'US/Pacific', name: 'Pacific Daylight' },
         { tz: 'US/Alaska', name: 'Alaska Daylight' },
+        { tz: 'UTC', name: 'UTC' },
       ] as TimezoneInfo[],
       selectedTimezone: "US/Eastern",
 
       timestep: 0,
       timeIndex: 0,
       minIndex: 0,
-      maxIndex: 14,
+      maxIndex: timestamps.length - 1,
       timeValues: [...Array(timestamps.length).keys()],
       playing: false,
       imageOverlay: new L.ImageOverlay("", novDecBounds, {
@@ -525,6 +572,9 @@ export default defineComponent({
         interactive: false,
       }),
       timestamps,
+      erdTimestamps,
+      newTimestamps,
+      fosterTimestamps,
 
       searchOpen: true,
       searchErrorMessage: null as string | null,
@@ -647,11 +697,79 @@ export default defineComponent({
       }
       return `${this.date.getUTCMonth()+1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${hourValue}:${date.getUTCMinutes().toString().padStart(2, '0')} ${amPm}`;
     },
-    imageUrl(): string {
-      const url =  'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/tempo_';
-      // const url = 'tempo-lite-images.s3.us-east-1.amazonaws.com';
-      return `${url}${this.date.getUTCFullYear()}-${(this.date.getUTCMonth()+1).toString().padStart(2, '0')}-${this.date.getUTCDate().toString().padStart(2, '0')}T${this.date.getUTCHours()}h${this.date.getUTCMinutes().toString().padStart(2, '0')}m.png`;
+    
+    imageName(): string {
+      const fname = `tempo_${this.date.getUTCFullYear()}-${(this.date.getUTCMonth()+1).toString().padStart(2, '0')}-${this.date.getUTCDate().toString().padStart(2, '0')}T${this.date.getUTCHours()}h${this.date.getUTCMinutes().toString().padStart(2, '0')}m.png`;
+      return fname;
     },
+    
+    imageUrl(): string {
+      if (this.customImageUrl) {
+        return this.customImageUrl;
+      }
+      let url = '';
+      if (this.fosterTimestamps.includes(this.timestamp)) {
+        url = 'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/';
+      }
+      
+      if (this.erdTimestamps.includes(this.timestamp)) {
+        // url = 'https://tempo-images-bucket.s3.amazonaws.com/early_release_v01/';
+        url = "https://johnarban.github.io/wwt_interactives/images/tempo-data/erd/";
+      }
+      
+      if (this.newTimestamps.includes(this.timestamp)) {
+        // url = 'https://tempo-images-bucket.s3.amazonaws.com/level3_version3/';
+        url = "https://johnarban.github.io/wwt_interactives/images/tempo-data/new/";
+      }
+    
+      return url + this.imageName;
+    },
+    
+    whichDataSet(): string {
+      if (this.fosterTimestamps.includes(this.timestamp)) {
+        return 'TEMPO-lite';
+      }
+      
+      if (this.erdTimestamps.includes(this.timestamp)) {
+        return 'Early Release (V01)';
+      }
+      
+      if (this.newTimestamps.includes(this.timestamp)) {
+        return 'Level 3 (V03)';
+      }
+      
+      return 'Unknown';
+    },
+    
+    newBounds() {
+      return new L.LatLngBounds(
+        new L.LatLng(this.bounds[1], this.bounds[0]),
+        new L.LatLng(this.bounds[3], this.bounds[2])
+      );
+    },
+    
+    imageBounds() {
+      // currently the 2023 data is all V01
+      if (this.date.getUTCFullYear() === 2023) {
+        return this.novDecBounds;
+      } else if (this.date.getUTCFullYear() === 2024 && this.date.getUTCMonth() === 2) {
+        return this.marchBounds;
+      } else {
+        return this.newBounds;
+      }
+    },
+    
+    uniqueDays() {
+      // eastern time
+      const offset = (date: Date) => getTimezoneOffset("US/Eastern", date);
+      const easternDates = this.timestamps.map(ts => new Date(ts + offset(new Date(ts))));
+      const days = easternDates.map(date => new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())).map(date => date.getTime());
+      const unique =  Array.from(new Set(days));
+      const stamps = unique.map(day => new Date(day)).map(date => date.toDateString());
+      // create an object with keys for timestamp and value
+      return stamps.map((stamp, index) => ({ value: unique[index], title: stamp }));
+    }
+    
   },
 
   methods: {
@@ -722,12 +840,27 @@ export default defineComponent({
         } else {
           this.timeIndex += 1;
         }
-      }, 1000);
+      }, 250);
     },
     pause() {
       if (this.playInterval) {
         clearInterval(this.playInterval);
       }
+    },
+    updateBounds() {
+      this.imageOverlay.setBounds(this.imageBounds);
+    },
+    
+    setNearestDate(date: number | null) {
+      if (date == null) {
+        return;
+      }
+      const onedayinms = 1000 * 60 * 60 * 24;
+      const mod = this.timestamps.filter(ts => ((ts - date) < onedayinms) && (ts - date) > 0);
+      // set minIndex and maxIndex to the first and last index of the mod array
+      this.minIndex = this.timestamps.indexOf(mod[0]);
+      this.maxIndex = this.timestamps.indexOf(mod[mod.length - 1]);
+      this.timeIndex = this.minIndex;
     }
   },
 
@@ -754,8 +887,14 @@ export default defineComponent({
       }
     },
     imageUrl(url: string) {
+      this.updateBounds();
       this.imageOverlay.setUrl(url);
     },
+    
+    imageBounds(bounds: L.LatLngBounds) {
+      console.log(this.whichDataSet, bounds.toBBoxString());
+    },
+    
     showFieldOfRegard (show: boolean) {
       if (show) {
         this.fieldOfRegardLayer.addTo(this.map as Map);
@@ -763,17 +902,24 @@ export default defineComponent({
         this.map.removeLayer(this.fieldOfRegardLayer as L.Layer);
       }
     },
+    
     radio(value: number) {
-      const minIndex = 15 * value;
-      this.minIndex = minIndex;
-      this.maxIndex = Math.min(15 * (value + 1) - 1, this.timestamps.length - 1);
-      this.timeIndex = minIndex;
-      const bounds = value < 2 ? this.novDecBounds : this.marchBounds;
-      this.imageOverlay.setBounds(bounds);
+      if (value === undefined) {
+        return;
+      }
+      if (value == 3) {
+        this.minIndex = 0;
+        this.maxIndex = this.timestamps.length - 1;
+        this.sublocationRadio = null;
+        return;
+      }
+      this.setNearestDate(this.datesOfInterest[value].getTime());
       this.sublocationRadio = null;
     },
+    
+    
     sublocationRadio(value: number | null) {
-      if (value !== null) {
+      if (value !== null && this.radio !== undefined) {
         const loi = this.locationsOfInterest[this.radio][value];
         this.map?.setView(loi.latlng, loi.zoom);
         this.timeIndex = loi.index;
@@ -957,7 +1103,7 @@ ul {
   
   display: grid;
   grid-template-columns: .08fr .8fr .3fr;
-  grid-template-rows: 50px var(--map-height) 78px 1fr;
+  grid-template-rows: 50px var(--map-height) 78px .5fr .5fr;
   gap: 20px 10px;
   
   > * {
@@ -1003,18 +1149,18 @@ ul {
   #timezone-select {
     margin-left: 1.5rem;
     grid-column: 3 / 4;
-    grid-row: 3 / 4;
+    grid-row: 3 / 5;
   }
   
   #information {
     padding: 1rem;
     grid-column: 2 / 3;
-    grid-row: 4 / 5;
+    grid-row: 4 / 6;
   }
 
   #body-logos { 
     grid-column: 3 / 4;
-    grid-row: 4 / 5;
+    grid-row: 5 / 6;
     align-self: end;
     justify-self: end;
   }
@@ -1249,6 +1395,10 @@ a {
 
 .v-radio-group .v-input__details {
   display: none;
+}
+
+.leaflet-image-layer {
+  border: 1px solid blue;
 }
 
 </style>

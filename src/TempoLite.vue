@@ -389,6 +389,7 @@ import  { cividis } from "./cividis";
 import  { svs } from "./svs_cmap";
 import { cbarNO2, cbarNO2ColorsRevised2023 } from "./revised_cmap";
 import fieldOfRegard from "./assets/TEMPO_FOR.json";
+import augustFieldOfRegard from "./assets/august_for.json";
 // We DO use MapBoxFeature in the template, but eslint isn't picking this up for some reason
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
@@ -624,6 +625,7 @@ export default defineComponent({
 
     this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
     
+    this.updateFieldOfRegard();
     if (this.showFieldOfRegard) {
       this.fieldOfRegardLayer.addTo(this.map as Map);
     }
@@ -861,7 +863,20 @@ export default defineComponent({
       this.minIndex = this.timestamps.indexOf(mod[0]);
       this.maxIndex = this.timestamps.indexOf(mod[mod.length - 1]);
       this.timeIndex = this.minIndex;
+    },
+    
+    updateFieldOfRegard() {
+      console.log('updateFieldOfRegarg');
+      if (this.date.getUTCFullYear() === 2023 && this.date.getUTCMonth() === 7) {
+        console.log('august');
+        (this.fieldOfRegardLayer as L.GeoJSON).clearLayers();
+        (this.fieldOfRegardLayer as L.GeoJSON).addData(augustFieldOfRegard as GeoJSON.GeometryCollection);
+      } else {
+        (this.fieldOfRegardLayer as L.GeoJSON).clearLayers();
+        (this.fieldOfRegardLayer as L.GeoJSON).addData(fieldOfRegard as GeoJSON.GeometryCollection);
+      }
     }
+    
   },
 
   watch: {
@@ -889,6 +904,7 @@ export default defineComponent({
     imageUrl(url: string) {
       this.updateBounds();
       this.imageOverlay.setUrl(url);
+      this.updateFieldOfRegard();
     },
     
     imageBounds(bounds: L.LatLngBounds) {

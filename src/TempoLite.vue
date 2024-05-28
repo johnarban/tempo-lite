@@ -233,6 +233,28 @@
             @update:model-value="(e) => { singleDateSelected = e;}"
             hide-details
           ></v-select>
+          <!-- add buttons to increment and decrement the singledateselected -->
+          <div class="d-flex flex-row align-center">
+            <v-btn
+              @click="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) - 1]?.value"
+              @keyup.enter="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) - 1]?.value"
+              :disabled="singleDateSelected === uniqueDays[0].value"
+              elevation="0"
+              size="small"
+              icon="mdi-chevron-left"
+            >
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn
+              @click="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) + 1]?.value"
+              @keyup.enter="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) + 1]?.value"
+              :disabled="singleDateSelected === uniqueDays[uniqueDays.length - 1].value"
+              elevation="0"
+              size="small"
+              icon="mdi-chevron-right"
+            >
+            </v-btn>
+          </div>
           <br>
           <v-progress-linear
           v-if="loadedImagesProgress < 100"

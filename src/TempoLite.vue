@@ -233,6 +233,13 @@
             @update:model-value="(e) => { singleDateSelected = e;}"
             hide-details
           ></v-select>
+          <br>
+          <v-progress-linear
+          v-if="loadedImagesProgress < 100"
+          v-model="loadedImagesProgress"
+          color="red"
+          height="5"
+        ></v-progress-linear>
         </div>
 
 
@@ -412,7 +419,7 @@ import augustFieldOfRegard from "./assets/august_for.json";
 // We DO use MapBoxFeature in the template, but eslint isn't picking this up for some reason
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
-
+import { _preloadImages } from "./PreloadImages";
 
 type SheetType = "text" | "video" | null;
 type Timeout = ReturnType<typeof setTimeout>;
@@ -485,6 +492,10 @@ interface LocationOfInterest {
 }
 
 const WINDOW_DONTSHOWINTRO = window.localStorage.getItem("dontShowIntro") === 'true';
+
+function zpad(n: number, width: number = 2, character: string = "0"): string {
+  return n.toString().padStart(width, character);
+}
 
 export default defineComponent({
   data() {
@@ -617,6 +628,8 @@ export default defineComponent({
       showControls: true,
       showFieldOfRegard: true,
       showCredits: false,
+      
+      loadedImagesProgress: 50,
     };
   },
 
@@ -736,33 +749,14 @@ export default defineComponent({
     },
     
     imageName(): string {
-      const fname = `tempo_${this.date.getUTCFullYear()}-${(this.date.getUTCMonth()+1).toString().padStart(2, '0')}-${this.date.getUTCDate().toString().padStart(2, '0')}T${this.date.getUTCHours()}h${this.date.getUTCMinutes().toString().padStart(2, '0')}m.png`;
-      return fname;
+      return this.getTempoFilename(this.date);
     },
     
     imageUrl(): string {
       if (this.customImageUrl) {
         return this.customImageUrl;
       }
-      let url = '';
-      if (this.fosterTimestamps.includes(this.timestamp)) {
-        url = 'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/';
-      }
-      
-      if (this.erdTimestamps.includes(this.timestamp)) {
-        // url = 'https://tempo-images-bucket.s3.amazonaws.com/early_release_v01/';
-        url = "https://johnarban.github.io/wwt_interactives/images/tempo-data/erd/";
-      }
-      
-      if (this.newTimestamps.includes(this.timestamp)) {
-        // url = 'https://tempo-images-bucket.s3.amazonaws.com/level3_version3/';
-        url = "https://johnarban.github.io/wwt_interactives/images/tempo-data/new/";
-      }
-      
-      if (this.may2228Times.includes(this.timestamp)) {
-        url = "https://johnarban.github.io/wwt_interactives/images/tempo-data/new_may_22_28/";
-      }
-      console.log('url', url + this.imageName) ;
+      const url = this.getTempoDataUrl(this.timestamp);
       return url + this.imageName;
     },
     
@@ -847,7 +841,7 @@ export default defineComponent({
     closeSplashScreen() {
       this.showSplashScreen = false; 
     },
-
+    
     selectSheet(name: SheetType) {
       if (this.sheet === name) {
         this.sheet = null;
@@ -896,6 +890,36 @@ export default defineComponent({
       this.imageOverlay.setBounds(this.imageBounds);
     },
     
+    // preloadImages(images: string[]) {
+    //   const promises = images.map(src => loadImage(src));
+    //   return promises;
+    // },
+    
+    getTempoFilename(date: Date): string {
+      return `tempo_${date.getUTCFullYear()}-${zpad(date.getUTCMonth()+1)}-${zpad(date.getUTCDate())}T${zpad(date.getUTCHours())}h${zpad(date.getUTCMinutes())}m.png`;
+    },
+    
+    getTempoDataUrl(timestamp: number): string {
+      if (this.fosterTimestamps.includes(timestamp)) {
+        return 'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/';
+      }
+      
+      if (this.erdTimestamps.includes(timestamp)) {
+        // url = 'https://tempo-images-bucket.s3.amazonaws.com/early_release_v01/';
+        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/erd/";
+      }
+      
+      if (this.newTimestamps.includes(timestamp)) {
+        // url = 'https://tempo-images-bucket.s3.amazonaws.com/level3_version3/';
+        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/new/";
+      }
+      
+      if (this.may2228Times.includes(timestamp)) {
+        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/new_may_22_28/";
+      }
+      return '';
+    }, 
+    
     setNearestDate(date: number | null) {
       if (date == null) {
         return;
@@ -906,19 +930,34 @@ export default defineComponent({
       this.minIndex = this.timestamps.indexOf(mod[0]);
       this.maxIndex = this.timestamps.indexOf(mod[mod.length - 1]);
       this.timeIndex = this.minIndex;
+      this.imagePreload();
     },
     
     updateFieldOfRegard() {
-      console.log('updateFieldOfRegarg');
       if (this.date.getUTCFullYear() === 2023 && this.date.getUTCMonth() === 7) {
-        console.log('august');
         (this.fieldOfRegardLayer as L.GeoJSON).clearLayers();
         (this.fieldOfRegardLayer as L.GeoJSON).addData(augustFieldOfRegard as GeoJSON.GeometryCollection);
       } else {
         (this.fieldOfRegardLayer as L.GeoJSON).clearLayers();
         (this.fieldOfRegardLayer as L.GeoJSON).addData(fieldOfRegard as GeoJSON.GeometryCollection);
       }
-    }
+    },
+    
+    imagePreload() {
+      const times = this.timestamps.slice(this.minIndex, this.maxIndex + 1);
+      const images = times.map(ts => this.getTempoDataUrl(ts) + this.getTempoFilename(new Date(ts)));
+      const promises = _preloadImages(images);
+      console.log(promises.length);
+      let loaded = 0;
+      promises.forEach((promise) => {
+        promise.then(() => {
+          loaded += 1;
+          this.loadedImagesProgress = (loaded / promises.length) * 100;
+        }).catch((err) => {
+          console.log('error loading image', err);
+        });
+      });
+    },
     
   },
 

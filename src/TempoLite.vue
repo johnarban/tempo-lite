@@ -1430,7 +1430,7 @@ a {
   display: flex;
   flex-direction: row;
   img {
-    height: 35px;
+    height: 35px !important;
     vertical-align: middle;
     margin: 2px;
   }

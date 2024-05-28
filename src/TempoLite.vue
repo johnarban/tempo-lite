@@ -62,7 +62,7 @@
                   <li>
                     Select a date and press the “Play” button or scroll the time slider to view the changing concentrations of NO<sub>2</sub> over North America on those dates. 
                   </li>
-                  <li>
+                  <li v-bind:style="cssVars">
                     Press the <v-icon style="font-size: 1.3em; color: var(--accent-color)" elevation="1">mdi-information-variant-circle-outline</v-icon> button next to each Featured Date to get an overview of what to look for on that date
                   </li>
                   <li>

@@ -420,7 +420,7 @@ interface TimezoneInfo {
   name: string;
 }
 
-import { erdTimestamps, newTimestamps } from "./timestamps";
+import { erdTimestamps, newTimestamps, may2228Times } from "./timestamps";
 
 const fosterTimestamps = [
   1698838920000,
@@ -470,7 +470,7 @@ const fosterTimestamps = [
 ];
 
 // combine the timestamps from the two sources
-const timestamps = erdTimestamps.concat(fosterTimestamps).concat(newTimestamps);
+const timestamps = erdTimestamps.concat(fosterTimestamps).concat(newTimestamps).concat(may2228Times);
 // sort the timestamps
 timestamps.sort();
 
@@ -605,6 +605,7 @@ export default defineComponent({
       erdTimestamps,
       newTimestamps,
       fosterTimestamps,
+      may2228Times,
 
       searchOpen: true,
       searchErrorMessage: null as string | null,
@@ -752,6 +753,10 @@ export default defineComponent({
         // url = 'https://tempo-images-bucket.s3.amazonaws.com/level3_version3/';
         url = "https://johnarban.github.io/wwt_interactives/images/tempo-data/new/";
       }
+      
+      if (this.may2228Times.includes(this.timestamp)) {
+        url = "https://johnarban.github.io/wwt_interactives/images/tempo-data/new_may_22_28/";
+      }
     
       return url + this.imageName;
     },
@@ -767,6 +772,10 @@ export default defineComponent({
       
       if (this.newTimestamps.includes(this.timestamp)) {
         return 'Level 3 (V03)';
+      }
+      
+      if (this.may2228Times.includes(this.timestamp)) {
+        return 'Level 3 (V03) May 22-28';
       }
       
       return 'Unknown';

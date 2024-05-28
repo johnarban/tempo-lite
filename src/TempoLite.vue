@@ -217,18 +217,20 @@
           <div class="d-flex flex-row align-center">
             <v-radio-group v-model="radio">
               <v-radio
-                label="All Available Dates"
+                label="Selected a date"
                 :value="0"
               ></v-radio>
             </v-radio-group>
           </div>        
           <!-- create a list of the uniqueDays -->
           <v-select
+            :modelValue="singleDateSelected"
+            :disabled="radio !== 0"
             :items="uniqueDays"
             item-title="title"
             item-value="value"
             label="Select a Date"
-            @update:model-value="(e) => {radio = undefined; setNearestDate(e);}"
+            @update:model-value="(e) => { singleDateSelected = e;}"
             hide-details
           ></v-select>
         </div>
@@ -516,7 +518,7 @@ export default defineComponent({
       new Date(2024, 2, 28), // Mar 28
     ];
 
-    const dateStrings = {
+    const dateStrings: Record<number,string> = {
       1: 'Nov 1',
       2: 'Nov 3',
       3: 'Mar 28'
@@ -559,7 +561,7 @@ export default defineComponent({
       inIntro: !WINDOW_DONTSHOWINTRO,
       dontShowIntro: WINDOW_DONTSHOWINTRO,
 
-      radio: 0 as number | undefined,
+      radio: 0 as number,
       sublocationRadio: null as number | null,
 
       touchscreen: false,
@@ -606,6 +608,8 @@ export default defineComponent({
       newTimestamps,
       fosterTimestamps,
       may2228Times,
+      
+      singleDateSelected: Date.now() as number | null,
 
       searchOpen: true,
       searchErrorMessage: null as string | null,
@@ -653,6 +657,7 @@ export default defineComponent({
       pane: 'labels'
     }).addTo(this.map as Map);
 
+    this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1].value;
     this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
     
     this.updateFieldOfRegard();
@@ -757,7 +762,7 @@ export default defineComponent({
       if (this.may2228Times.includes(this.timestamp)) {
         url = "https://johnarban.github.io/wwt_interactives/images/tempo-data/new_may_22_28/";
       }
-    
+      console.log('url', url + this.imageName) ;
       return url + this.imageName;
     },
     
@@ -962,13 +967,20 @@ export default defineComponent({
         return;
       }
       if (value == 0) {
-        this.minIndex = 0;
-        this.maxIndex = this.timestamps.length - 1;
+        // this.minIndex = 0;
+        // this.maxIndex = this.timestamps.length - 1;
+        this.setNearestDate(this.singleDateSelected);
         this.sublocationRadio = null;
         return;
       }
       this.setNearestDate(this.datesOfInterest[value]?.getTime() ?? null);
       this.sublocationRadio = null;
+    },
+    
+    singleDateSelected(value: number) {
+      if (value !== null) {
+        this.setNearestDate(value);
+      }
     },
     
     

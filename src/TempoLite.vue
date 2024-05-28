@@ -39,7 +39,15 @@
             <v-window-item :value="2">
               <div class="intro-text mb-3">
                 <p class="mb-3">
-                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO<sub>2</sub>) data from several different dates. NO<sub>2</sub> is produced by the burning of fossil fuels – for example from vehicles, power plants, manufacturing sites, oil refineries, and wildfires. For each date, you can see the scans beginning on the East Coast in the morning, and ending on the West Coast as the Sun sets.
+                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO<sub>2</sub>) data from several different dates. NO<sub>2</sub> is produced by:
+                </p> 
+                <ul>
+                  <li>burning of fossil fuels&#8212;for example from vehicles, power plants, manufacturing sites, oil refineries</li>
+                  <li>wildfires</li>
+                  <li>agricultural use of nitrogen-based fertilizers (which are broken down into NO<sub>2</sub> by microbes in soil)</li>
+                </ul>
+                <p class="mt-3">
+                For each date, you can see the scans beginning on the East Coast in the morning, and ending on the West Coast as the Sun sets.
                 </p> 
               </div>
             </v-window-item>
@@ -174,13 +182,7 @@
         </div>
 
 
-        <div id="timezone-select">
-                  <!-- add text box that allows manually setting the custom image url -->
-          <v-text-field
-            v-model="customImageUrl"
-            label="Custom Image URL"
-            hide-details
-          ></v-text-field>
+        <div id="bottom-options">
           <br>
           <v-select
             v-model="selectedTimezone"
@@ -189,19 +191,49 @@
             item-title="name"
             item-value="tz"
           ></v-select>
+          <div id="control-checkboxes">
+            <v-checkbox
+              v-model="showFieldOfRegard"
+              @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
+              label="TEMPO Field of Regard"
+              color="#c10124"
+              hide-details
+            />       
+          </div>
+                  <!-- add text box that allows manually setting the custom image url -->
+          <!-- <v-text-field
+            v-model="customImageUrl"
+            label="Custom Image URL"
+            hide-details
+          ></v-text-field> -->
+
+          
         </div>
 
        <div id="user-options">
-        {{ whichDataSet }} Data
-        <!-- create a list of the uniqueDays -->
-        <v-select
-          :items="uniqueDays"
-          item-title="title"
-          item-value="value"
-          label="Select a Date"
-          @update:model-value="(e) => {radio = undefined; setNearestDate(e);}"
-          hide-details
-        ></v-select>
+        <!-- {{ whichDataSet }} Data -->
+        <div id="all-dates">
+          <h2>Date Picker</h2>  
+          <div class="d-flex flex-row align-center">
+            <v-radio-group v-model="radio">
+              <v-radio
+                label="All Available Dates"
+                :value="0"
+              ></v-radio>
+            </v-radio-group>
+          </div>        
+          <!-- create a list of the uniqueDays -->
+          <v-select
+            :items="uniqueDays"
+            item-title="title"
+            item-value="value"
+            label="Select a Date"
+            @update:model-value="(e) => {radio = undefined; setNearestDate(e);}"
+            hide-details
+          ></v-select>
+        </div>
+
+
          <div id="date-radio">
            <!-- make a v-radio-group with 3 options -->
           <h2>Featured Dates</h2>
@@ -212,7 +244,7 @@
             <div class="d-flex flex-row align-center">
               <v-radio
                 label="November 1, 2023"
-                :value="0"
+                :value="1"
               >
               </v-radio>
               <info-button>
@@ -231,7 +263,7 @@
             <div class="d-flex flex-row align-center">
               <v-radio
                 label="November 3, 2023"
-                :value="1"
+                :value="2"
               ></v-radio>
               <info-button>
                 Levels of NO<sub>2</sub> change quickly from day to day, 
@@ -242,7 +274,7 @@
             <div class="d-flex flex-row align-center">
               <v-radio
                 label="March 28, 2024"
-                :value="2"
+                :value="3"
               ></v-radio>
               <info-button>
                 Breathing air with a high concentration of NO<sub>2</sub>, 
@@ -254,19 +286,13 @@
                 decisions and take action to improve air quality.
               </info-button>
             </div>
-            <div class="d-flex flex-row align-center">
-              <v-radio
-                label="All Dates"
-                :value="3"
-              ></v-radio>
-            </div>
           </v-radio-group>
         </div>
 
-        <hr style="border-color: grey;">
+        <hr style="border-color: grey;"  v-if="radio>0">
         
-        <div id="locations-of-interest">
-          <h3 class="mb-1">Locations for {{ radio==0 ? 'Nov 1' : radio==1 ? 'Nov 3' : 'Mar 28' }}</h3>
+        <div id="locations-of-interest" v-if="radio>0">
+          <h3 class="mb-1">Locations for {{ dateStrings[radio] }}</h3>
           <v-radio-group
             v-if="radio !== undefined"
             v-model="sublocationRadio"
@@ -290,15 +316,6 @@
 
         <hr style="border-color: grey;">
 
-        <div id="control-checkboxes">
-          <v-checkbox
-            v-model="showFieldOfRegard"
-            @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
-            label="TEMPO Field of Regard"
-            color="#c10124"
-            hide-details
-          />       
-        </div>
       </div>
   
       <div id="information">
@@ -492,23 +509,33 @@ export default defineComponent({
     ) as L.Layer;
       
     const datesOfInterest = [
+      null,
       new Date(2023, 10, 1), // Nov 1
       new Date(2023, 10, 3), // Nov 3
       new Date(2024, 2, 28), // Mar 28
     ];
+
+    const dateStrings = {
+      1: 'Nov 1',
+      2: 'Nov 3',
+      3: 'Mar 28'
+    };
+
     const locationsOfInterest = [
-      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: 4}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: 4}],  // Nov 1
-      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: 19}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: 16}],  // Nov 3
-      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Oil and Gas Production", index: 32}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Fires", index: 36}],  // Mar 28
+      null,
+      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: timestamps.indexOf(1698848520000)}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: timestamps.indexOf(1698848520000)}],  // Nov 1
+      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: timestamps.indexOf(1699021320000)}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: timestamps.indexOf(1699014120000)}],  // Nov 3
+      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Oil and Gas Production", index: timestamps.indexOf(1711631040000)}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Fires", index: timestamps.indexOf(1711644240000)}],  // Mar 28
     ] as LocationOfInterest[][];
     
     const locationsOfInterestText = [
+      ['',''],
       [
         '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly. As the smoke from the fires builds up, it becomes so thick that it becomes difficult for the TEMPO instrument to &lsquo;see through.&rsquo; </p>', 
         '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
       ],  // Nov 1
       [
-        '<p>Los Angeles clearly stands out. NO<sub>2</sub> values are even higher than the maximum of our color bar. You can clearly see the highways including Route 10 between San Bernardino and Mexicali and Route 15 leading from San Bernardino towards Las Vegas. A significant amount of NO<sub>2</sub> in California&rsquo;s central valley is a byproduct of agricultural activity there. Excess fertilizer in the soil gets broken down by microbes to produce nitrogen oxides which are very reactive. Emissions that don&rsquo;t come from combustion are typically much harder to see, but the Central Valley is an area where TEMPO data reveal this agricultural source of pollution.</p>',
+        '<p>Los Angeles clearly stands out. NO<sub>2</sub> values are even higher than the maximum of our color bar. You can clearly see the highways including Route 10 between San Bernardino and Mexicali and Route 15 leading from San Bernardino towards Las Vegas. A significant amount of NO<sub>2</sub> in California&rsquo;s central valley is a byproduct of agricultural activity there. Excess fertilizer in the soil gets broken down by microbes to produce nitrogen oxides which are very reactive. Emissions that don&rsquo;t come from combustion are typically much harder to see, but the Central Valley is an area where TEMPO data may reveal this agricultural source of pollution.</p>',
         '<p>Air pollution is often transported, or moved, over great distances. In this data set large plumes can be seen over the Northeast. If you look closely you can see that many of these plumes appear to originate out of cities in the midwest including Nashville, St. Louis, and Memphis.</p>'
       ],  // Nov 3
       [
@@ -531,7 +558,7 @@ export default defineComponent({
       inIntro: !WINDOW_DONTSHOWINTRO,
       dontShowIntro: WINDOW_DONTSHOWINTRO,
 
-      radio: undefined as number | undefined,
+      radio: 0 as number | undefined,
       sublocationRadio: null as number | null,
 
       touchscreen: false,
@@ -548,6 +575,8 @@ export default defineComponent({
       locationsOfInterest,
       locationsOfInterestText,
       datesOfInterest,
+      dateStrings,
+
       customImageUrl: "",
 
       timezoneOptions: [
@@ -907,13 +936,13 @@ export default defineComponent({
       if (value === undefined) {
         return;
       }
-      if (value == 3) {
+      if (value == 0) {
         this.minIndex = 0;
         this.maxIndex = this.timestamps.length - 1;
         this.sublocationRadio = null;
         return;
       }
-      this.setNearestDate(this.datesOfInterest[value].getTime());
+      this.setNearestDate(this.datesOfInterest[value]?.getTime() ?? null);
       this.sublocationRadio = null;
     },
     
@@ -1146,7 +1175,7 @@ ul {
     grid-row: 3 / 4;
   }
 
-  #timezone-select {
+  #bottom-options {
     margin-left: 1.5rem;
     grid-column: 3 / 4;
     grid-row: 3 / 5;
@@ -1225,7 +1254,10 @@ a {
 
 // prevent overflows of the content
 #user-options {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 5px; 
 }
 
 #date-radio {
@@ -1376,7 +1408,6 @@ a {
 }
 
 #control-checkboxes {
-  margin-top: 0.5em;
 }
 
 #body-logos {

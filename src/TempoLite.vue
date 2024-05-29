@@ -716,7 +716,6 @@ export default defineComponent({
       // @ts-ignore
       crs: L.CRS.EPSG4326
     });
-    console.log(this.map);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const zoomHome = L.Control.zoomHome();

@@ -1587,4 +1587,10 @@ a {
 i.mdi-menu-down {
   color: var(--smithsonian-blue);
 }
+
+*:focus {
+  outline: 5px solid red !important;
+  background-color: red !important;
+}
+
 </style>

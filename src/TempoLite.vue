@@ -1583,7 +1583,7 @@ a {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: end;
+  align-items: flex-start;
   gap: 10px;
 }
 
@@ -1592,6 +1592,8 @@ a {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  padding-left: 7%;
+  padding-right: 7%;
   gap: 2px;
 
   .v-slider {

@@ -1580,6 +1580,18 @@ a {
 }
 
 #control-checkboxes {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+}
+
+#opacity-slider-container {
+  width: 100%;
+
+  .v-slider {
+    margin-right: 0;
+  }
 }
 
 #body-logos {

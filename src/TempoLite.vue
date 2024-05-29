@@ -234,27 +234,44 @@
             hide-details
           ></v-select>
           <!-- add buttons to increment and decrement the singledateselected -->
-          <div class="d-flex flex-row align-center">
-            <v-btn
-              @click="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) - 1]?.value"
-              @keyup.enter="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) - 1]?.value"
-              :disabled="singleDateSelected === uniqueDays[0].value"
-              elevation="0"
-              size="small"
-              icon="mdi-chevron-left"
-            >
-            </v-btn>
+          <div class="d-flex flex-row align-center my-1">
+            <v-tooltip text="Previous Date">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  class="rounded-icon-wrapper"
+                  @click="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) - 1]?.value"
+                  @keyup.enter="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) - 1]?.value"
+                  :disabled="radio !== 0 || singleDateSelected === uniqueDays[0].value"
+                  color="#009ade"
+                  variant="outlined"
+                  elevation="0"
+                  size="md"
+                >
+                  <v-icon>mdi-chevron-double-left</v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
             <v-spacer></v-spacer>
-            <v-btn
-              @click="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) + 1]?.value"
-              @keyup.enter="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) + 1]?.value"
-              :disabled="singleDateSelected === uniqueDays[uniqueDays.length - 1].value"
-              elevation="0"
-              size="small"
-              icon="mdi-chevron-right"
-            >
-            </v-btn>
+            <v-tooltip text="Next Date">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  class="rounded-icon-wrapper"
+                  @click="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) + 1]?.value"
+                  @keyup.enter="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) + 1]?.value"
+                  :disabled="radio !== 0 || singleDateSelected === uniqueDays[uniqueDays.length - 1].value"
+                  color="#009ade"
+                  variant="outlined"
+                  elevation="0"
+                  size="md"
+                >
+                  <v-icon>mdi-chevron-double-right</v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
           </div>
+          <hr style="border-color: grey">
           <br>
           <v-progress-linear
           v-if="loadedImagesProgress < 100"
@@ -1530,4 +1547,18 @@ a {
   border: 1px solid blue;
 }
 
+.rounded-icon-wrapper{
+  height: fit-content;
+  align-self: center;
+  padding-inline: 0.5rem;
+  margin-left: 0.75rem;
+  width: 2.5rem;
+  color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  border-radius: 20px;
+}
+
+i.mdi-menu-down {
+  color: var(--smithsonian-blue);
+}
 </style>

@@ -118,10 +118,10 @@
       <!-- tempo logo -->
       <a href="https://tempo.si.edu" target="_blank" rel="noopener noreferrer" >
         <img 
-        src="./assets/TEMPO-Logo-Small.png"
-        alt="TEMPO Logo"
-        style="width: 100px; height: 100px;"
-      >
+          src="./assets/TEMPO-Logo-Small.png"
+          alt="TEMPO Logo"
+          style="width: 100px; height: 100px;"
+        >
       </a>
 
       <h1 id="title">What is in the Air You Breathe?</h1>
@@ -137,7 +137,7 @@
           start-value="1"
           end-value="150"
           :extend="true"
-          >
+        >
           <template v-slot:label>
               <div style="text-align: center;">Amount of NO&#x2082;<br><span class="unit-label">(10&sup1;&#x2074; molecules/cm&sup2;)</span></div>
           </template>
@@ -156,10 +156,12 @@
           }"
           @error="(error: string) => searchErrorMessage = error"
         ></location-search>
+
       </div>
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
           <v-slider
+            class="time-slider"
             v-model="timeIndex"
             :min="minIndex"
             :max="maxIndex"
@@ -183,7 +185,6 @@
           ></icon-button>
         </div>
 
-
         <div id="bottom-options">
           <br>
           <v-select
@@ -200,7 +201,21 @@
               label="TEMPO Field of Regard"
               color="#c10124"
               hide-details
-            />       
+            />
+          <div
+            id="opacity-slider-container"
+          >
+            <v-slider
+              v-model="opacity"
+              :min="0"
+              :max="1"
+              color="#c10124"
+              density="compact"
+              hide-details
+            >
+            </v-slider>
+            <div id="opacity-slider-label">TEMPO opacity</div>
+          </div> 
           </div>
                   <!-- add text box that allows manually setting the custom image url -->
           <!-- <v-text-field
@@ -609,6 +624,8 @@ export default defineComponent({
         '<p>Two fires can be seen popping up south and east of Alexandria. These are most easily identified as hot spots of NO2 that appear quickly. As the smoke from the fires build up it becomes so thick that it becomes difficult for the TEMPO instrument to &lsquo;see through.&rsquo;</p>'
       ],  // Mar 28
     ];
+
+    const opacity = 0.7;
     return {
       showSplashScreen,
       sheet: null as SheetType,
@@ -663,9 +680,10 @@ export default defineComponent({
       timeValues: [...Array(timestamps.length).keys()],
       playing: false,
       imageOverlay: new L.ImageOverlay("", novDecBounds, {
-        opacity: 1,
+        opacity,
         interactive: false,
       }),
+      opacity,
       timestamps,
       erdTimestamps,
       newTimestamps,
@@ -1084,13 +1102,16 @@ export default defineComponent({
       }
     },
     
-    
     sublocationRadio(value: number | null) {
       if (value !== null && this.radio !== undefined) {
         const loi = this.locationsOfInterest[this.radio][value];
         this.map?.setView(loi.latlng, loi.zoom);
         this.timeIndex = loi.index;
       }
+    },
+
+    opacity(value: number) {
+      this.imageOverlay.setOpacity(value);
     }
   }
 });
@@ -1292,7 +1313,7 @@ ul {
     grid-column: 2 / 3;
     grid-row: 1 / 2;
   }
-  
+
   #where {
     grid-column: 1 / 2;
     grid-row: 2 / 3;
@@ -1317,6 +1338,7 @@ ul {
     margin-left: 1.5rem;
     grid-column: 3 / 4;
     grid-row: 3 / 5;
+    height: fit-content;
   }
   
   #information {
@@ -1452,7 +1474,7 @@ a {
     z-index: 1000;
     width: 250px;
   }
-  
+
   > #map-legend {
     position: absolute;
     top: 0;
@@ -1512,44 +1534,77 @@ a {
   }
 }
 
+.time-slider {
 
-.v-slider-thumb__surface::after {
-  background-image: url("./assets/smithsonian.png");
-  background-size: 30px 30px;
-  height: 30px;
-  width: 30px;
-}
+  .v-slider-thumb {
 
-.v-slider-thumb__label {
-  background-color: var(--accent-color-2);
-  border: 0.25rem solid var(--accent-color);
-  width: max-content;
-  height: 2.5rem;
-  font-size: 1rem;
+    .v-slider-thumb__surface::after {
+      background-image: url("./assets/smithsonian.png");
+      background-size: 30px 30px;
+      height: 30px;
+      width: 30px;
+    }
+    
+    .v-slider-thumb__label {
+      background-color: var(--accent-color-2);
+      border: 0.25rem solid var(--accent-color);
+      width: max-content;
+      height: 2.5rem;
+      font-size: 1rem;
+    
+      &::before {
+        color: var(--accent-color);
+      }
+    }
+  }
 
-  &::before {
-    color: var(--accent-color);
+  .v-slider {
+  
+    .v-slider.v-input--horizontal {
+      grid-template-rows: auto 0px;
+    }
+    
+    .v-slider.v-input--horizontal .v-slider-thumb__label {
+      // top: calc(var(--v-slider-thumb-size) * 1.5);
+      z-index:2000;
+    }
+    
+    .v-slider.v-input--horizontal .v-slider-thumb__label::before {
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+        border-top: 6px solid currentColor;
+        bottom: -15px;
+    }
   }
 }
 
-.v-slider.v-input--horizontal {
-  grid-template-rows: auto 0px;
-}
-
-.v-slider.v-input--horizontal .v-slider-thumb__label {
-  // top: calc(var(--v-slider-thumb-size) * 1.5);
-  z-index:2000;
-}
-
-.v-slider.v-input--horizontal .v-slider-thumb__label::before {
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-bottom: 6px solid transparent;
-    border-top: 6px solid currentColor;
-    bottom: -15px;
-}
-
 #control-checkboxes {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+#opacity-slider-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding-left: 7%;
+  padding-right: 7%;
+  gap: 2px;
+
+  .v-slider {
+    margin-right: 0;
+    width: 100%;
+  }
+
+  #opacity-slider-label {
+    opacity: 0.7;
+    width: fit-content;
+  }
 }
 
 #body-logos {
@@ -1568,10 +1623,6 @@ a {
 
 .v-radio-group .v-input__details {
   display: none;
-}
-
-.leaflet-image-layer {
-  border: 1px solid blue;
 }
 
 .rounded-icon-wrapper{

@@ -215,25 +215,74 @@
        <div id="user-options">
         <!-- {{ whichDataSet }} Data -->
         <div id="all-dates">
-          <h2>Date Picker</h2>  
+          <h2>Available Dates</h2>  
           <div class="d-flex flex-row align-center">
             <v-radio-group v-model="radio">
               <v-radio
-                label="All Available Dates"
+                label="Select a date"
                 :value="0"
               ></v-radio>
             </v-radio-group>
           </div>        
           <!-- create a list of the uniqueDays -->
           <v-select
+            :modelValue="singleDateSelected"
+            :disabled="radio !== 0"
             :items="uniqueDays"
             item-title="title"
             item-value="value"
             label="Select a Date"
-            @update:model-value="(e) => {radio = undefined; setNearestDate(e);}"
+            @update:model-value="(e) => { singleDateSelected = e;}"
             hide-details
+            variant="solo"
           ></v-select>
+          <!-- add buttons to increment and decrement the singledateselected -->
+          <div class="d-flex flex-row align-center my-3">
+            <v-tooltip text="Previous Date">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  class="rounded-icon-wrapper"
+                  @click="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) - 1]?.value"
+                  @keyup.enter="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) - 1]?.value"
+                  :disabled="radio !== 0 || singleDateSelected === uniqueDays[0].value"
+                  color="#009ade"
+                  variant="outlined"
+                  elevation="0"
+                  size="md"
+                >
+                  <v-icon>mdi-chevron-double-left</v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
+            <v-spacer></v-spacer>
+            <v-tooltip text="Next Date">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  class="rounded-icon-wrapper"
+                  @click="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) + 1]?.value"
+                  @keyup.enter="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) + 1]?.value"
+                  :disabled="radio !== 0 || singleDateSelected === uniqueDays[uniqueDays.length - 1].value"
+                  color="#009ade"
+                  variant="outlined"
+                  elevation="0"
+                  size="md"
+                >
+                  <v-icon>mdi-chevron-double-right</v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
+          </div>
+          <v-progress-linear
+            v-if="loadedImagesProgress < 100"
+            v-model="loadedImagesProgress"
+            color="red"
+            height="5"
+          ></v-progress-linear>
         </div>
+
+        <hr style="border-color: grey">
 
 
          <div id="date-radio">
@@ -412,7 +461,7 @@ import augustFieldOfRegard from "./assets/august_for.json";
 // We DO use MapBoxFeature in the template, but eslint isn't picking this up for some reason
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
-
+import { _preloadImages } from "./PreloadImages";
 
 type SheetType = "text" | "video" | null;
 type Timeout = ReturnType<typeof setTimeout>;
@@ -422,7 +471,7 @@ interface TimezoneInfo {
   name: string;
 }
 
-import { erdTimestamps, newTimestamps } from "./timestamps";
+import { erdTimestamps, newTimestamps, may2228Times } from "./timestamps";
 
 const fosterTimestamps = [
   1698838920000,
@@ -472,7 +521,7 @@ const fosterTimestamps = [
 ];
 
 // combine the timestamps from the two sources
-const timestamps = erdTimestamps.concat(fosterTimestamps).concat(newTimestamps);
+const timestamps = erdTimestamps.concat(fosterTimestamps).concat(newTimestamps).concat(may2228Times);
 // sort the timestamps
 timestamps.sort();
 
@@ -485,6 +534,10 @@ interface LocationOfInterest {
 }
 
 const WINDOW_DONTSHOWINTRO = window.localStorage.getItem("dontShowIntro") === 'true';
+
+function zpad(n: number, width: number = 2, character: string = "0"): string {
+  return n.toString().padStart(width, character);
+}
 
 export default defineComponent({
   data() {
@@ -518,7 +571,7 @@ export default defineComponent({
       new Date(2024, 2, 28), // Mar 28
     ];
 
-    const dateStrings = {
+    const dateStrings: Record<number,string> = {
       1: 'Nov 1',
       2: 'Nov 3',
       3: 'Mar 28'
@@ -561,7 +614,7 @@ export default defineComponent({
       inIntro: !WINDOW_DONTSHOWINTRO,
       dontShowIntro: WINDOW_DONTSHOWINTRO,
 
-      radio: 0 as number | undefined,
+      radio: 0 as number,
       sublocationRadio: null as number | null,
 
       touchscreen: false,
@@ -607,6 +660,9 @@ export default defineComponent({
       erdTimestamps,
       newTimestamps,
       fosterTimestamps,
+      may2228Times,
+      
+      singleDateSelected: Date.now() as number | null,
 
       searchOpen: true,
       searchErrorMessage: null as string | null,
@@ -614,6 +670,8 @@ export default defineComponent({
       showControls: true,
       showFieldOfRegard: true,
       showCredits: false,
+      
+      loadedImagesProgress: 50,
     };
   },
 
@@ -654,6 +712,7 @@ export default defineComponent({
       pane: 'labels'
     }).addTo(this.map as Map);
 
+    this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1].value;
     this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
     
     this.updateFieldOfRegard();
@@ -732,29 +791,14 @@ export default defineComponent({
     },
     
     imageName(): string {
-      const fname = `tempo_${this.date.getUTCFullYear()}-${(this.date.getUTCMonth()+1).toString().padStart(2, '0')}-${this.date.getUTCDate().toString().padStart(2, '0')}T${this.date.getUTCHours()}h${this.date.getUTCMinutes().toString().padStart(2, '0')}m.png`;
-      return fname;
+      return this.getTempoFilename(this.date);
     },
     
     imageUrl(): string {
       if (this.customImageUrl) {
         return this.customImageUrl;
       }
-      let url = '';
-      if (this.fosterTimestamps.includes(this.timestamp)) {
-        url = 'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/';
-      }
-      
-      if (this.erdTimestamps.includes(this.timestamp)) {
-        // url = 'https://tempo-images-bucket.s3.amazonaws.com/early_release_v01/';
-        url = "https://johnarban.github.io/wwt_interactives/images/tempo-data/erd/";
-      }
-      
-      if (this.newTimestamps.includes(this.timestamp)) {
-        // url = 'https://tempo-images-bucket.s3.amazonaws.com/level3_version3/';
-        url = "https://johnarban.github.io/wwt_interactives/images/tempo-data/new/";
-      }
-    
+      const url = this.getTempoDataUrl(this.timestamp);
       return url + this.imageName;
     },
     
@@ -769,6 +813,10 @@ export default defineComponent({
       
       if (this.newTimestamps.includes(this.timestamp)) {
         return 'Level 3 (V03)';
+      }
+      
+      if (this.may2228Times.includes(this.timestamp)) {
+        return 'Level 3 (V03) May 22-28';
       }
       
       return 'Unknown';
@@ -835,7 +883,7 @@ export default defineComponent({
     closeSplashScreen() {
       this.showSplashScreen = false; 
     },
-
+    
     selectSheet(name: SheetType) {
       if (this.sheet === name) {
         this.sheet = null;
@@ -873,7 +921,7 @@ export default defineComponent({
         } else {
           this.timeIndex += 1;
         }
-      }, 250);
+      }, 1000);
     },
     pause() {
       if (this.playInterval) {
@@ -883,6 +931,36 @@ export default defineComponent({
     updateBounds() {
       this.imageOverlay.setBounds(this.imageBounds);
     },
+    
+    // preloadImages(images: string[]) {
+    //   const promises = images.map(src => loadImage(src));
+    //   return promises;
+    // },
+    
+    getTempoFilename(date: Date): string {
+      return `tempo_${date.getUTCFullYear()}-${zpad(date.getUTCMonth()+1)}-${zpad(date.getUTCDate())}T${zpad(date.getUTCHours())}h${zpad(date.getUTCMinutes())}m.png`;
+    },
+    
+    getTempoDataUrl(timestamp: number): string {
+      if (this.fosterTimestamps.includes(timestamp)) {
+        return 'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/';
+      }
+      
+      if (this.erdTimestamps.includes(timestamp)) {
+        // url = 'https://tempo-images-bucket.s3.amazonaws.com/early_release_v01/';
+        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/erd/";
+      }
+      
+      if (this.newTimestamps.includes(timestamp)) {
+        // url = 'https://tempo-images-bucket.s3.amazonaws.com/level3_version3/';
+        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/new/";
+      }
+      
+      if (this.may2228Times.includes(timestamp)) {
+        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/new_may_22_28/";
+      }
+      return '';
+    }, 
     
     setNearestDate(date: number | null) {
       if (date == null) {
@@ -894,19 +972,34 @@ export default defineComponent({
       this.minIndex = this.timestamps.indexOf(mod[0]);
       this.maxIndex = this.timestamps.indexOf(mod[mod.length - 1]);
       this.timeIndex = this.minIndex;
+      this.imagePreload();
     },
     
     updateFieldOfRegard() {
-      console.log('updateFieldOfRegarg');
       if (this.date.getUTCFullYear() === 2023 && this.date.getUTCMonth() === 7) {
-        console.log('august');
         (this.fieldOfRegardLayer as L.GeoJSON).clearLayers();
         (this.fieldOfRegardLayer as L.GeoJSON).addData(augustFieldOfRegard as GeoJSON.GeometryCollection);
       } else {
         (this.fieldOfRegardLayer as L.GeoJSON).clearLayers();
         (this.fieldOfRegardLayer as L.GeoJSON).addData(fieldOfRegard as GeoJSON.GeometryCollection);
       }
-    }
+    },
+    
+    imagePreload() {
+      const times = this.timestamps.slice(this.minIndex, this.maxIndex + 1);
+      const images = times.map(ts => this.getTempoDataUrl(ts) + this.getTempoFilename(new Date(ts)));
+      const promises = _preloadImages(images);
+      console.log(promises.length);
+      let loaded = 0;
+      promises.forEach((promise) => {
+        promise.then(() => {
+          loaded += 1;
+          this.loadedImagesProgress = (loaded / promises.length) * 100;
+        }).catch((err) => {
+          console.log('error loading image', err);
+        });
+      });
+    },
     
   },
 
@@ -955,13 +1048,20 @@ export default defineComponent({
         return;
       }
       if (value == 0) {
-        this.minIndex = 0;
-        this.maxIndex = this.timestamps.length - 1;
+        // this.minIndex = 0;
+        // this.maxIndex = this.timestamps.length - 1;
+        this.setNearestDate(this.singleDateSelected);
         this.sublocationRadio = null;
         return;
       }
       this.setNearestDate(this.datesOfInterest[value]?.getTime() ?? null);
       this.sublocationRadio = null;
+    },
+    
+    singleDateSelected(value: number) {
+      if (value !== null) {
+        this.setNearestDate(value);
+      }
     },
     
     
@@ -1279,6 +1379,10 @@ a {
 }
 
 #date-radio {
+  padding-block: 0.5rem;
+}
+
+#all-dates {
   padding-bottom: 0.5rem;
 }
 
@@ -1450,4 +1554,18 @@ a {
   border: 1px solid blue;
 }
 
+.rounded-icon-wrapper{
+  height: fit-content;
+  align-self: center;
+  padding-inline: 0.5rem;
+  margin-left: 0.75rem;
+  width: 2.5rem;
+  color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  border-radius: 20px;
+}
+
+i.mdi-menu-down {
+  color: var(--smithsonian-blue);
+}
 </style>

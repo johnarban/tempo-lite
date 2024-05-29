@@ -126,21 +126,6 @@
 
       <h1 id="title">What is in the Air You Breathe?</h1>
       <div id="where" class="big-label">where</div>
-      <div
-        id="opacity-slider-container"
-      >
-        <v-slider
-          v-model="opacity"
-          :min="0"
-          :max="1"
-          color="red"
-          direction="vertical"
-        >
-          <template v-slot:thumb-label>
-            <span class="mdi mdi-opacity"></span>
-          </template>
-        </v-slider>
-      </div>
       <div id="map-container">
         <div id="map"></div>
         <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
@@ -216,7 +201,23 @@
               label="TEMPO Field of Regard"
               color="#c10124"
               hide-details
-            />       
+            />
+          <div
+            id="opacity-slider-container"
+          >
+            <v-slider
+              v-model="opacity"
+              :min="0"
+              :max="1"
+              color="#c10124"
+              density="compact"
+              label="TEMPO opacity"
+            >
+              <template v-slot:thumb-label>
+                <span class="mdi mdi-opacity"></span>
+              </template>
+            </v-slider>
+          </div> 
           </div>
                   <!-- add text box that allows manually setting the custom image url -->
           <!-- <v-text-field

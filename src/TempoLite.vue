@@ -332,7 +332,7 @@
         </p>
 
           <div class="d-flex flex-row justify-space-between">
-          <a>
+          <a tabindex="0">
             Credits
             <v-dialog
               id="credits-dialog"

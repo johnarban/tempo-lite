@@ -473,7 +473,7 @@ interface TimezoneInfo {
   name: string;
 }
 
-import { erdTimestamps, newTimestamps, may2228Times } from "./timestamps";
+import { erdTimestamps, newTimestamps, may2228Times, may28th } from "./timestamps";
 
 const fosterTimestamps = [
   1698838920000,
@@ -523,7 +523,7 @@ const fosterTimestamps = [
 ];
 
 // combine the timestamps from the two sources
-const timestamps = erdTimestamps.concat(fosterTimestamps).concat(newTimestamps).concat(may2228Times);
+const timestamps = erdTimestamps.concat(fosterTimestamps).concat(newTimestamps).concat(may2228Times).concat(may28th);
 // sort the timestamps
 timestamps.sort();
 
@@ -666,6 +666,7 @@ export default defineComponent({
       newTimestamps,
       fosterTimestamps,
       may2228Times,
+      may28th,
       
       singleDateSelected: Date.now() as number | null,
 
@@ -821,7 +822,11 @@ export default defineComponent({
       }
       
       if (this.may2228Times.includes(this.timestamp)) {
-        return 'Level 3 (V03) May 22-28';
+        return 'Level 3 (V03) May 22-27';
+      }
+      
+      if (this.may28th.includes(this.timestamp)) {
+        return 'Level 3 (V03) May 28';
       }
       
       return 'Unknown';
@@ -964,6 +969,11 @@ export default defineComponent({
       if (this.may2228Times.includes(timestamp)) {
         return "https://johnarban.github.io/wwt_interactives/images/tempo-data/new_may_22_28/";
       }
+      
+      if (this.may28th.includes(timestamp)) {
+        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/may_28/";
+      }
+      
       return '';
     }, 
     

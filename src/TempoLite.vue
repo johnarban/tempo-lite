@@ -211,11 +211,10 @@
               :max="1"
               color="#c10124"
               density="compact"
+              hide-details
             >
-              <template v-slot:append>
-                <span style="opacity: 0.7">TEMPO opacity</span>
-              </template>
             </v-slider>
+            <div id="opacity-slider-label">TEMPO opacity</div>
           </div> 
           </div>
                   <!-- add text box that allows manually setting the custom image url -->
@@ -1339,6 +1338,7 @@ ul {
     margin-left: 1.5rem;
     grid-column: 3 / 4;
     grid-row: 3 / 5;
+    height: fit-content;
   }
   
   #information {
@@ -1584,13 +1584,24 @@ a {
   display: flex;
   flex-direction: column;
   align-items: end;
+  gap: 10px;
 }
 
 #opacity-slider-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
+  gap: 2px;
 
   .v-slider {
     margin-right: 0;
+    width: 100%;
+  }
+
+  #opacity-slider-label {
+    opacity: 0.7;
+    width: fit-content;
   }
 }
 

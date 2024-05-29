@@ -1625,10 +1625,6 @@ a {
   display: none;
 }
 
-.leaflet-image-layer {
-  border: 1px solid blue;
-}
-
 .rounded-icon-wrapper{
   height: fit-content;
   align-self: center;

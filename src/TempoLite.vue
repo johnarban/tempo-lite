@@ -235,7 +235,7 @@
             variant="solo"
           ></v-select>
           <!-- add buttons to increment and decrement the singledateselected -->
-          <div class="d-flex flex-row align-center my-1">
+          <div class="d-flex flex-row align-center my-3">
             <v-tooltip text="Previous Date">
               <template v-slot:activator="{ props }">
                 <v-btn
@@ -272,15 +272,15 @@
               </template>
             </v-tooltip>
           </div>
-          <hr style="border-color: grey">
-          <br>
           <v-progress-linear
-          v-if="loadedImagesProgress < 100"
-          v-model="loadedImagesProgress"
-          color="red"
-          height="5"
-        ></v-progress-linear>
+            v-if="loadedImagesProgress < 100"
+            v-model="loadedImagesProgress"
+            color="red"
+            height="5"
+          ></v-progress-linear>
         </div>
+
+        <hr style="border-color: grey">
 
 
          <div id="date-radio">
@@ -1377,6 +1377,10 @@ a {
 }
 
 #date-radio {
+  padding-block: 0.5rem;
+}
+
+#all-dates {
   padding-bottom: 0.5rem;
 }
 

@@ -213,7 +213,7 @@
        <div id="user-options">
         <!-- {{ whichDataSet }} Data -->
         <div id="all-dates">
-          <h2>Date Picker</h2>  
+          <h2>Available Dates</h2>  
           <div class="d-flex flex-row align-center">
             <v-radio-group v-model="radio">
               <v-radio

@@ -213,7 +213,7 @@
               density="compact"
             >
               <template v-slot:append>
-                TEMPO opacity 
+                <span style="opacity: 0.7">TEMPO opacity</span>
               </template>
             </v-slider>
           </div> 

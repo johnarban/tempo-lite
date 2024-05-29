@@ -118,14 +118,29 @@
       <!-- tempo logo -->
       <a href="https://tempo.si.edu" target="_blank" rel="noopener noreferrer" >
         <img 
-        src="./assets/TEMPO-Logo-Small.png"
-        alt="TEMPO Logo"
-        style="width: 100px; height: 100px;"
-      >
+          src="./assets/TEMPO-Logo-Small.png"
+          alt="TEMPO Logo"
+          style="width: 100px; height: 100px;"
+        >
       </a>
 
       <h1 id="title">What is in the Air You Breathe?</h1>
       <div id="where" class="big-label">where</div>
+      <div
+        id="opacity-slider-container"
+      >
+        <v-slider
+          v-model="opacity"
+          :min="0"
+          :max="1"
+          color="red"
+          direction="vertical"
+        >
+          <template v-slot:thumb-label>
+            <span class="mdi mdi-opacity"></span>
+          </template>
+        </v-slider>
+      </div>
       <div id="map-container">
         <div id="map"></div>
         <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
@@ -137,7 +152,7 @@
           start-value="1"
           end-value="150"
           :extend="true"
-          >
+        >
           <template v-slot:label>
               <div style="text-align: center;">Amount of NO&#x2082;<br><span class="unit-label">(10&sup1;&#x2074; molecules/cm&sup2;)</span></div>
           </template>
@@ -156,10 +171,12 @@
           }"
           @error="(error: string) => searchErrorMessage = error"
         ></location-search>
+
       </div>
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
           <v-slider
+            class="time-slider"
             v-model="timeIndex"
             :min="minIndex"
             :max="maxIndex"
@@ -182,7 +199,6 @@
             @activate="playing = !playing"
           ></icon-button>
         </div>
-
 
         <div id="bottom-options">
           <br>
@@ -609,6 +625,8 @@ export default defineComponent({
         '<p>Two fires can be seen popping up south and east of Alexandria. These are most easily identified as hot spots of NO2 that appear quickly. As the smoke from the fires build up it becomes so thick that it becomes difficult for the TEMPO instrument to &lsquo;see through.&rsquo;</p>'
       ],  // Mar 28
     ];
+
+    const opacity = 0.7;
     return {
       showSplashScreen,
       sheet: null as SheetType,
@@ -663,9 +681,10 @@ export default defineComponent({
       timeValues: [...Array(timestamps.length).keys()],
       playing: false,
       imageOverlay: new L.ImageOverlay("", novDecBounds, {
-        opacity: 1,
+        opacity,
         interactive: false,
       }),
+      opacity,
       timestamps,
       erdTimestamps,
       newTimestamps,
@@ -699,6 +718,7 @@ export default defineComponent({
       // @ts-ignore
       crs: L.CRS.EPSG4326
     });
+    console.log(this.map);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const zoomHome = L.Control.zoomHome();
@@ -1084,13 +1104,16 @@ export default defineComponent({
       }
     },
     
-    
     sublocationRadio(value: number | null) {
       if (value !== null && this.radio !== undefined) {
         const loi = this.locationsOfInterest[this.radio][value];
         this.map?.setView(loi.latlng, loi.zoom);
         this.timeIndex = loi.index;
       }
+    },
+
+    opacity(value: number) {
+      this.imageOverlay.setOpacity(value);
     }
   }
 });
@@ -1292,7 +1315,7 @@ ul {
     grid-column: 2 / 3;
     grid-row: 1 / 2;
   }
-  
+
   #where {
     grid-column: 1 / 2;
     grid-row: 2 / 3;
@@ -1452,7 +1475,7 @@ a {
     z-index: 1000;
     width: 250px;
   }
-  
+
   > #map-legend {
     position: absolute;
     top: 0;
@@ -1512,41 +1535,49 @@ a {
   }
 }
 
+.time-slider {
 
-.v-slider-thumb__surface::after {
-  background-image: url("./assets/smithsonian.png");
-  background-size: 30px 30px;
-  height: 30px;
-  width: 30px;
-}
+  .v-slider-thumb {
 
-.v-slider-thumb__label {
-  background-color: var(--accent-color-2);
-  border: 0.25rem solid var(--accent-color);
-  width: max-content;
-  height: 2.5rem;
-  font-size: 1rem;
-
-  &::before {
-    color: var(--accent-color);
+    .v-slider-thumb__surface::after {
+      background-image: url("./assets/smithsonian.png");
+      background-size: 30px 30px;
+      height: 30px;
+      width: 30px;
+    }
+    
+    .v-slider-thumb__label {
+      background-color: var(--accent-color-2);
+      border: 0.25rem solid var(--accent-color);
+      width: max-content;
+      height: 2.5rem;
+      font-size: 1rem;
+    
+      &::before {
+        color: var(--accent-color);
+      }
+    }
   }
-}
 
-.v-slider.v-input--horizontal {
-  grid-template-rows: auto 0px;
-}
-
-.v-slider.v-input--horizontal .v-slider-thumb__label {
-  // top: calc(var(--v-slider-thumb-size) * 1.5);
-  z-index:2000;
-}
-
-.v-slider.v-input--horizontal .v-slider-thumb__label::before {
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-bottom: 6px solid transparent;
-    border-top: 6px solid currentColor;
-    bottom: -15px;
+  .v-slider {
+  
+    .v-slider.v-input--horizontal {
+      grid-template-rows: auto 0px;
+    }
+    
+    .v-slider.v-input--horizontal .v-slider-thumb__label {
+      // top: calc(var(--v-slider-thumb-size) * 1.5);
+      z-index:2000;
+    }
+    
+    .v-slider.v-input--horizontal .v-slider-thumb__label::before {
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+        border-top: 6px solid currentColor;
+        bottom: -15px;
+    }
+  }
 }
 
 #control-checkboxes {

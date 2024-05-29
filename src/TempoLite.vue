@@ -221,6 +221,7 @@
               <v-radio
                 label="Select a date"
                 :value="0"
+                @keyup.enter="radio = 0"
               ></v-radio>
             </v-radio-group>
           </div>        
@@ -296,6 +297,7 @@
               <v-radio
                 label="November 1, 2023"
                 :value="1"
+                @keyup.enter="radio = 1"
               >
               </v-radio>
               <info-button>
@@ -315,6 +317,7 @@
               <v-radio
                 label="November 3, 2023"
                 :value="2"
+                @keyup.enter="radio = 2"
               ></v-radio>
               <info-button>
                 Levels of NO<sub>2</sub> change quickly from day to day, 
@@ -326,6 +329,7 @@
               <v-radio
                 label="March 28, 2024"
                 :value="3"
+                @keyup.enter="radio = 3"
               ></v-radio>
               <info-button>
                 Breathing air with a high concentration of NO<sub>2</sub>, 
@@ -357,6 +361,7 @@
               class="sublocation-radio"
               :label="loi.text"
               :value="index"
+              @keyup.enter="sublocationRadio = index"
             ></v-radio>
             <info-button>
               <p v-html="locationsOfInterestText[radio][index]"></p>
@@ -378,7 +383,7 @@
         </p>
 
           <div class="d-flex flex-row justify-space-between">
-          <a>
+          <a tabindex="0">
             Credits
             <v-dialog
               id="credits-dialog"

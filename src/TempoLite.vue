@@ -216,17 +216,8 @@
         <!-- {{ whichDataSet }} Data -->
         <div id="all-dates">
           <h2>Available Dates</h2>  
-          <div class="d-flex flex-row align-center">
-            <v-radio-group v-model="radio">
-              <v-radio
-                label="Select a date"
-                :value="0"
-                @keyup.enter="radio = 0"
-              ></v-radio>
-            </v-radio-group>
-          </div>        
-          <!-- create a list of the uniqueDays -->
           <v-select
+            class="my-2"
             :modelValue="singleDateSelected"
             :disabled="radio !== 0"
             :items="uniqueDays"
@@ -235,10 +226,11 @@
             label="Select a Date"
             @update:model-value="(e) => { singleDateSelected = e;}"
             hide-details
-            variant="solo"
+            variant="outlined"
+            density="compact"
           ></v-select>
           <!-- add buttons to increment and decrement the singledateselected -->
-          <div class="d-flex flex-row align-center my-3">
+          <div class="d-flex flex-row align-center mt-2 mb-1">
             <v-tooltip text="Previous Date">
               <template v-slot:activator="{ props }">
                 <v-btn
@@ -293,6 +285,13 @@
             v-model="radio"
             row
           >
+            <div class="d-flex flex-column align-stretch">
+              <v-radio
+                label="Select a date"
+                :value="0"
+                @keyup.enter="radio = 0"
+              ></v-radio>
+            </div>        
             <div class="d-flex flex-row align-center">
               <v-radio
                 label="November 1, 2023"
@@ -1403,7 +1402,7 @@ a {
 }
 
 #all-dates {
-  padding-bottom: 0.5rem;
+  // padding-bottom: 0.5rem;
 }
 
 #locations-of-interest {

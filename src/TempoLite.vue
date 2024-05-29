@@ -39,12 +39,14 @@
             <v-window-item :value="2">
               <div class="intro-text mb-3">
                 <p class="mb-3">
-                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO<sub>2</sub>) data from several different dates. NO<sub>2</sub> is produced by:
+                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO<sub>2</sub>) data over time. NO<sub>2</sub> can be produced by:
                 </p> 
                 <ul>
-                  <li>burning of fossil fuels&#8212;for example from vehicles, power plants, manufacturing sites, oil refineries</li>
-                  <li>wildfires</li>
-                  <li>agricultural use of nitrogen-based fertilizers (which are broken down into NO<sub>2</sub> by microbes in soil)</li>
+                  <li>Burning of fossil fuels&#8212;for example from vehicles, power plants, manufacturing sites, and oil refineries</li>
+                  <li>Fires and biomass burning&#8212;including wildfires and prescribed burns, as well as burning of vegetation for land clearing</li>
+                  <li>Bacteria, which naturally convert nitrogen in soil into compounds that can form NO<sub>2</sub>. Agricultural use of nitrogen-based fertilizers increases the amount of NO<sub>2</sub> produced by these bacteria.</li>
+                  <li>Lightning, which triggers a chemical reaction that turns harmless N<sub>2</sub> in the atmosphere into NO<sub>2</sub>.
+</li>
                 </ul>
                 <p class="mt-3">
                 For each date, you can see the scans beginning on the East Coast in the morning, and ending on the West Coast as the Sun sets.
@@ -60,11 +62,11 @@
                   <li>
                     Select a date and press the “Play” button or scroll the time slider to view the changing concentrations of NO<sub>2</sub> over North America on those dates. 
                   </li>
-                  <li>
-                    Press the “Info” button next to each Featured Date to get an overview of what to look for on that date
+                  <li v-bind:style="cssVars">
+                    Press the <v-icon style="font-size: 1.3em; color: var(--accent-color)" elevation="1">mdi-information-variant-circle-outline</v-icon> button next to each Featured Date to get an overview of what to look for on that date
                   </li>
                   <li>
-                    For each date, select one of two zoomed-in Locations to investigate specific pollution events.
+                    For each Featured Date, select one of two zoomed-in Locations to investigate specific pollution events.
                   </li>
                   <li>
                     You can use the “Timezone” setting to investigate how pollution evolves over the day, for example as rush hour progresses in large cities.
@@ -182,7 +184,8 @@
         </div>
 
 
-        <div id="timezone-select">
+        <div id="bottom-options">
+          <br>
           <v-select
             v-model="selectedTimezone"
             label="Timezone"
@@ -190,9 +193,98 @@
             item-title="name"
             item-value="tz"
           ></v-select>
+          <div id="control-checkboxes">
+            <v-checkbox
+              v-model="showFieldOfRegard"
+              @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
+              label="TEMPO Field of Regard"
+              color="#c10124"
+              hide-details
+            />       
+          </div>
+                  <!-- add text box that allows manually setting the custom image url -->
+          <!-- <v-text-field
+            v-model="customImageUrl"
+            label="Custom Image URL"
+            hide-details
+          ></v-text-field> -->
+
+          
         </div>
 
        <div id="user-options">
+        <!-- {{ whichDataSet }} Data -->
+        <div id="all-dates">
+          <h2>Available Dates</h2>  
+          <div class="d-flex flex-row align-center">
+            <v-radio-group v-model="radio">
+              <v-radio
+                label="Select a date"
+                :value="0"
+              ></v-radio>
+            </v-radio-group>
+          </div>        
+          <!-- create a list of the uniqueDays -->
+          <v-select
+            :modelValue="singleDateSelected"
+            :disabled="radio !== 0"
+            :items="uniqueDays"
+            item-title="title"
+            item-value="value"
+            label="Select a Date"
+            @update:model-value="(e) => { singleDateSelected = e;}"
+            hide-details
+            variant="solo"
+          ></v-select>
+          <!-- add buttons to increment and decrement the singledateselected -->
+          <div class="d-flex flex-row align-center my-3">
+            <v-tooltip text="Previous Date">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  class="rounded-icon-wrapper"
+                  @click="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) - 1]?.value"
+                  @keyup.enter="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) - 1]?.value"
+                  :disabled="radio !== 0 || singleDateSelected === uniqueDays[0].value"
+                  color="#009ade"
+                  variant="outlined"
+                  elevation="0"
+                  size="md"
+                >
+                  <v-icon>mdi-chevron-double-left</v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
+            <v-spacer></v-spacer>
+            <v-tooltip text="Next Date">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  v-bind="props"
+                  class="rounded-icon-wrapper"
+                  @click="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) + 1]?.value"
+                  @keyup.enter="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) + 1]?.value"
+                  :disabled="radio !== 0 || singleDateSelected === uniqueDays[uniqueDays.length - 1].value"
+                  color="#009ade"
+                  variant="outlined"
+                  elevation="0"
+                  size="md"
+                >
+                  <v-icon>mdi-chevron-double-right</v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
+          </div>
+          <v-progress-linear
+            v-if="loadedImagesProgress < 100"
+            v-model="loadedImagesProgress"
+            color="red"
+            height="5"
+          ></v-progress-linear>
+        </div>
+
+        <hr style="border-color: grey">
+
+
          <div id="date-radio">
            <!-- make a v-radio-group with 3 options -->
           <h2>Featured Dates</h2>
@@ -203,7 +295,7 @@
             <div class="d-flex flex-row align-center">
               <v-radio
                 label="November 1, 2023"
-                :value="0"
+                :value="1"
               >
               </v-radio>
               <info-button>
@@ -222,7 +314,7 @@
             <div class="d-flex flex-row align-center">
               <v-radio
                 label="November 3, 2023"
-                :value="1"
+                :value="2"
               ></v-radio>
               <info-button>
                 Levels of NO<sub>2</sub> change quickly from day to day, 
@@ -233,7 +325,7 @@
             <div class="d-flex flex-row align-center">
               <v-radio
                 label="March 28, 2024"
-                :value="2"
+                :value="3"
               ></v-radio>
               <info-button>
                 Breathing air with a high concentration of NO<sub>2</sub>, 
@@ -248,11 +340,12 @@
           </v-radio-group>
         </div>
 
-        <hr style="border-color: grey;">
+        <hr style="border-color: grey;"  v-if="radio>0">
         
-        <div id="locations-of-interest">
-          <h3 class="mb-1">Locations for {{ radio==0 ? 'Nov 1' : radio==1 ? 'Nov 3' : 'Mar 28' }}</h3>
+        <div id="locations-of-interest" v-if="radio>0">
+          <h3 class="mb-1">Locations for {{ dateStrings[radio] }}</h3>
           <v-radio-group
+            v-if="radio !== undefined"
             v-model="sublocationRadio"
             row
           >
@@ -274,15 +367,6 @@
 
         <hr style="border-color: grey;">
 
-        <div id="control-checkboxes">
-          <v-checkbox
-            v-model="showFieldOfRegard"
-            @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
-            label="TEMPO Field of Regard"
-            color="#c10124"
-            hide-details
-          />       
-        </div>
       </div>
   
       <div id="information">
@@ -373,9 +457,11 @@ import  { cividis } from "./cividis";
 import  { svs } from "./svs_cmap";
 import { cbarNO2, cbarNO2ColorsRevised2023 } from "./revised_cmap";
 import fieldOfRegard from "./assets/TEMPO_FOR.json";
+import augustFieldOfRegard from "./assets/august_for.json";
 // We DO use MapBoxFeature in the template, but eslint isn't picking this up for some reason
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
+import { _preloadImages } from "./PreloadImages";
 
 
 
@@ -387,7 +473,9 @@ interface TimezoneInfo {
   name: string;
 }
 
-const timestamps = [
+import { erdTimestamps, newTimestamps, may2228Times } from "./timestamps";
+
+const fosterTimestamps = [
   1698838920000,
   1698841320000,
   1698843720000,
@@ -434,6 +522,12 @@ const timestamps = [
   1711668240000,
 ];
 
+// combine the timestamps from the two sources
+const timestamps = erdTimestamps.concat(fosterTimestamps).concat(newTimestamps).concat(may2228Times);
+// sort the timestamps
+timestamps.sort();
+
+
 interface LocationOfInterest {
   latlng: L.LatLngExpression;
   zoom: number;
@@ -446,12 +540,21 @@ const hideIntro = urlParams.get("hideintro") === "true";
 const WINDOW_DONTSHOWINTRO = hideIntro ? true: window.localStorage.getItem("dontShowIntro") === 'true';
 
 
+function zpad(n: number, width: number = 2, character: string = "0"): string {
+  return n.toString().padStart(width, character);
+}
+
 export default defineComponent({
   data() {
     const showSplashScreen = new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false";
     const novDecBounds = new L.LatLngBounds(
       new L.LatLng(17.025, -154.975),
       new L.LatLng(63.975, -24.475)
+    );
+    
+    const marchBounds = new L.LatLngBounds(
+      new L.LatLng(14.01, -167.99),
+      new L.LatLng(72.99, -13.01)
     );
 
     const fieldOfRegardLayer = L.geoJSON(
@@ -465,14 +568,29 @@ export default defineComponent({
         },
       }
     ) as L.Layer;
+      
+    const datesOfInterest = [
+      null,
+      new Date(2023, 10, 1), // Nov 1
+      new Date(2023, 10, 3), // Nov 3
+      new Date(2024, 2, 28), // Mar 28
+    ];
+
+    const dateStrings: Record<number,string> = {
+      1: 'Nov 1',
+      2: 'Nov 3',
+      3: 'Mar 28'
+    };
 
     const locationsOfInterest = [
-      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: 4}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: 4}],  // Nov 1
-      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: 19}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: 16}],  // Nov 3
-      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Oil and Gas Production", index: 32}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Fires", index: 36}],  // Mar 28
+      null,
+      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: timestamps.indexOf(1698848520000)}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: timestamps.indexOf(1698848520000)}],  // Nov 1
+      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: timestamps.indexOf(1699021320000)}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: timestamps.indexOf(1699014120000)}],  // Nov 3
+      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Oil and Gas Production", index: timestamps.indexOf(1711631040000)}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Fires", index: timestamps.indexOf(1711644240000)}],  // Mar 28
     ] as LocationOfInterest[][];
     
     const locationsOfInterestText = [
+      ['',''],
       [
         '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly. As the smoke from the fires builds up, it becomes so thick that it becomes difficult for the TEMPO instrument to &lsquo;see through.&rsquo; </p>', 
         '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
@@ -501,7 +619,7 @@ export default defineComponent({
       inIntro: !WINDOW_DONTSHOWINTRO,
       dontShowIntro: WINDOW_DONTSHOWINTRO,
 
-      radio: 0,
+      radio: 0 as number,
       sublocationRadio: null as number | null,
 
       touchscreen: false,
@@ -513,9 +631,14 @@ export default defineComponent({
         new L.LatLng(14.01, -167.99),
         new L.LatLng(72.99, -13.01)
       ),
+      bounds: marchBounds.toBBoxString().split(",").map(parseFloat),
       fieldOfRegardLayer,
       locationsOfInterest,
       locationsOfInterestText,
+      datesOfInterest,
+      dateStrings,
+
+      customImageUrl: "",
 
       timezoneOptions: [
         { tz: 'US/Eastern', name: 'Eastern Daylight' },
@@ -524,13 +647,14 @@ export default defineComponent({
         { tz: 'US/Arizona', name: 'Mountain Standard' },
         { tz: 'US/Pacific', name: 'Pacific Daylight' },
         { tz: 'US/Alaska', name: 'Alaska Daylight' },
+        { tz: 'UTC', name: 'UTC' },
       ] as TimezoneInfo[],
       selectedTimezone: "US/Eastern",
 
       timestep: 0,
       timeIndex: 0,
       minIndex: 0,
-      maxIndex: 14,
+      maxIndex: timestamps.length - 1,
       timeValues: [...Array(timestamps.length).keys()],
       playing: false,
       imageOverlay: new L.ImageOverlay("", novDecBounds, {
@@ -538,6 +662,12 @@ export default defineComponent({
         interactive: false,
       }),
       timestamps,
+      erdTimestamps,
+      newTimestamps,
+      fosterTimestamps,
+      may2228Times,
+      
+      singleDateSelected: Date.now() as number | null,
 
       searchOpen: true,
       searchErrorMessage: null as string | null,
@@ -545,6 +675,8 @@ export default defineComponent({
       showControls: true,
       showFieldOfRegard: true,
       showCredits: false,
+      
+      loadedImagesProgress: 50,
     };
   },
 
@@ -585,8 +717,10 @@ export default defineComponent({
       pane: 'labels'
     }).addTo(this.map as Map);
 
+    this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1].value;
     this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
     
+    this.updateFieldOfRegard();
     if (this.showFieldOfRegard) {
       this.fieldOfRegardLayer.addTo(this.map as Map);
     }
@@ -660,11 +794,68 @@ export default defineComponent({
       }
       return `${this.date.getUTCMonth()+1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${hourValue}:${date.getUTCMinutes().toString().padStart(2, '0')} ${amPm}`;
     },
-    imageUrl(): string {
-      const url =  'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/tempo_';
-      // const url = 'tempo-lite-images.s3.us-east-1.amazonaws.com';
-      return `${url}${this.date.getUTCFullYear()}-${(this.date.getUTCMonth()+1).toString().padStart(2, '0')}-${this.date.getUTCDate().toString().padStart(2, '0')}T${this.date.getUTCHours()}h${this.date.getUTCMinutes().toString().padStart(2, '0')}m.png`;
+    
+    imageName(): string {
+      return this.getTempoFilename(this.date);
     },
+    
+    imageUrl(): string {
+      if (this.customImageUrl) {
+        return this.customImageUrl;
+      }
+      const url = this.getTempoDataUrl(this.timestamp);
+      return url + this.imageName;
+    },
+    
+    whichDataSet(): string {
+      if (this.fosterTimestamps.includes(this.timestamp)) {
+        return 'TEMPO-lite';
+      }
+      
+      if (this.erdTimestamps.includes(this.timestamp)) {
+        return 'Early Release (V01)';
+      }
+      
+      if (this.newTimestamps.includes(this.timestamp)) {
+        return 'Level 3 (V03)';
+      }
+      
+      if (this.may2228Times.includes(this.timestamp)) {
+        return 'Level 3 (V03) May 22-28';
+      }
+      
+      return 'Unknown';
+    },
+    
+    newBounds() {
+      return new L.LatLngBounds(
+        new L.LatLng(this.bounds[1], this.bounds[0]),
+        new L.LatLng(this.bounds[3], this.bounds[2])
+      );
+    },
+    
+    imageBounds() {
+      // currently the 2023 data is all V01
+      if (this.date.getUTCFullYear() === 2023) {
+        return this.novDecBounds;
+      } else if (this.date.getUTCFullYear() === 2024 && this.date.getUTCMonth() === 2) {
+        return this.marchBounds;
+      } else {
+        return this.newBounds;
+      }
+    },
+    
+    uniqueDays() {
+      // eastern time
+      const offset = (date: Date) => getTimezoneOffset("US/Eastern", date);
+      const easternDates = this.timestamps.map(ts => new Date(ts + offset(new Date(ts))));
+      const days = easternDates.map(date => new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())).map(date => date.getTime());
+      const unique =  Array.from(new Set(days));
+      const stamps = unique.map(day => new Date(day)).map(date => date.toDateString());
+      // create an object with keys for timestamp and value
+      return stamps.map((stamp, index) => ({ value: unique[index], title: stamp }));
+    }
+    
   },
 
   methods: {
@@ -697,7 +888,7 @@ export default defineComponent({
     closeSplashScreen() {
       this.showSplashScreen = false; 
     },
-
+    
     selectSheet(name: SheetType) {
       if (this.sheet === name) {
         this.sheet = null;
@@ -741,7 +932,80 @@ export default defineComponent({
       if (this.playInterval) {
         clearInterval(this.playInterval);
       }
-    }
+    },
+    updateBounds() {
+      this.imageOverlay.setBounds(this.imageBounds);
+    },
+    
+    // preloadImages(images: string[]) {
+    //   const promises = images.map(src => loadImage(src));
+    //   return promises;
+    // },
+    
+    getTempoFilename(date: Date): string {
+      return `tempo_${date.getUTCFullYear()}-${zpad(date.getUTCMonth()+1)}-${zpad(date.getUTCDate())}T${zpad(date.getUTCHours())}h${zpad(date.getUTCMinutes())}m.png`;
+    },
+    
+    getTempoDataUrl(timestamp: number): string {
+      if (this.fosterTimestamps.includes(timestamp)) {
+        return 'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/';
+      }
+      
+      if (this.erdTimestamps.includes(timestamp)) {
+        // url = 'https://tempo-images-bucket.s3.amazonaws.com/early_release_v01/';
+        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/erd/";
+      }
+      
+      if (this.newTimestamps.includes(timestamp)) {
+        // url = 'https://tempo-images-bucket.s3.amazonaws.com/level3_version3/';
+        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/new/";
+      }
+      
+      if (this.may2228Times.includes(timestamp)) {
+        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/new_may_22_28/";
+      }
+      return '';
+    }, 
+    
+    setNearestDate(date: number | null) {
+      if (date == null) {
+        return;
+      }
+      const onedayinms = 1000 * 60 * 60 * 24;
+      const mod = this.timestamps.filter(ts => ((ts - date) < onedayinms) && (ts - date) > 0);
+      // set minIndex and maxIndex to the first and last index of the mod array
+      this.minIndex = this.timestamps.indexOf(mod[0]);
+      this.maxIndex = this.timestamps.indexOf(mod[mod.length - 1]);
+      this.timeIndex = this.minIndex;
+      this.imagePreload();
+    },
+    
+    updateFieldOfRegard() {
+      if (this.date.getUTCFullYear() === 2023 && this.date.getUTCMonth() === 7) {
+        (this.fieldOfRegardLayer as L.GeoJSON).clearLayers();
+        (this.fieldOfRegardLayer as L.GeoJSON).addData(augustFieldOfRegard as GeoJSON.GeometryCollection);
+      } else {
+        (this.fieldOfRegardLayer as L.GeoJSON).clearLayers();
+        (this.fieldOfRegardLayer as L.GeoJSON).addData(fieldOfRegard as GeoJSON.GeometryCollection);
+      }
+    },
+    
+    imagePreload() {
+      const times = this.timestamps.slice(this.minIndex, this.maxIndex + 1);
+      const images = times.map(ts => this.getTempoDataUrl(ts) + this.getTempoFilename(new Date(ts)));
+      const promises = _preloadImages(images);
+      console.log(promises.length);
+      let loaded = 0;
+      promises.forEach((promise) => {
+        promise.then(() => {
+          loaded += 1;
+          this.loadedImagesProgress = (loaded / promises.length) * 100;
+        }).catch((err) => {
+          console.log('error loading image', err);
+        });
+      });
+    },
+    
   },
 
   watch: {
@@ -767,8 +1031,15 @@ export default defineComponent({
       }
     },
     imageUrl(url: string) {
+      this.updateBounds();
       this.imageOverlay.setUrl(url);
+      this.updateFieldOfRegard();
     },
+    
+    imageBounds(bounds: L.LatLngBounds) {
+      console.log(this.whichDataSet, bounds.toBBoxString());
+    },
+    
     showFieldOfRegard (show: boolean) {
       if (show) {
         this.fieldOfRegardLayer.addTo(this.map as Map);
@@ -776,17 +1047,31 @@ export default defineComponent({
         this.map.removeLayer(this.fieldOfRegardLayer as L.Layer);
       }
     },
+    
     radio(value: number) {
-      const minIndex = 15 * value;
-      this.minIndex = minIndex;
-      this.maxIndex = Math.min(15 * (value + 1) - 1, this.timestamps.length - 1);
-      this.timeIndex = minIndex;
-      const bounds = value < 2 ? this.novDecBounds : this.marchBounds;
-      this.imageOverlay.setBounds(bounds);
+      if (value === undefined) {
+        return;
+      }
+      if (value == 0) {
+        // this.minIndex = 0;
+        // this.maxIndex = this.timestamps.length - 1;
+        this.setNearestDate(this.singleDateSelected);
+        this.sublocationRadio = null;
+        return;
+      }
+      this.setNearestDate(this.datesOfInterest[value]?.getTime() ?? null);
       this.sublocationRadio = null;
     },
-    sublocationRadio(value: number | null) {
+    
+    singleDateSelected(value: number) {
       if (value !== null) {
+        this.setNearestDate(value);
+      }
+    },
+    
+    
+    sublocationRadio(value: number | null) {
+      if (value !== null && this.radio !== undefined) {
         const loi = this.locationsOfInterest[this.radio][value];
         this.map?.setView(loi.latlng, loi.zoom);
         this.timeIndex = loi.index;
@@ -970,7 +1255,7 @@ ul {
   
   display: grid;
   grid-template-columns: .08fr .8fr .3fr;
-  grid-template-rows: 50px var(--map-height) 78px 1fr;
+  grid-template-rows: 50px var(--map-height) 78px .5fr .5fr;
   gap: 20px 10px;
   
   > * {
@@ -1013,21 +1298,21 @@ ul {
     grid-row: 3 / 4;
   }
 
-  #timezone-select {
+  #bottom-options {
     margin-left: 1.5rem;
     grid-column: 3 / 4;
-    grid-row: 3 / 4;
+    grid-row: 3 / 5;
   }
   
   #information {
     padding: 1rem;
     grid-column: 2 / 3;
-    grid-row: 4 / 5;
+    grid-row: 4 / 6;
   }
 
   #body-logos { 
     grid-column: 3 / 4;
-    grid-row: 4 / 5;
+    grid-row: 5 / 6;
     align-self: end;
     justify-self: end;
   }
@@ -1092,10 +1377,17 @@ a {
 
 // prevent overflows of the content
 #user-options {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 5px; 
 }
 
 #date-radio {
+  padding-block: 0.5rem;
+}
+
+#all-dates {
   padding-bottom: 0.5rem;
 }
 
@@ -1243,14 +1535,13 @@ a {
 }
 
 #control-checkboxes {
-  margin-top: 0.5em;
 }
 
 #body-logos {
   display: flex;
   flex-direction: row;
   img {
-    height: 35px;
+    height: 35px !important;
     vertical-align: middle;
     margin: 2px;
   }
@@ -1264,4 +1555,22 @@ a {
   display: none;
 }
 
+.leaflet-image-layer {
+  border: 1px solid blue;
+}
+
+.rounded-icon-wrapper{
+  height: fit-content;
+  align-self: center;
+  padding-inline: 0.5rem;
+  margin-left: 0.75rem;
+  width: 2.5rem;
+  color: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  border-radius: 20px;
+}
+
+i.mdi-menu-down {
+  color: var(--smithsonian-blue);
+}
 </style>

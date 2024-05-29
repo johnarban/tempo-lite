@@ -39,12 +39,14 @@
             <v-window-item :value="2">
               <div class="intro-text mb-3">
                 <p class="mb-3">
-                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO<sub>2</sub>) data from several different dates. NO<sub>2</sub> is produced by:
+                  This Data Story provides an introduction to what can be learned from TEMPO’s data, which became publicly available May 20, 2024. The map here visualizes hourly Nitrogen Dioxide (NO<sub>2</sub>) data over time. NO<sub>2</sub> can be produced by:
                 </p> 
                 <ul>
-                  <li>burning of fossil fuels&#8212;for example from vehicles, power plants, manufacturing sites, oil refineries</li>
-                  <li>wildfires</li>
-                  <li>agricultural use of nitrogen-based fertilizers (which are broken down into NO<sub>2</sub> by microbes in soil)</li>
+                  <li>Burning of fossil fuels&#8212;for example from vehicles, power plants, manufacturing sites, and oil refineries</li>
+                  <li>Fires and biomass burning&#8212;including wildfires and prescribed burns, as well as burning of vegetation for land clearing</li>
+                  <li>Bacteria, which naturally convert nitrogen in soil into compounds that can form NO<sub>2</sub>. Agricultural use of nitrogen-based fertilizers increases the amount of NO<sub>2</sub> produced by these bacteria.</li>
+                  <li>Lightning, which triggers a chemical reaction that turns harmless N<sub>2</sub> in the atmosphere into NO<sub>2</sub>.
+</li>
                 </ul>
                 <p class="mt-3">
                 For each date, you can see the scans beginning on the East Coast in the morning, and ending on the West Coast as the Sun sets.
@@ -60,11 +62,11 @@
                   <li>
                     Select a date and press the “Play” button or scroll the time slider to view the changing concentrations of NO<sub>2</sub> over North America on those dates. 
                   </li>
-                  <li>
-                    Press the “Info” button next to each Featured Date to get an overview of what to look for on that date
+                  <li v-bind:style="cssVars">
+                    Press the <v-icon style="font-size: 1.3em; color: var(--accent-color)" elevation="1">mdi-information-variant-circle-outline</v-icon> button next to each Featured Date to get an overview of what to look for on that date
                   </li>
                   <li>
-                    For each date, select one of two zoomed-in Locations to investigate specific pollution events.
+                    For each Featured Date, select one of two zoomed-in Locations to investigate specific pollution events.
                   </li>
                   <li>
                     You can use the “Timezone” setting to investigate how pollution evolves over the day, for example as rush hour progresses in large cities.
@@ -1430,7 +1432,7 @@ a {
   display: flex;
   flex-direction: row;
   img {
-    height: 35px;
+    height: 35px !important;
     vertical-align: middle;
     margin: 2px;
   }

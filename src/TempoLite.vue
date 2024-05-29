@@ -211,8 +211,10 @@
               :max="1"
               color="#c10124"
               density="compact"
-              label="TEMPO opacity"
             >
+              <template v-slot:append>
+                TEMPO opacity 
+              </template>
             </v-slider>
           </div> 
           </div>

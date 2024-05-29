@@ -213,9 +213,6 @@
               density="compact"
               label="TEMPO opacity"
             >
-              <template v-slot:thumb-label>
-                <span class="mdi mdi-opacity"></span>
-              </template>
             </v-slider>
           </div> 
           </div>

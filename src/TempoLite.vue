@@ -217,7 +217,7 @@
           <div class="d-flex flex-row align-center">
             <v-radio-group v-model="radio">
               <v-radio
-                label="Selected a date"
+                label="Select a date"
                 :value="0"
               ></v-radio>
             </v-radio-group>
@@ -232,6 +232,7 @@
             label="Select a Date"
             @update:model-value="(e) => { singleDateSelected = e;}"
             hide-details
+            variant="solo"
           ></v-select>
           <!-- add buttons to increment and decrement the singledateselected -->
           <div class="d-flex flex-row align-center my-1">
@@ -918,7 +919,7 @@ export default defineComponent({
         } else {
           this.timeIndex += 1;
         }
-      }, 250);
+      }, 1000);
     },
     pause() {
       if (this.playInterval) {

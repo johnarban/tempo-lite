@@ -1728,7 +1728,7 @@ i.mdi-menu-down {
   
   }
 }
-@media (max-width: 750px) {
+@media (max-width: 0px) {
   :root {
     --map-height: 50vh;
   }

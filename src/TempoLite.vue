@@ -1481,6 +1481,7 @@ a {
   position: relative;
   display: flex;
   flex-direction: row;
+  padding-right: 10px;
 
   > #map {
     flex-basis: 80%;
@@ -1648,6 +1649,10 @@ a {
   display: none;
 }
 
+.v-selection-control {
+  height: 2.5rem;
+}
+
 .v-radio-group .v-input__details {
   display: none;
 }
@@ -1675,8 +1680,14 @@ i.mdi-menu-down {
 // KEEP THEM ALL HERE
 @media (max-width: 1100px) {
   
-
+  h2 {
+    font-size: 1.5rem;
+  }
     
+  .v-label {
+    font-size: 1rem;
+  }
+  
   .content-with-sidebars {
     grid-template-columns: 0px auto auto;
     
@@ -1690,7 +1701,7 @@ i.mdi-menu-down {
     
     #title {
       text-wrap: wrap;
-      font-size: 1.5em;
+      font-size: 1.75rem;
       margin-left: 55px;
     }
     
@@ -1717,7 +1728,7 @@ i.mdi-menu-down {
   
   }
 }
-@media (max-width: 0px) {
+@media (max-width: 750px) {
   :root {
     --map-height: 50vh;
   }
@@ -1727,7 +1738,7 @@ i.mdi-menu-down {
   }
   
   .v-label {
-    font-size: 1.25em;
+    font-size: 1rem;
   }
   
   

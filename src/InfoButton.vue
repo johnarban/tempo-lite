@@ -71,12 +71,12 @@ export default defineComponent({
 }
 
 .info-button-close-icon__icon {
-  position:absolute;
-  right:0;
+  position:absolute !important;
+  right:0 !important;
   cursor:pointer;
   
-  padding:1em;
-  margin:-1em;
+  padding:1em !important;
+  margin:-1em !important;
 }
 
 .info-button-close-icon__icon:hover {

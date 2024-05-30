@@ -230,18 +230,31 @@
        <div id="user-options">
         <!-- {{ whichDataSet }} Data -->
         <div id="all-dates">
-          <h2>Available Dates</h2>  
+          <h2>Select a Date</h2>  
           <div class="d-flex flex-row align-center">
             <v-radio-group v-model="radio">
               <v-radio
                 label="Select a date"
                 :value="0"
                 @keyup.enter="radio = 0"
-              ></v-radio>
+              >
+              <template #label>
+                <v-select
+                  :modelValue="singleDateSelected"
+                  :disabled="radio !== 0"
+                  :items="uniqueDays"
+                  item-title="title"
+                  item-value="value"
+                  label="Select a Date"
+                  @update:model-value="(e) => { singleDateSelected = e;}"
+                  hide-details
+                ></v-select>
+              </template>
+            </v-radio>
             </v-radio-group>
           </div>        
           <!-- create a list of the uniqueDays -->
-          <v-select
+          <!-- <v-select
             :modelValue="singleDateSelected"
             :disabled="radio !== 0"
             :items="uniqueDays"
@@ -251,7 +264,7 @@
             @update:model-value="(e) => { singleDateSelected = e;}"
             hide-details
             variant="solo"
-          ></v-select>
+          ></v-select> -->
           <!-- add buttons to increment and decrement the singledateselected -->
           <div class="d-flex flex-row align-center my-3">
             <v-tooltip text="Previous Date">
@@ -493,7 +506,7 @@ interface TimezoneInfo {
   name: string;
 }
 
-import { erdTimestamps, newTimestamps, may2228Times, may28th } from "./timestamps";
+import { erdTimestamps, newTimestamps, may2228Times, may28th, may29th } from "./timestamps";
 
 const fosterTimestamps = [
   1698838920000,
@@ -543,7 +556,7 @@ const fosterTimestamps = [
 ];
 
 // combine the timestamps from the two sources
-const timestamps = erdTimestamps.concat(fosterTimestamps).concat(newTimestamps).concat(may2228Times).concat(may28th);
+const timestamps = erdTimestamps.concat(fosterTimestamps).concat(newTimestamps).concat(may2228Times).concat(may28th).concat(may29th);
 // sort the timestamps
 timestamps.sort();
 
@@ -612,7 +625,7 @@ export default defineComponent({
     const locationsOfInterestText = [
       ['',''],
       [
-        '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly. As the smoke from the fires builds up, it becomes so thick that it becomes difficult for the TEMPO instrument to &lsquo;see through.&rsquo; </p>', 
+        '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly.</p>', 
         '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
       ],  // Nov 1
       [
@@ -621,7 +634,7 @@ export default defineComponent({
       ],  // Nov 3
       [
         '<p>The Permian basin, near Odessa, has two large plumes of NO2. This is the largest oil and gas producing area in the USA. You can also see here how pollution from a source in one state (Texas) can be transported across state lines to New Mexico.</p>',
-        '<p>Two fires can be seen popping up south and east of Alexandria. These are most easily identified as hot spots of NO2 that appear quickly. As the smoke from the fires build up it becomes so thick that it becomes difficult for the TEMPO instrument to &lsquo;see through.&rsquo;</p>'
+        '<p>Two fires can be seen popping up south and east of Alexandria. These are most easily identified as hot spots of NO2 that appear quickly.</p>'
       ],  // Mar 28
     ];
 
@@ -690,6 +703,7 @@ export default defineComponent({
       fosterTimestamps,
       may2228Times,
       may28th,
+      may29th,
       
       singleDateSelected: Date.now() as number | null,
 
@@ -852,6 +866,11 @@ export default defineComponent({
         return 'Level 3 (V03) May 28';
       }
       
+      if (this.may28th.includes(this.timestamp)) {
+        return 'Level 3 (V03) May 29';
+      }
+      
+      
       return 'Unknown';
     },
     
@@ -997,6 +1016,9 @@ export default defineComponent({
         return "https://johnarban.github.io/wwt_interactives/images/tempo-data/may_28/";
       }
       
+      if (this.may29th.includes(timestamp)) {
+        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/may_29/";
+      }
       return '';
     }, 
     
@@ -1617,6 +1639,11 @@ a {
   }
 }
 
+*:focus-visible {
+  outline: 2px solid magenta;
+
+}
+
 #icons-container > a[href="https://worldwidetelescope.org/home/"] {
   display: none;
 }
@@ -1833,4 +1860,22 @@ i.mdi-menu-down {
 
 }
 
+/* Leaflet crispness override */
+// @JobLeonard - https://github.com/Leaflet/Leaflet/issues/5883#issue-269071844
+// .leaflet-container .leaflet-overlay-pane svg,
+// .leaflet-container .leaflet-marker-pane img,
+// .leaflet-container .leaflet-shadow-pane img,
+// .leaflet-container .leaflet-tile-pane img,
+.leaflet-container img.leaflet-image-layer {
+  max-width: none !important;
+  /* Preserve crisp pixels with scaled up images */
+  image-rendering: optimizeSpeed;             /* Legal fallback */
+  image-rendering: -moz-crisp-edges;          /* Firefox        */
+  image-rendering: -o-crisp-edges;            /* Opera          */
+  image-rendering: -webkit-optimize-contrast; /* Safari         */
+  image-rendering: optimize-contrast;         /* CSS3 Proposed  */
+  image-rendering: crisp-edges;               /* CSS4 Proposed  */
+  image-rendering: pixelated;                 /* CSS4 Proposed  */
+  -ms-interpolation-mode: nearest-neighbor;   /* IE8+           */
+}
 </style>

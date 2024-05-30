@@ -638,7 +638,7 @@ export default defineComponent({
       ],  // Mar 28
     ];
 
-    const opacity = 0.7;
+    const opacity = 1;
     return {
       showSplashScreen,
       sheet: null as SheetType,

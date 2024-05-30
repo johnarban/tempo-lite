@@ -1481,6 +1481,7 @@ a {
   position: relative;
   display: flex;
   flex-direction: row;
+  padding-right: 10px;
 
   > #map {
     flex-basis: 80%;
@@ -1497,7 +1498,7 @@ a {
     width: 250px;
   }
 
-  > #map-legend {
+  #map-legend {
     position: absolute;
     top: 0;
     right: 65px;
@@ -1648,6 +1649,10 @@ a {
   display: none;
 }
 
+.v-selection-control {
+  height: 2.5rem;
+}
+
 .v-radio-group .v-input__details {
   display: none;
 }
@@ -1665,6 +1670,205 @@ a {
 
 i.mdi-menu-down {
   color: var(--smithsonian-blue);
+}
+
+
+
+//  mobile styles
+
+// ========= DEFINE MOBILE STYLES =========
+// KEEP THEM ALL HERE
+@media (max-width: 1100px) {
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+    
+  .v-label {
+    font-size: 1rem;
+  }
+  
+  .content-with-sidebars {
+    grid-template-columns: 0px auto auto;
+    
+    #when {
+      display: none;
+    }
+    
+    #where {
+      display: none;
+    }
+    
+    #title {
+      text-wrap: wrap;
+      font-size: 1.75rem;
+      margin-left: 55px;
+    }
+    
+    #slider-row {
+      margin-left: 3rem;
+    }
+    
+    a[href="https://tempo.si.edu"] > img {
+      height: 50px!important;
+      width: auto !important;
+    }
+    
+    #map-container {
+      .colorbar-container {
+        z-index: 5000;
+      }
+      
+    }
+    
+    #user-options {
+      width: 250px;
+    }
+  
+  
+  }
+}
+@media (max-width: 0px) {
+  :root {
+    --map-height: 50vh;
+  }
+  
+  #app {
+    font-size: 12pt;
+  }
+  
+  .v-label {
+    font-size: 1rem;
+  }
+  
+  
+  #introduction-overlay .v-window {
+    max-height: 75vh;
+    max-height: 75dvh;
+    max-height: 75sdvh;
+    overflow-y: scroll;
+  }
+  
+  #introduction-overlay .intro-text {
+    font-size: 1.15em;
+  }
+  
+  #introduction-overlay ul li {
+    margin-block-start: 1.15em;
+  }
+  .content-with-sidebars {
+    grid-template-columns: 1fr;
+    grid-template-rows: 50px var(--map-height) 78px repeat(5, auto);
+    gap: 10px;
+    
+     > div {
+      margin: 0px;
+     }
+    
+    #title {
+      min-width: 0;
+      grid-column: 1 / 2;
+      grid-row: 1 / 2;
+    }
+    
+    a[href="https://tempo.si.edu"]:has(img) {
+      grid-column: 1 / 2;
+      grid-row: 1 / 2;
+    }
+    
+    #map-container {
+      grid-column: 1 / 2;
+      grid-row: 2 / 3;
+    }
+    
+    #slider-row {
+      grid-column: 1 / 2;
+      grid-row: 3 / 4;
+    }
+    
+    #user-options {
+      grid-column: 1 / 2;
+      grid-row: 4 / 5;
+    }
+    
+    
+    #where {
+      display: none;
+    }
+    
+    
+    #when {
+      display: none;
+    }
+    
+    
+    #bottom-options {
+      grid-column: 1 / 2;
+      grid-row: 5 / 6;
+    }
+    
+    #information {
+      grid-column: 1 / 2;
+      grid-row: 6 / 7;
+    }
+    
+    #body-logos {
+      grid-column: 1 / 2;
+      grid-row: 7 / 8;
+    }
+  }
+  
+  .content-with-sidebars {
+    
+    > div {
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+    }
+    
+    #map-container {
+      .colorbar-container {
+        display: none;
+      }
+    } 
+    
+    #slider-row {
+      margin-left: 3rem;
+    }
+    
+    #user-options {
+      margin: 0;
+    }
+    
+    #bottom-options {
+      margin: 0;
+    }
+    
+    #information {
+      font-size: 1em;
+    }
+    
+  }
+  
+  #title {
+    font-size: 16px;
+    margin-left: 75px;
+    text-wrap: wrap;
+
+  }
+
+  a[href="https://tempo.si.edu"] > img {
+
+      display: inline;
+      float: left;
+      height: 50px!important;
+      width: auto !important;
+
+    }
+  
+  
+  
+
 }
 
 /* Leaflet crispness override */

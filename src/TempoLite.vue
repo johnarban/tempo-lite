@@ -230,18 +230,31 @@
        <div id="user-options">
         <!-- {{ whichDataSet }} Data -->
         <div id="all-dates">
-          <h2>Available Dates</h2>  
+          <h2>Select a Date</h2>  
           <div class="d-flex flex-row align-center">
             <v-radio-group v-model="radio">
               <v-radio
                 label="Select a date"
                 :value="0"
                 @keyup.enter="radio = 0"
-              ></v-radio>
+              >
+              <template #label>
+                <v-select
+                  :modelValue="singleDateSelected"
+                  :disabled="radio !== 0"
+                  :items="uniqueDays"
+                  item-title="title"
+                  item-value="value"
+                  label="Select a Date"
+                  @update:model-value="(e) => { singleDateSelected = e;}"
+                  hide-details
+                ></v-select>
+              </template>
+            </v-radio>
             </v-radio-group>
           </div>        
           <!-- create a list of the uniqueDays -->
-          <v-select
+          <!-- <v-select
             :modelValue="singleDateSelected"
             :disabled="radio !== 0"
             :items="uniqueDays"
@@ -251,7 +264,7 @@
             @update:model-value="(e) => { singleDateSelected = e;}"
             hide-details
             variant="solo"
-          ></v-select>
+          ></v-select> -->
           <!-- add buttons to increment and decrement the singledateselected -->
           <div class="d-flex flex-row align-center my-3">
             <v-tooltip text="Previous Date">
@@ -1624,6 +1637,11 @@ a {
     vertical-align: middle;
     margin: 2px;
   }
+}
+
+*:focus {
+  outline: 2px solid magenta;
+
 }
 
 #icons-container > a[href="https://worldwidetelescope.org/home/"] {

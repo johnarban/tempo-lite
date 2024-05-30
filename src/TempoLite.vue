@@ -1682,6 +1682,10 @@ i.mdi-menu-down {
       }
       
     }
+    
+    #user-options {
+      width: 250px;
+    }
   
   
   }

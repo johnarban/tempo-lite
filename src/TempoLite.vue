@@ -1639,7 +1639,7 @@ a {
   }
 }
 
-*:focus {
+*:focus-visible {
   outline: 2px solid magenta;
 
 }

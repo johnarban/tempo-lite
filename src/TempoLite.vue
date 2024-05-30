@@ -1475,7 +1475,7 @@ a {
     width: 250px;
   }
 
-  > #map-legend {
+  #map-legend {
     position: absolute;
     top: 0;
     right: 65px;
@@ -1646,7 +1646,43 @@ i.mdi-menu-down {
 
 // ========= DEFINE MOBILE STYLES =========
 // KEEP THEM ALL HERE
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
+  
+
+    
+  .content-with-sidebars {
+    grid-template-columns: 0px auto auto;
+    
+    #when {
+      display: none;
+    }
+    
+    #where {
+      display: none;
+    }
+    
+    #title {
+      text-wrap: wrap;
+      font-size: 1.5em;
+      margin-left: 55px;
+    }
+    
+    a[href="https://tempo.si.edu"] > img {
+      height: 50px!important;
+      width: auto !important;
+    }
+    
+    #map-container {
+      .colorbar-container {
+        z-index: 5000;
+      }
+      
+    }
+  
+  
+  }
+}
+@media (max-width: 800px) {
   :root {
     --map-height: 50vh;
   }

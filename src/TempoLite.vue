@@ -1667,6 +1667,10 @@ i.mdi-menu-down {
       margin-left: 55px;
     }
     
+    #slider-row {
+      margin-left: 3rem;
+    }
+    
     a[href="https://tempo.si.edu"] > img {
       height: 50px!important;
       width: auto !important;
@@ -1682,7 +1686,7 @@ i.mdi-menu-down {
   
   }
 }
-@media (max-width: 800px) {
+@media (max-width: 0px) {
   :root {
     --map-height: 50vh;
   }

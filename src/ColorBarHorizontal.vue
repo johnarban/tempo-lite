@@ -1,10 +1,6 @@
 
 <template>
 <div :id="id" class="colorbar-container-horizontal">
-  <div 
-    :style="{'--background-color': backgroundColor}"
-    class="colorbar">
-  </div>
   <div class="colorbar-labels"> 
     <div><slot name="start">{{ startValue }}</slot></div>
     <div>
@@ -12,6 +8,11 @@
     </div>
     <div><slot name="end">{{ endValue }}</slot></div>
   </div>
+  <div 
+    :style="{'--background-color': backgroundColor}"
+    class="colorbar">
+  </div>
+  
 </div>
 </template>
 

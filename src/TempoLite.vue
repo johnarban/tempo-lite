@@ -127,6 +127,20 @@
       <h1 id="title">What is in the Air You Breathe?</h1>
       <div id="where" class="big-label">where</div>
       <div id="map-container">
+        <colorbar-horizontal
+          v-if="$vuetify.display.width <= 750"
+          label="Amount of NO2"
+          backgroundColor="transparent"
+          :nsteps="255"
+          :cmap="cbarNO2"
+          start-value="1"
+          end-value="150"
+          :extend="true"
+        >
+        <template v-slot:label>
+              <div style="text-align: center;">Amount of NO&#x2082;&nbsp;<span class="unit-label">(10&sup1;&#x2074; mol/cm&sup2;)</span></div>
+        </template>
+        </colorbar-horizontal>
         <div id="map-contents" style="width:100%; height: 100%;">
           <div id="map"></div>
           <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
@@ -159,20 +173,6 @@
               <div style="text-align: center;">Amount of NO&#x2082;<br><span class="unit-label">(10&sup1;&#x2074; molecules/cm&sup2;)</span></div>
           </template>
         </colorbar>
-        <colorbar-horizontal
-          v-if="$vuetify.display.width <= 750"
-          label="Amount of NO2"
-          backgroundColor="transparent"
-          :nsteps="255"
-          :cmap="cbarNO2"
-          start-value="1"
-          end-value="150"
-          :extend="true"
-        >
-        <template v-slot:label>
-              <div style="text-align: center;">NO&#x2082;&nbsp;<span class="unit-label">(10&sup1;&#x2074; mol/cm&sup2;)</span></div>
-        </template>
-        </colorbar-horizontal>
         
 
       </div>
@@ -1829,6 +1829,7 @@ i.mdi-menu-down {
     
     #slider-row {
       margin-left: 4rem;
+      padding-top: 10px;
     }
     
     #user-options {
@@ -1878,6 +1879,7 @@ i.mdi-menu-down {
       margin-top: 1rem;
       margin-bottom: 0.5rem;
       z-index: 5000;
+      --height: 0.75rem;
     }
     
   }

@@ -203,47 +203,7 @@
           ></icon-button>
         </div>
 
-        <div id="bottom-options">
-          <br>
-          <v-select
-            v-model="selectedTimezone"
-            label="Timezone"
-            :items="timezoneOptions"
-            item-title="name"
-            item-value="tz"
-          ></v-select>
-          <div id="control-checkboxes">
-            <v-checkbox
-              v-model="showFieldOfRegard"
-              @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
-              label="TEMPO Field of Regard"
-              color="#c10124"
-              hide-details
-            />
-          <div
-            id="opacity-slider-container"
-          >
-            <v-slider
-              v-model="opacity"
-              :min="0"
-              :max="1"
-              color="#c10124"
-              density="compact"
-              hide-details
-            >
-            </v-slider>
-            <div id="opacity-slider-label">TEMPO opacity</div>
-          </div> 
-          </div>
-                  <!-- add text box that allows manually setting the custom image url -->
-          <!-- <v-text-field
-            v-model="customImageUrl"
-            label="Custom Image URL"
-            hide-details
-          ></v-text-field> -->
-
-          
-        </div>
+        
 
        <div id="user-options">
         <!-- {{ whichDataSet }} Data -->
@@ -419,7 +379,49 @@
         <hr style="border-color: grey;">
 
       </div>
-  
+      
+      <div id="bottom-options">
+          <br>
+          <v-select
+            v-model="selectedTimezone"
+            label="Timezone"
+            :items="timezoneOptions"
+            item-title="name"
+            item-value="tz"
+          ></v-select>
+          <div id="control-checkboxes">
+            <v-checkbox
+              v-model="showFieldOfRegard"
+              @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
+              label="TEMPO Field of Regard"
+              color="#c10124"
+              hide-details
+            />
+          <div
+            id="opacity-slider-container"
+          >
+            <v-slider
+              v-model="opacity"
+              :min="0"
+              :max="1"
+              color="#c10124"
+              density="compact"
+              hide-details
+            >
+            </v-slider>
+            <div id="opacity-slider-label">TEMPO opacity</div>
+          </div> 
+          </div>
+                  <!-- add text box that allows manually setting the custom image url -->
+          <!-- <v-text-field
+            v-model="customImageUrl"
+            label="Custom Image URL"
+            hide-details
+          ></v-text-field> -->
+
+          
+        </div>
+      
       <div id="information">
       <article>
         <h2>TEMPO NO<sub>2</sub> Data</h2>

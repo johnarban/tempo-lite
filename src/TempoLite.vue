@@ -1825,7 +1825,7 @@ i.mdi-menu-down {
   .content-with-sidebars {
     
     #slider-row {
-      margin-left: 3rem;
+      margin-left: 4rem;
     }
     
     #user-options {

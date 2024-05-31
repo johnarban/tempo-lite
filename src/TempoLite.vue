@@ -160,7 +160,7 @@
           </template>
         </colorbar>
         <colorbar-horizontal
-          v-if="$vuetify.display.width <=750"
+          v-if="$vuetify.display.width <= 750"
           label="Amount of NO2"
           backgroundColor="transparent"
           :nsteps="255"
@@ -170,7 +170,7 @@
           :extend="true"
         >
         <template v-slot:label>
-              <div style="text-align: center;">Amount of NO&#x2082;<br><span class="unit-label">(10&sup1;&#x2074; molecules/cm&sup2;)</span></div>
+              <div style="text-align: center;">NO&#x2082;&nbsp;<span class="unit-label">(10&sup1;&#x2074; mol/cm&sup2;)</span></div>
         </template>
         </colorbar-horizontal>
         
@@ -1171,7 +1171,7 @@ export default defineComponent({
 :root {
   // font-size: clamp(14px, 1.7vw, 16px);
   // --default-font-size: 1rem; // we don't use this
-  // font-size: 16px; // this is the standard browser default
+  font-size: 16px; // this is the standard browser default
   --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem); // we don't use this
   --smithsonian-blue: #009ade;
   --smithsonian-yellow: #ffcc33;
@@ -1742,6 +1742,8 @@ i.mdi-menu-down {
 @media (max-width: 750px) {
   :root {
     --map-height: 60vh;
+    --map-height: 60dvh;
+    --map-height: 60svh;
   }
   
   #main-content {

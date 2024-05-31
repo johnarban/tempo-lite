@@ -829,9 +829,11 @@ export default defineComponent({
     },
     
     dateIsDST() {
-      const standardOffset = getTimezoneOffset(this.selectedTimezone);
+      const standardOffset = getTimezoneOffset(this.selectedTimezone, new Date(this.date.getUTCFullYear(), 0, 1));
       const currentOffset = getTimezoneOffset(this.selectedTimezone, this.date);
-      console.log(standardOffset, currentOffset);
+      // console.log(standardOffset / (3600 * 1000), currentOffset / (3600 * 1000));
+      // log offsets in houts
+      console.log(`standard: ${standardOffset/ (3600 * 1000)}, current ${currentOffset  / (3600 * 1000)}`);
       if (standardOffset === currentOffset) {
         return false;
       }

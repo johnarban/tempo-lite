@@ -1829,7 +1829,9 @@ i.mdi-menu-down {
     
     #slider-row {
       margin-left: 4rem;
+      margin-right: 1rem;
       padding-top: 10px;
+      align-items: center;
     }
     
     #user-options {

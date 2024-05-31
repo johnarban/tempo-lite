@@ -371,7 +371,7 @@
             </div>
           </v-radio-group>
         </div>
-
+        
         <hr style="border-color: grey;"  v-if="radio>0">
         
         <div id="locations-of-interest" v-if="radio>0">
@@ -681,15 +681,15 @@ export default defineComponent({
 
       customImageUrl: "",
 
-      timezoneOptions: [
-        { tz: 'US/Eastern', name: 'Eastern Daylight' },
-        { tz: 'US/Central', name: 'Central Daylight' },
-        { tz: 'US/Mountain', name: 'Mountain Daylight' },
-        { tz: 'US/Arizona', name: 'Mountain Standard' },
-        { tz: 'US/Pacific', name: 'Pacific Daylight' },
-        { tz: 'US/Alaska', name: 'Alaska Daylight' },
-        { tz: 'UTC', name: 'UTC' },
-      ] as TimezoneInfo[],
+      // timezoneOptions: [
+      //   { tz: 'US/Eastern', name: 'Eastern Daylight' },
+      //   { tz: 'US/Central', name: 'Central Daylight' },
+      //   { tz: 'US/Mountain', name: 'Mountain Daylight' },
+      //   { tz: 'US/Arizona', name: 'Mountain Standard' },
+      //   { tz: 'US/Pacific', name: 'Pacific Daylight' },
+      //   { tz: 'US/Alaska', name: 'Alaska Daylight' },
+      //   { tz: 'UTC', name: 'UTC' },
+      // ] as TimezoneInfo[],
       selectedTimezone: "US/Eastern",
 
       timestep: 0,
@@ -827,6 +827,29 @@ export default defineComponent({
     date() {
       return new Date(this.timestamp);
     },
+    
+    dateIsDST() {
+      const standardOffset = getTimezoneOffset(this.selectedTimezone);
+      const currentOffset = getTimezoneOffset(this.selectedTimezone, this.date);
+      console.log(standardOffset, currentOffset);
+      if (standardOffset === currentOffset) {
+        return false;
+      }
+      return true;
+    },
+    
+    timezoneOptions(): TimezoneInfo[] {
+      return [
+        { tz: 'US/Eastern', name: this.dateIsDST ? 'Eastern Daylight' : 'Eastern Standard' },
+        { tz: 'US/Central', name: this.dateIsDST ? 'Central Daylight' : 'Central Standard' },
+        { tz: 'US/Mountain', name: this.dateIsDST ? 'Mountain Daylight' : 'Mountain Standard' },
+        { tz: 'US/Arizona', name: 'Mountain Standard' },
+        { tz: 'US/Pacific', name: this.dateIsDST ? 'Pacific Daylight' : 'Pacific Standard' },
+        { tz: 'US/Alaska', name: this.dateIsDST ? 'Alaska Daylight' : 'Alaska Standard' },
+        { tz: 'UTC', name: 'UTC' },
+      ];
+    },
+    
     // TODO: Maybe there's a built-in Date function to get this formatting?
     thumbLabel(): string {
       const offset = getTimezoneOffset(this.selectedTimezone, this.date);
@@ -1061,7 +1084,6 @@ export default defineComponent({
       const times = this.timestamps.slice(this.minIndex, this.maxIndex + 1);
       const images = times.map(ts => this.getTempoDataUrl(ts) + this.getTempoFilename(new Date(ts)));
       const promises = _preloadImages(images);
-      console.log(promises.length);
       let loaded = 0;
       promises.forEach((promise) => {
         promise.then(() => {

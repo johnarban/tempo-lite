@@ -1744,6 +1744,7 @@ i.mdi-menu-down {
     --map-height: 60vh;
     --map-height: 60dvh;
     --map-height: 60svh;
+    font-size: 14px;
   }
   
   #main-content {

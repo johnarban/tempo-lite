@@ -127,9 +127,26 @@
       <h1 id="title">What is in the Air You Breathe?</h1>
       <div id="where" class="big-label">where</div>
       <div id="map-container">
-        <div id="map"></div>
-        <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
+        <div id="map-contents" style="width:100%; height: 100%;">
+          <div id="map"></div>
+          <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
+          <location-search
+            v-model="searchOpen"
+            small
+            stay-open
+            buttonSize="xl"
+            persist-selected
+            :search-provider="geocodingInfoForSearch"
+            @set-location="(feature: MapBoxFeature) => {
+              if (feature !== null) {
+                map?.setView([feature.center[1], feature.center[0]], 6);
+              }
+            }"
+            @error="(error: string) => searchErrorMessage = error"
+          ></location-search>
+        </div>
         <colorbar 
+          v-if="$vuetify.display.width > 750"
           label="Amount of NO2"
           backgroundColor="transparent"
           :nsteps="255"
@@ -142,20 +159,21 @@
               <div style="text-align: center;">Amount of NO&#x2082;<br><span class="unit-label">(10&sup1;&#x2074; molecules/cm&sup2;)</span></div>
           </template>
         </colorbar>
-        <location-search
-          v-model="searchOpen"
-          small
-          stay-open
-          buttonSize="xl"
-          persist-selected
-          :search-provider="geocodingInfoForSearch"
-          @set-location="(feature: MapBoxFeature) => {
-            if (feature !== null) {
-              map?.setView([feature.center[1], feature.center[0]], 6);
-            }
-          }"
-          @error="(error: string) => searchErrorMessage = error"
-        ></location-search>
+        <colorbar-horizontal
+          v-if="$vuetify.display.width <=750"
+          label="Amount of NO2"
+          backgroundColor="transparent"
+          :nsteps="255"
+          :cmap="cbarNO2"
+          start-value="1"
+          end-value="150"
+          :extend="true"
+        >
+        <template v-slot:label>
+              <div style="text-align: center;">Amount of NO&#x2082;<br><span class="unit-label">(10&sup1;&#x2074; molecules/cm&sup2;)</span></div>
+        </template>
+        </colorbar-horizontal>
+        
 
       </div>
         <div id="when" class="big-label">when</div>
@@ -266,7 +284,7 @@
             variant="solo"
           ></v-select> -->
           <!-- add buttons to increment and decrement the singledateselected -->
-          <div class="d-flex flex-row align-center my-3">
+          <div class="d-flex flex-row align-center my-2">
             <v-tooltip text="Previous Date">
               <template v-slot:activator="{ props }">
                 <v-btn
@@ -1149,9 +1167,10 @@ export default defineComponent({
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
 
 :root {
-  font-size: clamp(0.7rem, min(1.7vh, 1.7vw), 1.1rem);
-  --default-font-size: 1em;
-  --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem);
+  // font-size: clamp(14px, 1.7vw, 16px);
+  // --default-font-size: 1rem; // we don't use this
+  // font-size: 16px; // this is the standard browser default
+  --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem); // we don't use this
   --smithsonian-blue: #009ade;
   --smithsonian-yellow: #ffcc33;
   --info-background: #092088;
@@ -1298,7 +1317,6 @@ ul {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  font-size: 12pt;
 }
 
 #map {
@@ -1393,7 +1411,7 @@ ul {
 #title {
   color: var(--smithsonian-yellow);
   font-weight: 600;
-  font-size: 40px;
+  font-size: 2.5rem;
   text-align: left;
   text-wrap: nowrap;
 }
@@ -1483,7 +1501,7 @@ a {
   flex-direction: row;
   padding-right: 10px;
 
-  > #map {
+  #map {
     flex-basis: 80%;
     flex-grow: 1;
     flex-shrink: 1;
@@ -1501,7 +1519,7 @@ a {
   #map-legend {
     position: absolute;
     top: 0;
-    right: 65px;
+    right: 80px;
     width: fit-content;
     z-index: 1000;
     
@@ -1523,16 +1541,12 @@ a {
     }
   }
 
-  > .colorbar-container {
+   .colorbar-container {
     flex-grow: 0;
     flex-shrink: 1;
 
-    .colorbar-label {
-      transform: rotate(180deg) translate(-110%,-50%)
-    }
-
     .unit-label {
-      font-size: 11pt;
+      font-size: .95em;
     }
   }
 }
@@ -1650,11 +1664,17 @@ a {
 }
 
 .v-selection-control {
-  height: 2.5rem;
+  // height: fit-content;
 }
 
 .v-radio-group .v-input__details {
   display: none;
+}
+
+.v-radio-group .v-selection-control {
+  label {
+    width: 100%;
+  }
 }
 
 .rounded-icon-wrapper{
@@ -1678,18 +1698,11 @@ i.mdi-menu-down {
 
 // ========= DEFINE MOBILE STYLES =========
 // KEEP THEM ALL HERE
-@media (max-width: 1100px) {
-  
-  h2 {
-    font-size: 1.5rem;
-  }
-    
-  .v-label {
-    font-size: 1rem;
-  }
+@media (max-width: 1180px) {
   
   .content-with-sidebars {
     grid-template-columns: 0px auto auto;
+    grid-template-rows: 3.5rem var(--map-height) 78px .5fr .5fr;
     
     #when {
       display: none;
@@ -1702,6 +1715,7 @@ i.mdi-menu-down {
     #title {
       text-wrap: wrap;
       font-size: 1.75rem;
+      line-height: 1.25;
       margin-left: 55px;
     }
     
@@ -1714,13 +1728,6 @@ i.mdi-menu-down {
       width: auto !important;
     }
     
-    #map-container {
-      .colorbar-container {
-        z-index: 5000;
-      }
-      
-    }
-    
     #user-options {
       width: 250px;
     }
@@ -1728,19 +1735,16 @@ i.mdi-menu-down {
   
   }
 }
-@media (max-width: 0px) {
+
+    
+@media (max-width: 750px) {
   :root {
-    --map-height: 50vh;
+    --map-height: 60vh;
   }
   
-  #app {
-    font-size: 12pt;
+  #main-content {
+    padding: 1rem;
   }
-  
-  .v-label {
-    font-size: 1rem;
-  }
-  
   
   #introduction-overlay .v-window {
     max-height: 75vh;
@@ -1758,12 +1762,10 @@ i.mdi-menu-down {
   }
   .content-with-sidebars {
     grid-template-columns: 1fr;
-    grid-template-rows: 50px var(--map-height) 78px repeat(5, auto);
+    grid-template-rows: auto auto 78px repeat(5, auto);
     gap: 10px;
+    // padding-inline: 1rem;
     
-     > div {
-      margin: 0px;
-     }
     
     #title {
       min-width: 0;
@@ -1820,24 +1822,13 @@ i.mdi-menu-down {
   
   .content-with-sidebars {
     
-    > div {
-      min-width: 0;
-      margin: 0;
-      padding: 0;
-    }
-    
-    #map-container {
-      .colorbar-container {
-        display: none;
-      }
-    } 
-    
     #slider-row {
       margin-left: 3rem;
     }
     
     #user-options {
       margin: 0;
+      width: auto;
     }
     
     #bottom-options {
@@ -1851,23 +1842,41 @@ i.mdi-menu-down {
   }
   
   #title {
-    font-size: 16px;
+    font-size: 1rem;
     margin-left: 75px;
     text-wrap: wrap;
 
   }
 
   a[href="https://tempo.si.edu"] > img {
-
       display: inline;
-      float: left;
       height: 50px!important;
       width: auto !important;
 
     }
   
   
-  
+  #map-container {
+    display: flex;
+    flex-direction: column;
+    
+    
+    #map-contents {
+      position: relative;
+    }
+    
+    #map-legend {
+      right: 0;
+    }
+    
+    .colorbar-container-horizontal {
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      z-index: 5000;
+    }
+    
+  }
+
 
 }
 

@@ -4,6 +4,7 @@ import { FundingAcknowledgment, IconButton, CreditLogos } from "@cosmicds/vue-to
 import LocationSearch from "./LocationSearch.vue";
 import TempoLite from "./TempoLite.vue";
 import Colorbar from './ColorBar.vue';
+import ColorBarHorizontal from "./ColorBarHorizontal.vue";
 import InfoButton from "./InfoButton.vue";
 import vuetify from "../plugins/vuetify";
 
@@ -66,6 +67,7 @@ createApp(TempoLite, {})
   .component('colorbar', Colorbar)
   .component('location-search', LocationSearch)
   .component('info-button', InfoButton)
+  .component('colorbar-horizontal', ColorBarHorizontal)
 
   // Mount
   .mount("#app");

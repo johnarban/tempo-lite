@@ -506,7 +506,7 @@ interface TimezoneInfo {
   name: string;
 }
 
-import { erdTimestamps, newTimestamps, may2228Times, may28th, may29th } from "./timestamps";
+import { erdTimestamps, newTimestamps, may2228Times, may28th, may29th, may30th } from "./timestamps";
 
 const fosterTimestamps = [
   1698838920000,
@@ -556,7 +556,13 @@ const fosterTimestamps = [
 ];
 
 // combine the timestamps from the two sources
-const timestamps = erdTimestamps.concat(fosterTimestamps).concat(newTimestamps).concat(may2228Times).concat(may28th).concat(may29th);
+const timestamps = erdTimestamps
+  .concat(fosterTimestamps)
+  .concat(newTimestamps)
+  .concat(may2228Times)
+  .concat(may28th)
+  .concat(may29th)
+  .concat(may30th);
 // sort the timestamps
 timestamps.sort();
 
@@ -704,6 +710,7 @@ export default defineComponent({
       may2228Times,
       may28th,
       may29th,
+      may30th,
       
       singleDateSelected: Date.now() as number | null,
 
@@ -1019,6 +1026,11 @@ export default defineComponent({
       if (this.may29th.includes(timestamp)) {
         return "https://johnarban.github.io/wwt_interactives/images/tempo-data/may_29/";
       }
+      
+      if (this.may30th.includes(timestamp)) {
+        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/may_30/";
+      }
+      
       return '';
     }, 
     

@@ -715,7 +715,8 @@ export default defineComponent({
       showFieldOfRegard: true,
       showCredits: false,
       
-      loadedImagesProgress: 50,
+      loadedImagesProgress: 0,
+      useHighRes: true,
     };
   },
 
@@ -996,10 +997,16 @@ export default defineComponent({
       }
       
       if (this.erdTimestamps.includes(timestamp)) {
+        if (this.useHighRes) {
+          return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/early_release/images/';
+        }
         return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/early_release/images/resized_images/';
       }
       
       if (this.newTimestamps.includes(timestamp)) {
+        if (this.useHighRes) {
+          return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/released/images/';
+        }
         return "https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/released/images/resized_images/";
       }
       

@@ -105,7 +105,7 @@ export default defineComponent({
         const [color, _opacity] = Array.isArray(co) ? co : [co,1];
         return `${color} ${i*100/n}%`;
       });
-      return `linear-gradient(to left, ${colors.join(', ')})`;
+      return `linear-gradient(to right, ${colors.join(', ')})`;
     },
     
     colorbarGradient() {
@@ -131,17 +131,17 @@ export default defineComponent({
         start.className = 'colorbar-start';
         const end = document.createElement('div');
         end.className = 'colorbar-end';
-        colorbar.appendChild(end);
-        colorbar.appendChild(div);
         colorbar.appendChild(start);
-      
+        colorbar.appendChild(div);
+        colorbar.appendChild(end);
+        end && this.showEndTriangle
         if (start && this.showStartTriangle) {
           start.style.backgroundColor = this.cmap(0);
-          this.styleRightTriangle(start as HTMLDivElement);
+          this.styleLeftTriangle(start as HTMLDivElement);
         }
         if (end && this.showEndTriangle) {
           end.style.backgroundColor = this.cmap(1);
-          this.styleLeftTriangle(end as HTMLDivElement);
+          this.styleRightTriangle(end as HTMLDivElement);
         }
       } else {
         colorbar.appendChild(div);
@@ -218,6 +218,13 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.4.14,
+* Autoprefixer: v10.4.7
+* Browsers: last 5 version
+*/
+
 .colorbar-container-horizontal {
   position: relative;
   display: block;
@@ -228,20 +235,36 @@ export default defineComponent({
   width: 100%;
   height: var(--height);
   background: var(--background-color);
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-direction: row;
-  filter: drop-shadow(0 0 0.1rem white);
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-filter: drop-shadow(0 0 0.1rem white);
+          filter: drop-shadow(0 0 0.1rem white);
 }
 
 
 .colorbar-labels {
   
   width: calc(100% - 2*var(--height));
+  height: -webkit-max-content;
+  height: -moz-max-content;
   height: max-content;
   /* left: 50%; */
-  transform-origin: top center;
-  transform: translate(var(--height), 0);
+  -webkit-transform-origin: top center;
+      -ms-transform-origin: top center;
+          transform-origin: top center;
+  -webkit-transform: translate(var(--height), 0);
+      -ms-transform: translate(var(--height), 0);
+          transform: translate(var(--height), 0);
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  justify-content: space-between;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
 }
 </style>

@@ -180,15 +180,27 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.4.14,
+* Autoprefixer: v10.4.7
+* Browsers: last 5 version
+*/
+
 .colorbar-container {
   position: relative;
   display: inline-block;
   --width: 1.25em;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
   width: fit-content;
   margin-left: 5px;
   margin-right: 1em;
   background: var(--background-color);
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .colorbar {
@@ -197,43 +209,75 @@ export default defineComponent({
   margin-left: 5px;
   margin-right: 1em;
   background: var(--background-color);
+  display:-webkit-box;
+  display:-ms-flexbox;
   display:flex;
-  flex-direction: column;
-  filter: drop-shadow(0 0 0.1rem white);
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-filter: drop-shadow(0 0 0.1rem white);
+          filter: drop-shadow(0 0 0.1rem white);
 }
 
 /* make .colorbar-start and .colorbar-end triangles */
 .colorbar-chunk {
   
-  flex-shrink: 1;
-  flex-grow:1;
+  -ms-flex-negative: 1;
+  
+      flex-shrink: 1;
+  -webkit-box-flex:1;
+      -ms-flex-positive:1;
+          flex-grow:1;
 }
 
 .colorbar-start {
-  flex-basis: min-content;
-  flex-shrink: 0;
-  flex-grow:1;
+  -ms-flex-preferred-size: min-content;
+      flex-basis: min-content;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+  -webkit-box-flex:1;
+      -ms-flex-positive:1;
+          flex-grow:1;
 }
 
 .colorbar-end {
-  flex-basis: min-content;
-  flex-shrink: 0;
-  flex-grow: 1;
+  -ms-flex-preferred-size: min-content;
+      flex-basis: min-content;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
 }
 
 
 
 .colorbar-labels {
   position: absolute;
+  width: -webkit-max-content;
+  width: -moz-max-content;
   width: max-content;
   height: 100%;
   top: 50%;
   /* right: -1.5ch; */
-  transform-origin: top center;
-  transform: rotate(180deg) translate(-75%,-50%);
-  writing-mode: vertical-rl;
+  -webkit-transform-origin: top center;
+      -ms-transform-origin: top center;
+          transform-origin: top center;
+  -webkit-transform: rotate(180deg) translate(-75%,-50%);
+      -ms-transform: rotate(180deg) translate(-75%,-50%);
+          transform: rotate(180deg) translate(-75%,-50%);
+  -webkit-writing-mode: vertical-rl;
+      -ms-writing-mode: tb-rl;
+          writing-mode: vertical-rl;
+  
+  display: -webkit-box;
+  
+  display: -ms-flexbox;
   
   display: flex;
-  justify-content: space-between;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
   }
 </style>

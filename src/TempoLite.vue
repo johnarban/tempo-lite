@@ -169,6 +169,8 @@
             color="#068ede95"
             thumb-label="always"
             :track-size="10"
+            show-ticks="always"
+            tick-size="8"
             hide-details
           >
             <template v-slot:thumb-label>

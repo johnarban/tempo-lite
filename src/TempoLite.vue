@@ -203,6 +203,7 @@
               hide-details
             />
             <v-checkbox
+              :disabled="!highresAvailable"
               v-model="useHighRes"
               @keyup.enter="useHighRes = !useHighRes"
               label="Use High Resolution Data"
@@ -898,7 +899,12 @@ export default defineComponent({
       const stamps = unique.map(day => new Date(day)).map(date => date.toDateString());
       // create an object with keys for timestamp and value
       return stamps.map((stamp, index) => ({ value: unique[index], title: stamp }));
-    }
+    },
+    
+    highresAvailable() {
+      return this.newTimestamps.includes(this.timestamp);
+    },
+    
     
   },
 

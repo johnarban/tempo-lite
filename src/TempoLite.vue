@@ -202,6 +202,13 @@
               color="#c10124"
               hide-details
             />
+            <v-checkbox
+              v-model="useHighRes"
+              @keyup.enter="useHighRes = !useHighRes"
+              label="Use High Resolution Data"
+              color="#c10124"
+              hide-details
+            />
           <div
             id="opacity-slider-container"
           >
@@ -716,7 +723,7 @@ export default defineComponent({
       showCredits: false,
       
       loadedImagesProgress: 0,
-      useHighRes: true,
+      useHighRes: false,
     };
   },
 
@@ -997,10 +1004,7 @@ export default defineComponent({
       }
       
       if (this.erdTimestamps.includes(timestamp)) {
-        if (this.useHighRes) {
-          return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/early_release/images/';
-        }
-        return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/early_release/images/resized_images/';
+        return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/early_release/images/';
       }
       
       if (this.newTimestamps.includes(timestamp)) {
@@ -1083,6 +1087,10 @@ export default defineComponent({
       this.updateBounds();
       this.imageOverlay.setUrl(url);
       this.updateFieldOfRegard();
+    },
+    
+    useHighRes() {
+      this.imagePreload();
     },
     
     imageBounds(bounds: L.LatLngBounds) {

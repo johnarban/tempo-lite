@@ -1083,6 +1083,19 @@ export default defineComponent({
       }
     },
     
+    loadedImagesProgress(val: number) {
+      this.playing = false;
+      const btn = this.$el.querySelector('#play-pause-button');
+      if (btn) {
+        if (val < 100) {
+          btn.setAttribute('disabled', 'true');
+        } else {
+          btn.removeAttribute('disabled');
+        }
+        
+      }
+    },
+    
 
     playing(play: boolean) {
       if (play) {
@@ -1564,6 +1577,12 @@ a {
     width: 2.5rem;
     color: var(--accent-color);
     border: 2px solid var(--accent-color);
+  }
+  
+  #play-pause-button[disabled] {
+    filter: grayscale(100%);
+    cursor: progress;
+    cursor: not-allowed;
   }
 
   .icon-wrapper {

@@ -134,7 +134,7 @@ export default defineComponent({
         colorbar.appendChild(start);
         colorbar.appendChild(div);
         colorbar.appendChild(end);
-        end && this.showEndTriangle
+        end && this.showEndTriangle;
         if (start && this.showStartTriangle) {
           start.style.backgroundColor = this.cmap(0);
           this.styleLeftTriangle(start as HTMLDivElement);

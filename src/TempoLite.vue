@@ -1052,11 +1052,13 @@ export default defineComponent({
       if (!this.preload) {
         return;
       }
+      console.log('preloading images for ', this.thumbLabel);
       const times = this.timestamps.slice(this.minIndex, this.maxIndex + 1);
       const images = times.map(ts => this.getTempoDataUrl(ts) + this.getTempoFilename(new Date(ts)));
       const promises = _preloadImages(images);
       console.log(promises.length);
       let loaded = 0;
+      this.loadedImagesProgress = 0;
       promises.forEach((promise) => {
         promise.then(() => {
           loaded += 1;

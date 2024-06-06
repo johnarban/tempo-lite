@@ -116,6 +116,7 @@
   > 
     <div class="content-with-sidebars">
       <!-- tempo logo -->
+      <div id="logo-title">
       <a href="https://tempo.si.edu" target="_blank" rel="noopener noreferrer" >
         <img 
           src="./assets/TEMPO-Logo-Small.png"
@@ -125,6 +126,7 @@
       </a>
 
       <h1 id="title">What is in the Air You Breathe?</h1>
+      </div>
       <div id="where" class="big-label">where</div>
       <div id="map-container">
         <colorbar-horizontal
@@ -153,7 +155,7 @@
             :search-provider="geocodingInfoForSearch"
             @set-location="(feature: MapBoxFeature) => {
               if (feature !== null) {
-                map?.setView([feature.center[1], feature.center[0]], 6);
+                map?.setView([feature.center[1], feature.center[0]], 7);
               }
             }"
             @error="(error: string) => searchErrorMessage = error"
@@ -396,7 +398,20 @@
               label="TEMPO Field of Regard"
               color="#c10124"
               hide-details
-            />
+            >
+            <template #label>
+              TEMPO Field of Regard
+              <info-button>
+                <p>
+                  The TEMPO satellite observes the atmospher over North America from the Atlantic Ocean
+                   to the Pacific Coast and from roughly Mexico City 
+                   to central Canada. 
+                   The TEMPO Field of Regard (in <span class="text-red">red</span>, currently <em>{{ showFieldOfRegard ? 'visible' : "hidden" }}</em>)
+                  is the area over which the satellite takes measurements. 
+                </p>
+                </info-button>
+            </template>
+            </v-checkbox>
           <div
             id="opacity-slider-container"
           >
@@ -1332,8 +1347,8 @@ ul {
   padding: 0;
   
   display: grid;
-  grid-template-columns: .08fr .8fr .3fr;
-  grid-template-rows: 50px var(--map-height) 78px .5fr .5fr;
+  grid-template-columns: 0 .8fr .3fr;
+  grid-template-rows: 70px var(--map-height) 78px .5fr .5fr;
   gap: 20px 10px;
   
   > * {
@@ -1351,12 +1366,16 @@ ul {
     grid-row: 2 / 3;
   }
   
-  #title {
-    grid-column: 2 / 3;
+  #logo-title {
+    display: flex;
+    align-items: center;
+    grid-column: 2 / 4;
     grid-row: 1 / 2;
+    gap: 10px;
   }
 
   #where {
+    display: none;
     grid-column: 1 / 2;
     grid-row: 2 / 3;
   }
@@ -1367,6 +1386,7 @@ ul {
   }
   
   #when {
+    display: none;
     grid-column: 1 / 2;
     grid-row: 3 / 4;
   }
@@ -1416,6 +1436,12 @@ ul {
   font-size: 2.5rem;
   text-align: left;
   text-wrap: nowrap;
+}
+
+a[href="https://tempo.si.edu"] > img {
+  // display: inline;
+  height: 70px!important;
+  width: auto !important;
 }
 
 #information {
@@ -1497,6 +1523,9 @@ a {
   margin-top: 1.5rem;
 }
 
+#slider-row {
+  margin-left: 3rem;
+}
 #map-container {
   position: relative;
   display: flex;
@@ -1516,6 +1545,7 @@ a {
     
     z-index: 1000;
     width: 250px;
+    border: 2px solid black;
   }
 
   #map-legend {
@@ -1716,9 +1746,9 @@ i.mdi-menu-down {
     
     #title {
       text-wrap: wrap;
-      font-size: 1.75rem;
+      font-size: 2rem;
       line-height: 1.25;
-      margin-left: 55px;
+      margin-left: 10px;
     }
     
     #slider-row {
@@ -1726,7 +1756,7 @@ i.mdi-menu-down {
     }
     
     a[href="https://tempo.si.edu"] > img {
-      height: 50px!important;
+      height: 70px!important;
       width: auto !important;
     }
     
@@ -1772,7 +1802,7 @@ i.mdi-menu-down {
     // padding-inline: 1rem;
     
     
-    #title {
+    #logo-title {
       min-width: 0;
       grid-column: 1 / 2;
       grid-row: 1 / 2;
@@ -1847,21 +1877,16 @@ i.mdi-menu-down {
       font-size: 1em;
     }
     
-  }
+  
   
   #title {
-    font-size: 1rem;
-    margin-left: 75px;
+    font-size: 2rem;
+    margin-left: 15px;
     text-wrap: wrap;
 
   }
-
-  a[href="https://tempo.si.edu"] > img {
-      display: inline;
-      height: 50px!important;
-      width: auto !important;
-
-    }
+  
+}
   
   
   #map-container {

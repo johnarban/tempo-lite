@@ -170,7 +170,6 @@
             thumb-label="always"
             :track-size="10"
             show-ticks="always"
-            tick-size="8"
             hide-details
           >
             <template v-slot:thumb-label>
@@ -1613,6 +1612,14 @@ a {
         color: var(--accent-color);
       }
     }
+  }
+
+  .v-slider-track__tick {
+      background-color: var(--accent-color); /* Change color */
+      height: 15px; /* Change size */
+      width: 4px;
+      margin-top: 0 !important;
+      top: -10%;
   }
 
   .v-slider {

@@ -394,15 +394,14 @@
             item-value="tz"
           ></v-select>
           <div id="control-checkboxes">
+            <div class="d-flex flex-row align-center space-between">
             <v-checkbox
               v-model="showFieldOfRegard"
               @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
               label="TEMPO Field of Regard"
               color="#c10124"
               hide-details
-            >
-            <template #label>
-              TEMPO Field of Regard
+            />
               <info-button>
                 <p>
                   The TEMPO satellite observes the atmosphere over North America, from the Atlantic Ocean to the Pacific Coast, and from roughly Mexico City to central Canada. 
@@ -412,8 +411,7 @@
                   is the area over which the satellite takes measurements. 
                 </p>
                 </info-button>
-            </template>
-            </v-checkbox>
+              </div>
             <v-checkbox
               v-if="false"
               :disabled="!highresAvailable"
@@ -1720,7 +1718,6 @@ a {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: 10px;
 }
 

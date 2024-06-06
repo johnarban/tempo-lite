@@ -249,7 +249,7 @@
           ></v-select> -->
           <!-- add buttons to increment and decrement the singledateselected -->
           <div class="d-flex flex-row align-center my-2">
-            <v-tooltip text="Previous Date">
+            <v-tooltip :disabled="touchscreen" text="Previous Date">
               <template v-slot:activator="{ props }">
                 <v-btn
                   v-bind="props"
@@ -267,7 +267,7 @@
               </template>
             </v-tooltip>
             <v-spacer></v-spacer>
-            <v-tooltip text="Next Date">
+            <v-tooltip :disabled="touchscreen" text="Next Date">
               <template v-slot:activator="{ props }">
                 <v-btn
                   v-bind="props"

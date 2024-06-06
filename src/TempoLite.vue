@@ -205,6 +205,7 @@
               hide-details
             />
             <v-checkbox
+              v-if="false"
               :disabled="!highresAvailable"
               v-model="useHighRes"
               @keyup.enter="useHighRes = !useHighRes"

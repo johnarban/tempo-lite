@@ -171,6 +171,7 @@
             :track-size="10"
             show-ticks="always"
             hide-details
+            :disabled="loadedImagesProgress < 100"
           >
             <template v-slot:thumb-label>
               <div class="thumb-label">
@@ -1621,7 +1622,7 @@ a {
       height: 15px; /* Change size */
       width: 4px;
       margin-top: 0 !important;
-      top: -10%;
+      // top: -10%;
   }
 
   .v-slider {

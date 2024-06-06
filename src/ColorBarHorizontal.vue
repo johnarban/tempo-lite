@@ -1,10 +1,6 @@
 
 <template>
-<div :id="id" class="colorbar-container">
-  <div 
-    :style="{'--background-color': backgroundColor}"
-    class="colorbar">
-  </div>
+<div :id="id" class="colorbar-container-horizontal">
   <div class="colorbar-labels"> 
     <div><slot name="start">{{ startValue }}</slot></div>
     <div>
@@ -12,6 +8,11 @@
     </div>
     <div><slot name="end">{{ endValue }}</slot></div>
   </div>
+  <div 
+    :style="{'--background-color': backgroundColor}"
+    class="colorbar">
+  </div>
+  
 </div>
 </template>
 
@@ -72,6 +73,7 @@ export default defineComponent({
   
   mounted() {
     this.colorbarGradient();
+    console.log(this.$el);
   },
   
   computed: {
@@ -103,7 +105,7 @@ export default defineComponent({
         const [color, _opacity] = Array.isArray(co) ? co : [co,1];
         return `${color} ${i*100/n}%`;
       });
-      return `linear-gradient(to top, ${colors.join(', ')})`;
+      return `linear-gradient(to right, ${colors.join(', ')})`;
     },
     
     colorbarGradient() {
@@ -112,13 +114,15 @@ export default defineComponent({
         return;
       }
       // remove all the children of the colorbar
-      while (colorbar.firstChild) {
-        colorbar.removeChild(colorbar.firstChild);
-      }
+      // while (colorbar.firstChild) {
+      //   colorbar.removeChild(colorbar.firstChild);
+      // }
       const div = document.createElement('div');
+      // const div = this.$el.querySelector('.colorbar-chunk');
       div.className = 'colorbar-chunk';
       div.style.background = this.cssLinearGradientFromCmap();
-      div.style.height = '100%';
+      div.style.height = 'var(--height)';
+      div.style.width = '100%';
       
       
       // add the start and end triangles
@@ -127,21 +131,29 @@ export default defineComponent({
         start.className = 'colorbar-start';
         const end = document.createElement('div');
         end.className = 'colorbar-end';
-        colorbar.appendChild(end);
-        colorbar.appendChild(div);
         colorbar.appendChild(start);
-      
+        colorbar.appendChild(div);
+        colorbar.appendChild(end);
+        end && this.showEndTriangle;
         if (start && this.showStartTriangle) {
           start.style.backgroundColor = this.cmap(0);
-          this.styleDownTriangle(start as HTMLDivElement);
+          this.styleLeftTriangle(start as HTMLDivElement);
         }
         if (end && this.showEndTriangle) {
           end.style.backgroundColor = this.cmap(1);
-          this.styleUpTriangle(end as HTMLDivElement);
+          this.styleRightTriangle(end as HTMLDivElement);
         }
       } else {
         colorbar.appendChild(div);
       }
+    },
+    
+    styleColorbarChunk(div: HTMLDivElement) {
+      div.style.background = this.cssLinearGradientFromCmap();
+      div.style.height = 'var(--height)';
+      div.style.flexGrow = '1';
+      div.style.flexShrink = '1';
+      
     },
     
     styleUpTriangle(div: HTMLDivElement) {
@@ -164,6 +176,32 @@ export default defineComponent({
       div.style.borderLeft = `${width/2}px solid transparent`;
       div.style.borderRight = `${width/2}px solid transparent`;
       div.style.borderTop = `${height}px solid ${color}`;
+      div.style.flexShrink = '0';
+      div.style.flexGrow = '1';
+    },
+    
+    styleLeftTriangle(div: HTMLDivElement) {
+      div.style.width="var(--height)";
+      div.style.height="var(--height)";
+      const height = div.offsetHeight;
+      const color = div.style.backgroundColor;
+      div.style.backgroundColor = 'transparent';
+      
+      div.style.borderTop = `${height/2}px solid transparent`;
+      div.style.borderBottom = `${height/2}px solid transparent`;
+      div.style.borderRight = `${height}px solid ${color}`;
+    },
+    
+    styleRightTriangle(div: HTMLDivElement) {
+      div.style.width="var(--height)";
+      div.style.height="var(--height)";
+      const height = div.offsetHeight;
+      const color = div.style.backgroundColor;
+      div.style.backgroundColor = 'transparent';
+      
+      div.style.borderTop = `${height/2}px solid transparent`;
+      div.style.borderBottom = `${height/2}px solid transparent`;
+      div.style.borderLeft = `${height}px solid ${color}`;
     }
   },
   
@@ -187,97 +225,46 @@ export default defineComponent({
 * Browsers: last 5 version
 */
 
-.colorbar-container {
+.colorbar-container-horizontal {
   position: relative;
-  display: inline-block;
-  --width: 1.25em;
-  width: -webkit-fit-content;
-  width: -moz-fit-content;
-  width: fit-content;
-  margin-left: 5px;
-  margin-right: 1em;
-  background: var(--background-color);
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  display: block;
+  --height: 1.25em;
+  width: 100%;
 }
-
 .colorbar {
-  height: 100%;
-  width: var(--width);
-  margin-left: 5px;
-  margin-right: 1em;
+  width: 100%;
+  height: var(--height);
   background: var(--background-color);
-  display:-webkit-box;
-  display:-ms-flexbox;
-  display:flex;
-  -webkit-box-orient: vertical;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
+      -ms-flex-direction: row;
+          flex-direction: row;
   -webkit-filter: drop-shadow(0 0 0.1rem white);
           filter: drop-shadow(0 0 0.1rem white);
 }
 
-/* make .colorbar-start and .colorbar-end triangles */
-.colorbar-chunk {
-  
-  -ms-flex-negative: 1;
-  
-      flex-shrink: 1;
-  -webkit-box-flex:1;
-      -ms-flex-positive:1;
-          flex-grow:1;
-}
-
-.colorbar-start {
-  -ms-flex-preferred-size: min-content;
-      flex-basis: min-content;
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
-  -webkit-box-flex:1;
-      -ms-flex-positive:1;
-          flex-grow:1;
-}
-
-.colorbar-end {
-  -ms-flex-preferred-size: min-content;
-      flex-basis: min-content;
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
-  -webkit-box-flex: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-}
-
-
 
 .colorbar-labels {
-  position: absolute;
-  width: -webkit-max-content;
-  width: -moz-max-content;
-  width: max-content;
-  height: 100%;
-  top: 50%;
-  /* right: -1.5ch; */
+  
+  width: calc(100% - 2*var(--height));
+  height: -webkit-max-content;
+  height: -moz-max-content;
+  height: max-content;
+  /* left: 50%; */
   -webkit-transform-origin: top center;
       -ms-transform-origin: top center;
           transform-origin: top center;
-  -webkit-transform: rotate(180deg) translate(-75%,-50%);
-      -ms-transform: rotate(180deg) translate(-75%,-50%);
-          transform: rotate(180deg) translate(-75%,-50%);
-  -webkit-writing-mode: vertical-rl;
-      -ms-writing-mode: tb-rl;
-          writing-mode: vertical-rl;
-  
+  -webkit-transform: translate(var(--height), 0);
+      -ms-transform: translate(var(--height), 0);
+          transform: translate(var(--height), 0);
   display: -webkit-box;
-  
   display: -ms-flexbox;
-  
   display: flex;
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
-  }
+}
 </style>

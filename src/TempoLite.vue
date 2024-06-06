@@ -405,9 +405,9 @@
               TEMPO Field of Regard
               <info-button>
                 <p>
-                  The TEMPO satellite observes the atmospher over North America from the Atlantic Ocean
-                   to the Pacific Coast and from roughly Mexico City 
-                   to central Canada. 
+                  The TEMPO satellite observes the atmosphere over North America, from the Atlantic Ocean to the Pacific Coast, and from roughly Mexico City to central Canada. 
+                </p>
+                <p>
                    The TEMPO Field of Regard (in <span class="text-red">red</span>, currently <em>{{ showFieldOfRegard ? 'visible' : "hidden" }}</em>)
                   is the area over which the satellite takes measurements. 
                 </p>

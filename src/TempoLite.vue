@@ -189,7 +189,9 @@
             color="#068ede95"
             thumb-label="always"
             :track-size="10"
+            show-ticks="always"
             hide-details
+            :disabled="loadedImagesProgress < 100"
           >
             <template v-slot:thumb-label>
               <div class="thumb-label">
@@ -351,7 +353,7 @@
             </div>
           </v-radio-group>
         </div>
-
+        
         <hr style="border-color: grey;"  v-if="radio>0">
         
         <div id="locations-of-interest" v-if="radio>0">
@@ -412,6 +414,15 @@
                 </info-button>
             </template>
             </v-checkbox>
+            <v-checkbox
+              v-if="false"
+              :disabled="!highresAvailable"
+              v-model="useHighRes"
+              @keyup.enter="useHighRes = !useHighRes"
+              label="Use High Resolution Data"
+              color="#c10124"
+              hide-details
+            />
           <div
             id="opacity-slider-container"
           >
@@ -541,7 +552,12 @@ interface TimezoneInfo {
   name: string;
 }
 
-import { erdTimestamps, newTimestamps, may2228Times, may28th, may29th } from "./timestamps";
+import { getTimestamps } from "./timestamps";
+
+const erdTimestamps: number[] = [];
+const newTimestamps: number[] = [];
+
+
 
 const fosterTimestamps = [
   1698838920000,
@@ -591,10 +607,8 @@ const fosterTimestamps = [
 ];
 
 // combine the timestamps from the two sources
-const timestamps = erdTimestamps.concat(fosterTimestamps).concat(newTimestamps).concat(may2228Times).concat(may28th).concat(may29th);
-// sort the timestamps
-timestamps.sort();
 
+const timestamps = fosterTimestamps;
 
 interface LocationOfInterest {
   latlng: L.LatLngExpression;
@@ -710,15 +724,15 @@ export default defineComponent({
 
       customImageUrl: "",
 
-      timezoneOptions: [
-        { tz: 'US/Eastern', name: 'Eastern Daylight' },
-        { tz: 'US/Central', name: 'Central Daylight' },
-        { tz: 'US/Mountain', name: 'Mountain Daylight' },
-        { tz: 'US/Arizona', name: 'Mountain Standard' },
-        { tz: 'US/Pacific', name: 'Pacific Daylight' },
-        { tz: 'US/Alaska', name: 'Alaska Daylight' },
-        { tz: 'UTC', name: 'UTC' },
-      ] as TimezoneInfo[],
+      // timezoneOptions: [
+      //   { tz: 'US/Eastern', name: 'Eastern Daylight' },
+      //   { tz: 'US/Central', name: 'Central Daylight' },
+      //   { tz: 'US/Mountain', name: 'Mountain Daylight' },
+      //   { tz: 'US/Arizona', name: 'Mountain Standard' },
+      //   { tz: 'US/Pacific', name: 'Pacific Daylight' },
+      //   { tz: 'US/Alaska', name: 'Alaska Daylight' },
+      //   { tz: 'UTC', name: 'UTC' },
+      // ] as TimezoneInfo[],
       selectedTimezone: "US/Eastern",
 
       timestep: 0,
@@ -735,10 +749,8 @@ export default defineComponent({
       timestamps,
       erdTimestamps,
       newTimestamps,
-      fosterTimestamps,
-      may2228Times,
-      may28th,
-      may29th,
+      fosterTimestamps,      
+      preload: true,
       
       singleDateSelected: Date.now() as number | null,
 
@@ -749,7 +761,8 @@ export default defineComponent({
       showFieldOfRegard: true,
       showCredits: false,
       
-      loadedImagesProgress: 50,
+      loadedImagesProgress: 0,
+      useHighRes: false,
     };
   },
 
@@ -757,6 +770,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     this.touchscreen = ('ontouchstart' in window) || ('ontouchstart' in document.documentElement) || !!window.navigator.msPointerEnabled;
+    this.updateTimestamps();
   },
 
   mounted() {
@@ -855,6 +869,31 @@ export default defineComponent({
     date() {
       return new Date(this.timestamp);
     },
+    
+    dateIsDST() {
+      const standardOffset = getTimezoneOffset(this.selectedTimezone, new Date(this.date.getUTCFullYear(), 0, 1));
+      const currentOffset = getTimezoneOffset(this.selectedTimezone, this.date);
+      // console.log(standardOffset / (3600 * 1000), currentOffset / (3600 * 1000));
+      // log offsets in houts
+      console.log(`standard: ${standardOffset/ (3600 * 1000)}, current ${currentOffset  / (3600 * 1000)}`);
+      if (standardOffset === currentOffset) {
+        return false;
+      }
+      return true;
+    },
+    
+    timezoneOptions(): TimezoneInfo[] {
+      return [
+        { tz: 'US/Eastern', name: this.dateIsDST ? 'Eastern Daylight' : 'Eastern Standard' },
+        { tz: 'US/Central', name: this.dateIsDST ? 'Central Daylight' : 'Central Standard' },
+        { tz: 'US/Mountain', name: this.dateIsDST ? 'Mountain Daylight' : 'Mountain Standard' },
+        { tz: 'US/Arizona', name: 'Mountain Standard' },
+        { tz: 'US/Pacific', name: this.dateIsDST ? 'Pacific Daylight' : 'Pacific Standard' },
+        { tz: 'US/Alaska', name: this.dateIsDST ? 'Alaska Daylight' : 'Alaska Standard' },
+        { tz: 'UTC', name: 'UTC' },
+      ];
+    },
+    
     // TODO: Maybe there's a built-in Date function to get this formatting?
     thumbLabel(): string {
       const offset = getTimezoneOffset(this.selectedTimezone, this.date);
@@ -893,19 +932,6 @@ export default defineComponent({
         return 'Level 3 (V03)';
       }
       
-      if (this.may2228Times.includes(this.timestamp)) {
-        return 'Level 3 (V03) May 22-27';
-      }
-      
-      if (this.may28th.includes(this.timestamp)) {
-        return 'Level 3 (V03) May 28';
-      }
-      
-      if (this.may28th.includes(this.timestamp)) {
-        return 'Level 3 (V03) May 29';
-      }
-      
-      
       return 'Unknown';
     },
     
@@ -936,7 +962,12 @@ export default defineComponent({
       const stamps = unique.map(day => new Date(day)).map(date => date.toDateString());
       // create an object with keys for timestamp and value
       return stamps.map((stamp, index) => ({ value: unique[index], title: stamp }));
-    }
+    },
+    
+    highresAvailable() {
+      return this.newTimestamps.includes(this.timestamp);
+    },
+    
     
   },
 
@@ -1024,6 +1055,14 @@ export default defineComponent({
     //   return promises;
     // },
     
+    async updateTimestamps() {
+      return getTimestamps().then((ts) => {
+        this.erdTimestamps = ts.early_release;
+        this.newTimestamps = ts.released;
+        this.timestamps = this.timestamps.concat(this.erdTimestamps, this.newTimestamps).sort();
+      });
+    },
+    
     getTempoFilename(date: Date): string {
       return `tempo_${date.getUTCFullYear()}-${zpad(date.getUTCMonth()+1)}-${zpad(date.getUTCDate())}T${zpad(date.getUTCHours())}h${zpad(date.getUTCMinutes())}m.png`;
     },
@@ -1034,26 +1073,16 @@ export default defineComponent({
       }
       
       if (this.erdTimestamps.includes(timestamp)) {
-        // url = 'https://tempo-images-bucket.s3.amazonaws.com/early_release_v01/';
-        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/erd/";
+        return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/early_release/images/';
       }
       
       if (this.newTimestamps.includes(timestamp)) {
-        // url = 'https://tempo-images-bucket.s3.amazonaws.com/level3_version3/';
-        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/new/";
+        if (this.useHighRes) {
+          return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/released/images/';
+        }
+        return "https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/released/images/resized_images/";
       }
       
-      if (this.may2228Times.includes(timestamp)) {
-        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/new_may_22_28/";
-      }
-      
-      if (this.may28th.includes(timestamp)) {
-        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/may_28/";
-      }
-      
-      if (this.may29th.includes(timestamp)) {
-        return "https://johnarban.github.io/wwt_interactives/images/tempo-data/may_29/";
-      }
       return '';
     }, 
     
@@ -1081,11 +1110,15 @@ export default defineComponent({
     },
     
     imagePreload() {
+      if (!this.preload) {
+        return;
+      }
+      console.log('preloading images for ', this.thumbLabel);
       const times = this.timestamps.slice(this.minIndex, this.maxIndex + 1);
       const images = times.map(ts => this.getTempoDataUrl(ts) + this.getTempoFilename(new Date(ts)));
       const promises = _preloadImages(images);
-      console.log(promises.length);
       let loaded = 0;
+      this.loadedImagesProgress = 0;
       promises.forEach((promise) => {
         promise.then(() => {
           loaded += 1;
@@ -1112,6 +1145,19 @@ export default defineComponent({
       }
     },
     
+    loadedImagesProgress(val: number) {
+      this.playing = false;
+      const btn = this.$el.querySelector('#play-pause-button');
+      if (btn) {
+        if (val < 100) {
+          btn.setAttribute('disabled', 'true');
+        } else {
+          btn.removeAttribute('disabled');
+        }
+        
+      }
+    },
+    
 
     playing(play: boolean) {
       if (play) {
@@ -1126,6 +1172,10 @@ export default defineComponent({
       this.updateFieldOfRegard();
     },
     
+    useHighRes() {
+      this.imagePreload();
+    },
+    
     imageBounds(bounds: L.LatLngBounds) {
       console.log(this.whichDataSet, bounds.toBBoxString());
     },
@@ -1136,6 +1186,10 @@ export default defineComponent({
       } else if (this.map) {
         this.map.removeLayer(this.fieldOfRegardLayer as L.Layer);
       }
+    },
+    
+    timestamps() {
+      this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1].value;
     },
     
     radio(value: number) {
@@ -1597,6 +1651,12 @@ a {
     color: var(--accent-color);
     border: 2px solid var(--accent-color);
   }
+  
+  #play-pause-button[disabled] {
+    filter: grayscale(100%);
+    cursor: progress;
+    cursor: not-allowed;
+  }
 
   .icon-wrapper {
     padding-inline: 0.5rem !important;
@@ -1625,6 +1685,14 @@ a {
         color: var(--accent-color);
       }
     }
+  }
+
+  .v-slider-track__tick {
+      background-color: var(--accent-color); /* Change color */
+      height: 15px; /* Change size */
+      width: 4px;
+      margin-top: 0 !important;
+      // top: -10%;
   }
 
   .v-slider {

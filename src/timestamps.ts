@@ -14,7 +14,12 @@ export interface Manifest {
 
 export async function fetchManifest(): Promise<Manifest> {
   console.log("fetching manifest");
-  return fetch("https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/manifest.json").then((response) => response.json());
+  const url = "https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/manifest.json";
+  // try to use cache busting, but if that fails try with plain url
+  return fetch(`${url}?version=${Date.now()}}`)
+    .then((response) => response.json())
+    .catch(() => fetch(url).then((response) => response.json()));
+    
 }
 
 interface Timestamps {

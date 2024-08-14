@@ -959,13 +959,9 @@ export default defineComponent({
       if (!this.showClouds) {
         return '';
       }
-      const filename = this.getTempoFilename(this.date);
+
       if (this.cloudTimestamps.includes(this.timestamp)) {
-        if (this.useHighRes) {
-          return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/' + filename;
-        } else {
-          return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/resized_images/' + filename;
-        }
+        return this.getCloudFilename(this.date);
       }
       return '';
     },
@@ -1120,6 +1116,15 @@ export default defineComponent({
       });
     },
     
+    getCloudFilename(date: Date): string {
+      const filename = this.getTempoFilename(date);
+      if (this.useHighRes) {
+        return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/' + filename;
+      } else {
+        return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/resized_images/' + filename;
+      }
+    },
+    
     getTempoFilename(date: Date): string {
       return `tempo_${date.getUTCFullYear()}-${zpad(date.getUTCMonth()+1)}-${zpad(date.getUTCDate())}T${zpad(date.getUTCHours())}h${zpad(date.getUTCMinutes())}m.png`;
     },
@@ -1173,6 +1178,8 @@ export default defineComponent({
       console.log('preloading images for ', this.thumbLabel);
       const times = this.timestamps.slice(this.minIndex, this.maxIndex + 1);
       const images = times.map(ts => this.getTempoDataUrl(ts) + this.getTempoFilename(new Date(ts)));
+      const cloudImages = times.filter(ts => this.cloudTimestamps.includes(ts)).map(ts => this.getCloudFilename(new Date(ts)));
+      images.push(...cloudImages);
       const promises = _preloadImages(images);
       let loaded = 0;
       this.loadedImagesProgress = 0;

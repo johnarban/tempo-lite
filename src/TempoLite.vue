@@ -146,6 +146,20 @@
         <div id="map-contents" style="width:100%; height: 100%;">
           <div id="map"></div>
           <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
+          <!-- show hide cloud data, disable if none is available -->
+          <div id="map-show-hide-clouds">
+            <v-btn
+              class="ma-2"
+              v-if="cloudTimestamps.length > 0"
+              @click="showClouds = !showClouds"
+              @keyup.enter="showClouds = !showClouds"
+              elevation="5"
+              :color="cloudDataAvailable ? showClouds ? accentColor : buttonColor : 'grey'"
+              :disabled="!cloudDataAvailable"
+              :icon="`${(!showClouds || !cloudDataAvailable) ? 'mdi-cloud-off-outline' : 'mdi-cloud-outline'}`"
+            >
+            </v-btn>
+          </div>
           <location-search
             v-model="searchOpen"
             small
@@ -412,6 +426,13 @@
                 </p>
                 </info-button>
               </div>
+            <v-checkbox
+              v-model="showClouds"
+              @keyup.enter="showClouds = !showClouds"
+              label="Show Clouds"
+              color="#c10124"
+              hide-details
+            />
             <v-checkbox
               v-if="false"
               :disabled="!highresAvailable"
@@ -766,7 +787,8 @@ export default defineComponent({
         opacity,
         interactive: false,
       }),
-      cloudTimestamps
+      cloudTimestamps,
+      showClouds: true,
     };
   },
 
@@ -925,6 +947,9 @@ export default defineComponent({
     },
     
     cloudUrl(): string {
+      if (!this.showClouds) {
+        return '';
+      }
       const filename = this.getTempoFilename(this.date);
       if (this.cloudTimestamps.includes(this.timestamp)) {
         if (this.useHighRes) {
@@ -934,6 +959,10 @@ export default defineComponent({
         }
       }
       return '';
+    },
+    
+    cloudDataAvailable(): boolean {
+      return this.cloudTimestamps.includes(this.timestamp);
     },
     
     whichDataSet(): string {
@@ -1624,6 +1653,13 @@ a {
     z-index: 1000;
     width: 250px;
     border: 2px solid black;
+  }
+  
+  #map-show-hide-clouds {
+    z-index: 1000;
+    position: absolute;
+    top: 1rem;
+    right: 80px;
   }
 
   #map-legend {

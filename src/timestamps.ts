@@ -10,6 +10,11 @@ export interface Manifest {
     resized_image_directory: string;
     timestamps: number[];
   };
+  clouds: {
+    image_directory: string;
+    resized_image_directory: string;
+    timestamps: number[];
+  };
 }
 
 export async function fetchManifest(): Promise<Manifest> {
@@ -20,11 +25,13 @@ export async function fetchManifest(): Promise<Manifest> {
 interface Timestamps {
   early_release: number[];
   released: number[];
+  clouds: number[];
 }
 
 export  async function getTimestamps(): Promise<Timestamps> {
   const manifest = await fetchManifest();
   const earlyRelease = manifest.early_release;
   const released = manifest.released;
-  return { early_release: earlyRelease.timestamps, released: released.timestamps };
+  const clouds = manifest.clouds;
+  return { early_release: earlyRelease.timestamps, released: released.timestamps, clouds: clouds.timestamps };
 }

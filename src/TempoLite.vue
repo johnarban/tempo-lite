@@ -555,7 +555,7 @@ import { getTimestamps } from "./timestamps";
 const erdTimestamps: number[] = [];
 const newTimestamps: number[] = [];
 
-
+const cloudTimestamps: number[] = [];
 
 const fosterTimestamps = [
   1698838920000,
@@ -761,6 +761,12 @@ export default defineComponent({
       
       loadedImagesProgress: 0,
       useHighRes: false,
+      
+      cloudOverlay: new L.ImageOverlay("", novDecBounds, {
+        opacity,
+        interactive: false,
+      }),
+      cloudTimestamps
     };
   },
 
@@ -804,6 +810,7 @@ export default defineComponent({
 
     this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1].value;
     this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
+    this.cloudOverlay.setUrl(this.cloudUrl).addTo(this.map as Map);
     
     this.updateFieldOfRegard();
     if (this.showFieldOfRegard) {
@@ -915,6 +922,18 @@ export default defineComponent({
       }
       const url = this.getTempoDataUrl(this.timestamp);
       return url + this.imageName;
+    },
+    
+    cloudUrl(): string {
+      const filename = this.getTempoFilename(this.date);
+      if (this.cloudTimestamps.includes(this.timestamp)) {
+        if (this.useHighRes) {
+          return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/' + filename;
+        } else {
+          return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/resized_images/' + filename;
+        }
+      }
+      return '';
     },
     
     whichDataSet(): string {
@@ -1046,6 +1065,7 @@ export default defineComponent({
     },
     updateBounds() {
       this.imageOverlay.setBounds(this.imageBounds);
+      this.cloudOverlay.setBounds(this.imageBounds);
     },
     
     // preloadImages(images: string[]) {
@@ -1058,6 +1078,7 @@ export default defineComponent({
         this.erdTimestamps = ts.early_release;
         this.newTimestamps = ts.released;
         this.timestamps = this.timestamps.concat(this.erdTimestamps, this.newTimestamps).sort();
+        this.cloudTimestamps = ts.clouds;
       });
     },
     
@@ -1170,6 +1191,10 @@ export default defineComponent({
       this.updateFieldOfRegard();
     },
     
+    cloudUrl(url: string) {
+      this.cloudOverlay.setUrl(url);
+    },
+    
     useHighRes() {
       this.imagePreload();
     },
@@ -1221,6 +1246,7 @@ export default defineComponent({
 
     opacity(value: number) {
       this.imageOverlay.setOpacity(value);
+      this.cloudOverlay.setOpacity(value);
     }
   }
 });

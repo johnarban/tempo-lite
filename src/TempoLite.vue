@@ -429,7 +429,8 @@
             <v-checkbox
               v-model="showClouds"
               @keyup.enter="showClouds = !showClouds"
-              label="Show Clouds"
+              :disabled="!cloudDataAvailable"
+              :label="cloudDataAvailable ? 'Show Clouds' : 'No Cloud Data Available'"
               color="#c10124"
               hide-details
             />

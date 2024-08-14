@@ -430,7 +430,7 @@
               v-model="showClouds"
               @keyup.enter="showClouds = !showClouds"
               :disabled="!cloudDataAvailable"
-              :label="cloudDataAvailable ? 'Show Clouds' : 'No Cloud Data Available'"
+              :label="cloudDataAvailable ? 'Show Cloud Mask' : 'No Cloud Data Available'"
               color="#c10124"
               hide-details
             />
@@ -455,7 +455,7 @@
               hide-details
             >
             </v-slider>
-            <div id="opacity-slider-label">TEMPO opacity</div>
+            <div id="opacity-slider-label">Overlay opacity</div>
           </div> 
           </div>
                   <!-- add text box that allows manually setting the custom image url -->

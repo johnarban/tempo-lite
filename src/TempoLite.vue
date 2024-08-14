@@ -408,7 +408,7 @@
             item-value="tz"
           ></v-select>
           <div id="control-checkboxes">
-            <div class="d-flex flex-row align-center space-between">
+            <div class="d-flex flex-row align-center justify-space-between">
             <v-checkbox
               v-model="showFieldOfRegard"
               @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
@@ -426,6 +426,7 @@
                 </p>
                 </info-button>
               </div>
+            <div class="d-flex flex-row align-center justify-space-between">
             <v-checkbox
               v-model="showClouds"
               @keyup.enter="showClouds = !showClouds"
@@ -434,6 +435,12 @@
               color="#c10124"
               hide-details
             />
+              <info-button>
+                <p>
+                  The cloud mask shows where the satellite could not measure NO<sub>2</sub> because of cloud cover. 
+                </p>
+              </info-button>
+            </div>
             <v-checkbox
               v-if="false"
               :disabled="!highresAvailable"
@@ -536,12 +543,13 @@
 
       </article>
       </div>
-      <div id="body-logos">
-        <a href="https://www.si.edu/" target="_blank" rel="noopener noreferrer" class="mr-1" 
-        ><img alt="Smithsonian Logo" src="./assets/smithsonian.png"
-         /></a>
-        <credit-logos/>
-      </div>
+      
+    </div>
+    <div id="body-logos">
+      <a href="https://www.si.edu/" target="_blank" rel="noopener noreferrer" class="mr-1" 
+      ><img alt="Smithsonian Logo" src="./assets/smithsonian.png"
+        /></a>
+      <credit-logos/>
     </div>
   </div>
 </v-app>
@@ -1517,12 +1525,12 @@ ul {
     grid-row: 4 / 6;
   }
 
-  #body-logos { 
-    grid-column: 3 / 4;
-    grid-row: 5 / 6;
-    align-self: end;
-    justify-self: end;
-  }
+  // #body-logos { 
+  //   grid-column: 3 / 4;
+  //   grid-row: 5 / 6;
+  //   align-self: end;
+  //   justify-self: end;
+  // }
 }
 
 //  style the content 
@@ -1781,7 +1789,7 @@ a {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 5px;
 }
 
 #opacity-slider-container {
@@ -1805,8 +1813,10 @@ a {
 }
 
 #body-logos {
+  margin-bottom: -1rem;
   display: flex;
   flex-direction: row;
+  justify-content: flex-end;
   img {
     height: 35px !important;
     vertical-align: middle;
@@ -1977,10 +1987,10 @@ i.mdi-menu-down {
       grid-row: 6 / 7;
     }
     
-    #body-logos {
-      grid-column: 1 / 2;
-      grid-row: 7 / 8;
-    }
+    // #body-logos {
+    //   grid-column: 1 / 2;
+    //   grid-row: 7 / 8;
+    // }
   }
   
   .content-with-sidebars {

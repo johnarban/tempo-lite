@@ -146,6 +146,20 @@
         <div id="map-contents" style="width:100%; height: 100%;">
           <div id="map"></div>
           <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
+          <!-- show hide cloud data, disable if none is available -->
+          <div id="map-show-hide-clouds">
+            <v-btn
+              class="ma-2"
+              v-if="cloudTimestamps.length > 0"
+              @click="showClouds = !showClouds"
+              @keyup.enter="showClouds = !showClouds"
+              elevation="5"
+              :color="cloudDataAvailable ? showClouds ? accentColor : buttonColor : 'grey'"
+              :disabled="!cloudDataAvailable"
+              :icon="`${(!showClouds || !cloudDataAvailable) ? 'mdi-cloud-off-outline' : 'mdi-cloud-outline'}`"
+            >
+            </v-btn>
+          </div>
           <location-search
             v-model="searchOpen"
             small
@@ -394,7 +408,7 @@
             item-value="tz"
           ></v-select>
           <div id="control-checkboxes">
-            <div class="d-flex flex-row align-center space-between">
+            <div class="d-flex flex-row align-center justify-space-between">
             <v-checkbox
               v-model="showFieldOfRegard"
               @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
@@ -412,6 +426,21 @@
                 </p>
                 </info-button>
               </div>
+            <div class="d-flex flex-row align-center justify-space-between">
+            <v-checkbox
+              v-model="showClouds"
+              @keyup.enter="showClouds = !showClouds"
+              :disabled="!cloudDataAvailable"
+              :label="cloudDataAvailable ? 'Show Cloud Mask' : 'No Cloud Data Available'"
+              color="#c10124"
+              hide-details
+            />
+              <info-button>
+                <p>
+                  The cloud mask shows where the satellite could not measure NO<sub>2</sub> because of cloud cover. 
+                </p>
+              </info-button>
+            </div>
             <v-checkbox
               v-if="false"
               :disabled="!highresAvailable"
@@ -433,7 +462,7 @@
               hide-details
             >
             </v-slider>
-            <div id="opacity-slider-label">TEMPO opacity</div>
+            <div id="opacity-slider-label">Overlay opacity</div>
           </div> 
           </div>
                   <!-- add text box that allows manually setting the custom image url -->
@@ -514,12 +543,13 @@
 
       </article>
       </div>
-      <div id="body-logos">
-        <a href="https://www.si.edu/" target="_blank" rel="noopener noreferrer" class="mr-1" 
-        ><img alt="Smithsonian Logo" src="./assets/smithsonian.png"
-         /></a>
-        <credit-logos/>
-      </div>
+      
+    </div>
+    <div id="body-logos">
+      <a href="https://www.si.edu/" target="_blank" rel="noopener noreferrer" class="mr-1" 
+      ><img alt="Smithsonian Logo" src="./assets/smithsonian.png"
+        /></a>
+      <credit-logos/>
     </div>
   </div>
 </v-app>
@@ -555,7 +585,7 @@ import { getTimestamps } from "./timestamps";
 const erdTimestamps: number[] = [];
 const newTimestamps: number[] = [];
 
-
+const cloudTimestamps: number[] = [];
 
 const fosterTimestamps = [
   1698838920000,
@@ -761,6 +791,13 @@ export default defineComponent({
       
       loadedImagesProgress: 0,
       useHighRes: false,
+      
+      cloudOverlay: new L.ImageOverlay("", novDecBounds, {
+        opacity,
+        interactive: false,
+      }),
+      cloudTimestamps,
+      showClouds: true,
     };
   },
 
@@ -804,6 +841,7 @@ export default defineComponent({
 
     this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1].value;
     this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
+    this.cloudOverlay.setUrl(this.cloudUrl).addTo(this.map as Map);
     
     this.updateFieldOfRegard();
     if (this.showFieldOfRegard) {
@@ -915,6 +953,21 @@ export default defineComponent({
       }
       const url = this.getTempoDataUrl(this.timestamp);
       return url + this.imageName;
+    },
+    
+    cloudUrl(): string {
+      if (!this.showClouds) {
+        return '';
+      }
+
+      if (this.cloudTimestamps.includes(this.timestamp)) {
+        return this.getCloudFilename(this.date);
+      }
+      return '';
+    },
+    
+    cloudDataAvailable(): boolean {
+      return this.cloudTimestamps.includes(this.timestamp);
     },
     
     whichDataSet(): string {
@@ -1046,6 +1099,7 @@ export default defineComponent({
     },
     updateBounds() {
       this.imageOverlay.setBounds(this.imageBounds);
+      this.cloudOverlay.setBounds(this.imageBounds);
     },
     
     // preloadImages(images: string[]) {
@@ -1058,7 +1112,17 @@ export default defineComponent({
         this.erdTimestamps = ts.early_release;
         this.newTimestamps = ts.released;
         this.timestamps = this.timestamps.concat(this.erdTimestamps, this.newTimestamps).sort();
+        this.cloudTimestamps = ts.clouds;
       });
+    },
+    
+    getCloudFilename(date: Date): string {
+      const filename = this.getTempoFilename(date);
+      if (this.useHighRes) {
+        return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/' + filename;
+      } else {
+        return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/resized_images/' + filename;
+      }
     },
     
     getTempoFilename(date: Date): string {
@@ -1114,6 +1178,8 @@ export default defineComponent({
       console.log('preloading images for ', this.thumbLabel);
       const times = this.timestamps.slice(this.minIndex, this.maxIndex + 1);
       const images = times.map(ts => this.getTempoDataUrl(ts) + this.getTempoFilename(new Date(ts)));
+      const cloudImages = times.filter(ts => this.cloudTimestamps.includes(ts)).map(ts => this.getCloudFilename(new Date(ts)));
+      images.push(...cloudImages);
       const promises = _preloadImages(images);
       let loaded = 0;
       this.loadedImagesProgress = 0;
@@ -1170,6 +1236,10 @@ export default defineComponent({
       this.updateFieldOfRegard();
     },
     
+    cloudUrl(url: string) {
+      this.cloudOverlay.setUrl(url);
+    },
+    
     useHighRes() {
       this.imagePreload();
     },
@@ -1221,6 +1291,7 @@ export default defineComponent({
 
     opacity(value: number) {
       this.imageOverlay.setOpacity(value);
+      this.cloudOverlay.setOpacity(value);
     }
   }
 });
@@ -1461,12 +1532,12 @@ ul {
     grid-row: 4 / 6;
   }
 
-  #body-logos { 
-    grid-column: 3 / 4;
-    grid-row: 5 / 6;
-    align-self: end;
-    justify-self: end;
-  }
+  // #body-logos { 
+  //   grid-column: 3 / 4;
+  //   grid-row: 5 / 6;
+  //   align-self: end;
+  //   justify-self: end;
+  // }
 }
 
 //  style the content 
@@ -1599,6 +1670,13 @@ a {
     width: 250px;
     border: 2px solid black;
   }
+  
+  #map-show-hide-clouds {
+    z-index: 1000;
+    position: absolute;
+    top: 1rem;
+    right: 80px;
+  }
 
   #map-legend {
     position: absolute;
@@ -1718,7 +1796,7 @@ a {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 5px;
 }
 
 #opacity-slider-container {
@@ -1742,8 +1820,10 @@ a {
 }
 
 #body-logos {
+  margin-bottom: -1rem;
   display: flex;
   flex-direction: row;
+  justify-content: flex-end;
   img {
     height: 35px !important;
     vertical-align: middle;
@@ -1914,10 +1994,10 @@ i.mdi-menu-down {
       grid-row: 6 / 7;
     }
     
-    #body-logos {
-      grid-column: 1 / 2;
-      grid-row: 7 / 8;
-    }
+    // #body-logos {
+    //   grid-column: 1 / 2;
+    //   grid-row: 7 / 8;
+    // }
   }
   
   .content-with-sidebars {

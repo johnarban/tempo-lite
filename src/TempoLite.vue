@@ -2090,15 +2090,4 @@ i.mdi-menu-down {
   image-rendering: pixelated;                 /* CSS4 Proposed  */
   -ms-interpolation-mode: nearest-neighbor;   /* IE8+           */
 }
-
-// This is needed for the calendar to display
-#all-dates .v-label {
-  opacity: 1;
-  overflow: unset;
-
-  .dp__instance_calendar {
-    background: red;
-    opacity: 1;
-  }
-}
 </style>

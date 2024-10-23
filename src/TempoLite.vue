@@ -234,19 +234,17 @@
                 :value="0"
                 @keyup.enter="radio = 0"
               >
-              <template #label>
-                <v-select
-                  :modelValue="singleDateSelected"
-                  :disabled="radio !== 0"
-                  :items="uniqueDays"
-                  item-title="title"
-                  item-value="value"
-                  label="Select a Date"
-                  @update:model-value="(e) => { singleDateSelected = e;}"
-                  hide-details
-                ></v-select>
-              </template>
             </v-radio>
+            <date-picker
+              v-model="singleDateSelected"
+              :allowed-dates="uniqueDays"
+              :disabled="radio != 0"
+              :enable-time-picker="false"
+              :multi-dates="false"
+              :transitions="false"
+              :format="(date: Date | null) => date?.toDateString()"
+              dark
+            ></date-picker>
             </v-radio-group>
           </div>        
           <!-- create a list of the uniqueDays -->
@@ -268,9 +266,9 @@
                 <v-btn
                   v-bind="props"
                   class="rounded-icon-wrapper"
-                  @click="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) - 1]?.value"
-                  @keyup.enter="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) - 1]?.value"
-                  :disabled="radio !== 0 || singleDateSelected === uniqueDays[0].value"
+                  @click="moveBackwardOneDay"
+                  @keyup.enter="moveBackwardOneDay"
+                  :disabled="radio !== 0 || singleDateSelected === uniqueDays[0]"
                   color="#009ade"
                   variant="outlined"
                   elevation="0"
@@ -286,9 +284,9 @@
                 <v-btn
                   v-bind="props"
                   class="rounded-icon-wrapper"
-                  @click="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) + 1]?.value"
-                  @keyup.enter="singleDateSelected = uniqueDays[uniqueDays.findIndex(day => day.value === singleDateSelected) + 1]?.value"
-                  :disabled="radio !== 0 || singleDateSelected === uniqueDays[uniqueDays.length - 1].value"
+                  @click="moveForwardOneDay"
+                  @keyup.enter="moveForwardOneDay"
+                  :disabled="radio !== 0 || singleDateSelected === uniqueDays[uniqueDays.length - 1]"
                   color="#009ade"
                   variant="outlined"
                   elevation="0"
@@ -780,7 +778,7 @@ export default defineComponent({
       fosterTimestamps,      
       preload: true,
       
-      singleDateSelected: Date.now() as number | null,
+      singleDateSelected: new Date(),
 
       searchOpen: true,
       searchErrorMessage: null as string | null,
@@ -839,7 +837,7 @@ export default defineComponent({
       pane: 'labels'
     }).addTo(this.map as Map);
 
-    this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1].value;
+    this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1];
     this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
     this.cloudOverlay.setUrl(this.cloudUrl).addTo(this.map as Map);
     
@@ -1004,15 +1002,13 @@ export default defineComponent({
       }
     },
     
-    uniqueDays() {
+    uniqueDays(): Date[] {
       // eastern time
       const offset = (date: Date) => getTimezoneOffset("US/Eastern", date);
       const easternDates = this.timestamps.map(ts => new Date(ts + offset(new Date(ts))));
-      const days = easternDates.map(date => new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())).map(date => date.getTime());
-      const unique =  Array.from(new Set(days));
-      const stamps = unique.map(day => new Date(day)).map(date => date.toDateString());
-      // create an object with keys for timestamp and value
-      return stamps.map((stamp, index) => ({ value: unique[index], title: stamp }));
+      const days = easternDates.map(date => (new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())).getTime());
+      const unique = Array.from(new Set(days));
+      return unique.map(ts => new Date(ts));
     },
     
     highresAvailable() {
@@ -1192,6 +1188,18 @@ export default defineComponent({
         });
       });
     },
+
+    getUniqueDayIndex(date: Date): number {
+      return this.uniqueDays.findIndex(day => day.getTime() === date.getTime());
+    },
+
+    moveBackwardOneDay() {
+      this.singleDateSelected = this.uniqueDays[this.getUniqueDayIndex(this.singleDateSelected) - 1];
+    },
+
+    moveForwardOneDay() {
+      this.singleDateSelected = this.uniqueDays[this.getUniqueDayIndex(this.singleDateSelected) + 1];
+    }
     
   },
 
@@ -1257,7 +1265,7 @@ export default defineComponent({
     },
     
     timestamps() {
-      this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1].value;
+      this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1];
     },
     
     radio(value: number) {
@@ -1267,7 +1275,7 @@ export default defineComponent({
       if (value == 0) {
         // this.minIndex = 0;
         // this.maxIndex = this.timestamps.length - 1;
-        this.setNearestDate(this.singleDateSelected);
+        this.setNearestDate(this.singleDateSelected.getTime());
         this.sublocationRadio = null;
         return;
       }
@@ -2076,5 +2084,16 @@ i.mdi-menu-down {
   image-rendering: crisp-edges;               /* CSS4 Proposed  */
   image-rendering: pixelated;                 /* CSS4 Proposed  */
   -ms-interpolation-mode: nearest-neighbor;   /* IE8+           */
+}
+
+// This is needed for the calendar to display
+#all-dates .v-label {
+  opacity: 1;
+  overflow: unset;
+
+  .dp__instance_calendar {
+    background: red;
+    opacity: 1;
+  }
 }
 </style>

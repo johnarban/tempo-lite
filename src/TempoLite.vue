@@ -1325,6 +1325,10 @@ export default defineComponent({
   --map-height: 500px;
 }
 
+.dp__theme_dark {
+  --dp-primary-color: var(--accent-color) !important;
+}
+
 html {
   height: 100%;
   margin: 0;

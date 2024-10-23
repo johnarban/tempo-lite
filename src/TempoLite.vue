@@ -243,6 +243,7 @@
               :multi-dates="false"
               :transitions="false"
               :format="(date: Date | null) => date?.toDateString()"
+              :preview-format="(date: Date | null) => date?.toDateString()"
               dark
             ></date-picker>
             </v-radio-group>

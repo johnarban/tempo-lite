@@ -239,6 +239,7 @@
               v-model="singleDateSelected"
               :allowed-dates="uniqueDays"
               :disabled="radio != 0"
+              :clearable="false"
               :enable-time-picker="false"
               :multi-dates="false"
               :transitions="false"

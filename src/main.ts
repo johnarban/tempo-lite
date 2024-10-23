@@ -1,6 +1,6 @@
 import Vue, { createApp } from "vue";
 
-import { FundingAcknowledgment, IconButton, CreditLogos } from "@cosmicds/vue-toolkit";
+import { FundingAcknowledgement, IconButton, CreditLogos } from "@cosmicds/vue-toolkit";
 import LocationSearch from "./LocationSearch.vue";
 import TempoLite from "./TempoLite.vue";
 import Colorbar from './ColorBar.vue';
@@ -62,7 +62,7 @@ createApp(TempoLite, {})
   // Components
   .component('font-awesome-icon', FontAwesomeIcon)
   .component('icon-button', IconButton)
-  .component('funding-acknowledgment', FundingAcknowledgment)
+  .component('funding-acknowledgement', FundingAcknowledgement)
   .component('credit-logos', CreditLogos)
   .component('colorbar', Colorbar)
   .component('location-search', LocationSearch)

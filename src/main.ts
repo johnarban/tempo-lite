@@ -9,7 +9,6 @@ import InfoButton from "./InfoButton.vue";
 import vuetify from "../plugins/vuetify";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faBookOpen,
@@ -22,6 +21,9 @@ import {
   faSquareXmark,
   faHome,
 } from "@fortawesome/free-solid-svg-icons";
+
+import VueDatePicker from "@vuepic/vue-datepicker";
+import '@vuepic/vue-datepicker/dist/main.css';
 
 library.add(faBookOpen);
 library.add(faPlay);
@@ -68,6 +70,7 @@ createApp(TempoLite, {})
   .component('location-search', LocationSearch)
   .component('info-button', InfoButton)
   .component('colorbar-horizontal', ColorBarHorizontal)
+  .component('date-picker', VueDatePicker)
 
   // Mount
   .mount("#app");

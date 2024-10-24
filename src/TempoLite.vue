@@ -63,10 +63,10 @@
                     Select a date and press the “Play” button or scroll the time slider to view the changing concentrations of NO<sub>2</sub> over North America on those dates. 
                   </li>
                   <li v-bind:style="cssVars">
-                    Press the <v-icon style="font-size: 1.3em; color: var(--accent-color)" elevation="1">mdi-information-variant-circle-outline</v-icon> button next to each Featured Date to get an overview of what to look for on that date
+                    Press the <v-icon style="font-size: 1.3em; color: var(--accent-color)" elevation="1">mdi-information-variant-circle-outline</v-icon> button next to each Notable Date to get an overview of what to look for on that date
                   </li>
                   <li>
-                    For each Featured Date, select one of two zoomed-in Locations to investigate specific pollution events.
+                    For each Notable Date, select one of two zoomed-in Locations to investigate specific pollution events.
                   </li>
                   <li>
                     You can use the “Timezone” setting to investigate how pollution evolves over the day, for example as rush hour progresses in large cities.
@@ -300,11 +300,13 @@
             </v-tooltip>
           </div>
           <v-progress-linear
-            v-if="loadedImagesProgress < 100"
             v-model="loadedImagesProgress"
-            color="red"
-            height="5"
-          ></v-progress-linear>
+            color="#c10124"
+            height="20"
+          >
+          <span v-if="loadedImagesProgress < 100">Loading Data ({{ loadedImagesProgress.toFixed(0) }}%)</span>
+          <span v-else>Selected Date Loaded</span>
+          </v-progress-linear>
         </div>
 
         <hr style="border-color: grey">
@@ -312,7 +314,7 @@
 
          <div id="date-radio">
            <!-- make a v-radio-group with 3 options -->
-          <h2>Featured Dates</h2>
+          <h2>Notable Dates</h2>
           <v-radio-group
             v-model="radio"
             row
@@ -371,7 +373,7 @@
         <hr style="border-color: grey;"  v-if="radio>0">
         
         <div id="locations-of-interest" v-if="radio>0">
-          <h3 class="mb-1">Locations for {{ dateStrings[radio] }}</h3>
+          <h3 class="mb-1">Featured Events for {{ dateStrings[radio] }}</h3>
           <v-radio-group
             v-if="radio !== undefined"
             v-model="sublocationRadio"
@@ -507,7 +509,7 @@
                 <v-card-text>
                   <h4 class="mb-2"><a href="https://tempo.si.edu/" target="_blank" rel="noopener noreferrer">TEMPO</a> Team Acknowledgments:</h4>
                   <p>
-                    Caroline Nowlan, Aaron Naeger, and Erika Wright provided dates and locations for events of interest in the TEMPO data.
+                    Caroline Nowlan, Aaron Naeger, and Erika Wright provided dates and featured events of interest in the TEMPO data.
                   </p>
                   <p>
                     Xiong Liu provided the L3 version 2 TEMPO data files.
@@ -530,7 +532,7 @@
                   Harry Houghton<br>
                   Evaluator: Sue Sunbury<br>
 
-                  <funding-acknowledgment class="my-3"></funding-acknowledgment>
+                  <funding-acknowledgement class="my-3"></funding-acknowledgement>
                 </v-card-text>
               </v-card>
             </v-dialog>
@@ -1845,11 +1847,6 @@ a {
   }
 }
 
-*:focus-visible {
-  outline: 2px solid magenta;
-
-}
-
 #icons-container > a[href="https://worldwidetelescope.org/home/"] {
   display: none;
 }
@@ -1883,6 +1880,15 @@ i.mdi-menu-down {
   color: var(--smithsonian-blue);
 }
 
+// From Sara Soueidan (https://www.sarasoueidan.com/blog/focus-indicators/) & Erik Kroes (https://www.erikkroes.nl/blog/the-universal-focus-state/)
+:focus-visible,
+button:focus-visible,
+.focus-visible,
+.v-selection-control--focus-visible .v-selection-control__input {
+  outline: 9px double white !important;
+  box-shadow: 0 0 0 6px black !important;
+  border-radius: .125rem;
+}
 
 
 //  mobile styles

@@ -301,11 +301,11 @@
           </div>
           <v-progress-linear
             v-model="loadedImagesProgress"
-            color="red"
-            height="25"
+            color="#c10124"
+            height="20"
           >
           <span v-if="loadedImagesProgress < 100">Loading Data ({{ loadedImagesProgress.toFixed(0) }}%)</span>
-          <span v-else>Data Loaded</span>
+          <span v-else>Selected Date Loaded</span>
           </v-progress-linear>
         </div>
 

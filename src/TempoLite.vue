@@ -300,11 +300,13 @@
             </v-tooltip>
           </div>
           <v-progress-linear
-            v-if="loadedImagesProgress < 100"
             v-model="loadedImagesProgress"
             color="red"
-            height="5"
-          ></v-progress-linear>
+            height="25"
+          >
+          <span v-if="loadedImagesProgress < 100">{{ loadedImagesProgress.toFixed(0) }}%</span>
+          <span v-else>Data Loaded</span>
+          </v-progress-linear>
         </div>
 
         <hr style="border-color: grey">

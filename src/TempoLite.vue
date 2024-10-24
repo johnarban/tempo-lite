@@ -304,7 +304,7 @@
             color="red"
             height="25"
           >
-          <span v-if="loadedImagesProgress < 100">{{ loadedImagesProgress.toFixed(0) }}%</span>
+          <span v-if="loadedImagesProgress < 100">Loading Data ({{ loadedImagesProgress.toFixed(0) }}%)</span>
           <span v-else>Data Loaded</span>
           </v-progress-linear>
         </div>

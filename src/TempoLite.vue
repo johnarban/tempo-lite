@@ -229,24 +229,21 @@
           <h2>Select a Date</h2>  
           <div class="d-flex flex-row align-center">
             <v-radio-group v-model="radio">
-              <v-radio
-                label="Select a date"
-                :value="0"
-                @keyup.enter="radio = 0"
-              >
-            </v-radio>
-            <date-picker
-              v-model="singleDateSelected"
-              :allowed-dates="uniqueDays"
-              :disabled="radio != 0"
-              :clearable="false"
-              :enable-time-picker="false"
-              :multi-dates="false"
-              :transitions="false"
-              :format="(date: Date | null) => date?.toDateString()"
-              :preview-format="(date: Date | null) => date?.toDateString()"
-              dark
-            ></date-picker>
+              <date-picker
+                v-model="singleDateSelected"
+                @update:model-value="(value: Date) => {
+                  let index: number | null = datesOfInterest.map(d => d.getTime()).indexOf(value.getTime());
+                  radio = index < 0 ? null : index;
+                }"
+                :allowed-dates="uniqueDays"
+                :clearable="false"
+                :enable-time-picker="false"
+                :multi-dates="false"
+                :transitions="false"
+                :format="(date: Date | null) => date?.toDateString()"
+                :preview-format="(date: Date | null) => date?.toDateString()"
+                dark
+              ></date-picker>
             </v-radio-group>
           </div>        
           <!-- create a list of the uniqueDays -->
@@ -270,7 +267,7 @@
                   class="rounded-icon-wrapper"
                   @click="moveBackwardOneDay"
                   @keyup.enter="moveBackwardOneDay"
-                  :disabled="radio !== 0 || singleDateSelected === uniqueDays[0]"
+                  :disabled="radio !== null || singleDateSelected === uniqueDays[0]"
                   color="#009ade"
                   variant="outlined"
                   elevation="0"
@@ -288,7 +285,7 @@
                   class="rounded-icon-wrapper"
                   @click="moveForwardOneDay"
                   @keyup.enter="moveForwardOneDay"
-                  :disabled="radio !== 0 || singleDateSelected === uniqueDays[uniqueDays.length - 1]"
+                  :disabled="radio !== null || singleDateSelected === uniqueDays[uniqueDays.length - 1]"
                   color="#009ade"
                   variant="outlined"
                   elevation="0"
@@ -322,8 +319,8 @@
             <div class="d-flex flex-row align-center">
               <v-radio
                 label="November 1, 2023"
-                :value="1"
-                @keyup.enter="radio = 1"
+                :value="0"
+                @keyup.enter="radio = 0"
               >
               </v-radio>
               <info-button>
@@ -342,8 +339,8 @@
             <div class="d-flex flex-row align-center">
               <v-radio
                 label="November 3, 2023"
-                :value="2"
-                @keyup.enter="radio = 2"
+                :value="1"
+                @keyup.enter="radio = 1"
               ></v-radio>
               <info-button>
                 Levels of NO<sub>2</sub> change quickly from day to day, 
@@ -354,8 +351,8 @@
             <div class="d-flex flex-row align-center">
               <v-radio
                 label="March 28, 2024"
-                :value="3"
-                @keyup.enter="radio = 3"
+                :value="2"
+                @keyup.enter="radio = 2"
               ></v-radio>
               <info-button>
                 Breathing air with a high concentration of NO<sub>2</sub>, 
@@ -370,12 +367,12 @@
           </v-radio-group>
         </div>
         
-        <hr style="border-color: grey;"  v-if="radio>0">
+        <hr style="border-color: grey;"  v-if="radio !== null ">
         
-        <div id="locations-of-interest" v-if="radio>0">
+        <div id="locations-of-interest" v-if="radio !== null">
           <h3 class="mb-1">Featured Events for {{ dateStrings[radio] }}</h3>
           <v-radio-group
-            v-if="radio !== undefined"
+            v-if="radio !== null"
             v-model="sublocationRadio"
             row
           >
@@ -682,7 +679,6 @@ export default defineComponent({
     ) as L.Layer;
       
     const datesOfInterest = [
-      null,
       new Date(2023, 10, 1), // Nov 1
       new Date(2023, 10, 3), // Nov 3
       new Date(2024, 2, 28), // Mar 28
@@ -695,14 +691,12 @@ export default defineComponent({
     };
 
     const locationsOfInterest = [
-      null,
       [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: timestamps.indexOf(1698848520000)}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: timestamps.indexOf(1698848520000)}],  // Nov 1
       [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: timestamps.indexOf(1699021320000)}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: timestamps.indexOf(1699014120000)}],  // Nov 3
       [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Oil and Gas Production", index: timestamps.indexOf(1711631040000)}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Fires", index: timestamps.indexOf(1711644240000)}],  // Mar 28
     ] as LocationOfInterest[][];
     
     const locationsOfInterestText = [
-      ['',''],
       [
         '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly.</p>', 
         '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
@@ -733,7 +727,7 @@ export default defineComponent({
       inIntro: !WINDOW_DONTSHOWINTRO,
       dontShowIntro: WINDOW_DONTSHOWINTRO,
 
-      radio: 0 as number,
+      radio: null as number | null,
       sublocationRadio: null as number | null,
 
       touchscreen: false,
@@ -1271,11 +1265,8 @@ export default defineComponent({
       this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1];
     },
     
-    radio(value: number) {
-      if (value === undefined) {
-        return;
-      }
-      if (value == 0) {
+    radio(value: number | null) {
+      if (value == null) {
         // this.minIndex = 0;
         // this.maxIndex = this.timestamps.length - 1;
         this.setNearestDate(this.singleDateSelected.getTime());
@@ -1295,7 +1286,7 @@ export default defineComponent({
     },
     
     sublocationRadio(value: number | null) {
-      if (value !== null && this.radio !== undefined) {
+      if (value !== null && this.radio != null) {
         const loi = this.locationsOfInterest[this.radio][value];
         this.map?.setView(loi.latlng, loi.zoom);
         this.timeIndex = loi.index;

@@ -793,7 +793,7 @@ export default defineComponent({
         interactive: false,
       }),
       cloudTimestamps,
-      showClouds: true,
+      showClouds: false,
     };
   },
 

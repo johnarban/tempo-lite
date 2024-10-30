@@ -711,7 +711,7 @@ export default defineComponent({
       ],  // Mar 28
     ];
 
-    const opacity = 1;
+    const opacity = 0.9;
     return {
       showSplashScreen,
       sheet: null as SheetType,
@@ -793,7 +793,7 @@ export default defineComponent({
         interactive: false,
       }),
       cloudTimestamps,
-      showClouds: true,
+      showClouds: false,
     };
   },
 
@@ -826,16 +826,19 @@ export default defineComponent({
     //   crs: L.CRS.EPSG4326
     // }).addTo(this.map as Map);
     
+    const labelPane = this.map.createPane("labels");
+    labelPane.style.zIndex = "650";
+    labelPane.style.pointerEvents = "none";
+    
     this.basemap = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_lines/{z}/{x}/{y}{r}.png', {
       minZoom: 0,
       maxZoom: 20,
       attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       // crs: L.CRS.EPSG4326
+      pane: 'labels'
     }).addTo(this.map as Map);
 
-    const labelPane = this.map.createPane("labels");
-    labelPane.style.zIndex = "650";
-    labelPane.style.pointerEvents = "none";
+    
 
     // L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
     //   attribution: 'OpenStreetMap, CartoDB',

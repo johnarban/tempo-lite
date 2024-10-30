@@ -461,7 +461,7 @@
               hide-details
             >
             </v-slider>
-            <div id="opacity-slider-label">Overlay opacity</div>
+            <div id="opacity-slider-label">TEMPO data opacity</div>
           </div> 
           </div>
                   <!-- add text box that allows manually setting the custom image url -->

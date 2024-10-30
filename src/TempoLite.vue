@@ -242,7 +242,7 @@
                 :transitions="false"
                 :format="(date: Date | null) => date?.toDateString()"
                 :preview-format="(date: Date | null) => date?.toDateString()"
-                dark
+                dark="true"
               ></date-picker>
             </v-radio-group>
           </div>        
@@ -1322,7 +1322,19 @@ export default defineComponent({
 }
 
 .dp__theme_dark {
-  --dp-primary-color: var(--accent-color) !important;
+  --dp-primary-text-color: #fff !important; // selected date text
+  --dp-primary-color: var(--accent-color)!important; // selected date background
+}
+
+.dp__month_year_select,
+.dp__calendar_item {
+  color: #97c8f1!important; // selectable date text & Month/Year
+  font-weight: 800 !important;
+}
+
+.dp__cell_disabled {
+  color: #888 !important;
+  font-weight: 400;
 }
 
 html {

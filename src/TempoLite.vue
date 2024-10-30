@@ -739,7 +739,7 @@ export default defineComponent({
       touchscreen: false,
       playInterval: null as Timeout | null,
       map: null as Map | null,
-      basemap: null as L.TileLayer.WMS | null,
+      basemap: null as L.TileLayer.WMS | null | L.TileLayer,
       novDecBounds,
       marchBounds: new L.LatLngBounds(
         new L.LatLng(14.01, -167.99),
@@ -828,8 +828,15 @@ export default defineComponent({
     zoomHome.addTo(this.map);
     this.addCoastlines();
 
-    this.basemap = new L.TileLayer.WMS('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
-      crs: L.CRS.EPSG4326
+    // this.basemap = new L.TileLayer.WMS('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+    //   crs: L.CRS.EPSG4326
+    // }).addTo(this.map as Map);
+    
+    this.basemap = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_background/{z}/{x}/{y}{r}.png', {
+      minZoom: 0,
+      maxZoom: 20,
+      attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      // crs: L.CRS.EPSG4326
     }).addTo(this.map as Map);
 
     const labelPane = this.map.createPane("labels");

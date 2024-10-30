@@ -169,7 +169,7 @@
             :search-provider="geocodingInfoForSearch"
             @set-location="(feature: MapBoxFeature) => {
               if (feature !== null) {
-                map?.setView([feature.center[1], feature.center[0]], 7);
+                map?.setView([feature.center[1], feature.center[0]], 12);
               }
             }"
             @error="(error: string) => searchErrorMessage = error"

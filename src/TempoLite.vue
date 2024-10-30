@@ -1233,7 +1233,6 @@ export default defineComponent({
         
       }
     },
-    
 
     playing(play: boolean) {
       if (play) {
@@ -1283,7 +1282,9 @@ export default defineComponent({
         this.sublocationRadio = null;
         return;
       }
-      this.setNearestDate(this.datesOfInterest[value]?.getTime() ?? null);
+      const date = this.datesOfInterest[value] ?? this.singleDateSelected;
+      this.singleDateSelected = date;
+      this.setNearestDate(date.getTime());
       this.sublocationRadio = null;
     },
     

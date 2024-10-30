@@ -1881,7 +1881,7 @@ i.mdi-menu-down {
 }
 
 // From Sara Soueidan (https://www.sarasoueidan.com/blog/focus-indicators/) & Erik Kroes (https://www.erikkroes.nl/blog/the-universal-focus-state/)
-:focus-visible,
+:focus-visible:not(.v-field__input input),
 button:focus-visible,
 .focus-visible,
 .v-selection-control--focus-visible .v-selection-control__input {

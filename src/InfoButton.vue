@@ -3,13 +3,26 @@
     <template v-slot:activator="{ props: activatorProps }">
       <v-tooltip :text="tooltipTextValue" :disabled="!showTooltip">
         <template v-slot:activator=" { props} ">
-        <v-icon v-bind="{...activatorProps, ...props}" style="margin-left: 1em;font-size: 1.3em; color: var(--accent-color);" elevation="1">mdi-information-variant-circle-outline</v-icon>
+        <v-icon 
+          v-bind="{...activatorProps, ...props}" 
+          style="margin-left: 1em;font-size: 1.3em; color: var(--accent-color);" elevation="1"
+          @click="dialogVisible = true"
+          @keydown="handleKeydown"
+          >
+          mdi-information-variant-circle-outline
+        </v-icon>
         </template>
       </v-tooltip>
     </template>
     <v-card class="gradient-background">
       <div class="info-button-close-icon">
-        <v-icon class="info-button-close-icon__icon" @click="dialogVisible = false">mdi-close</v-icon>
+        <v-icon 
+          class="info-button-close-icon__icon"
+          @click="dialogVisible = false"
+          @keydown="handleKeydown"
+        >
+          mdi-close
+        </v-icon>
       </div>
       <div class="v-card-info-text ma-3">
         <slot>{{ helpText }}</slot>
@@ -46,7 +59,15 @@ export default defineComponent({
       dialogVisible: false,
       tooltipTextValue: this.tooltipText ?? (this.showTooltip ? 'Learn More' : undefined),
     };
-  }
+  },
+
+  methods: {
+    handleKeydown(event: KeyboardEvent) {
+      if (event.key === 'Enter') {
+        this.dialogVisible = !this.dialogVisible;
+      }
+    },
+  },
 });
 </script>
 

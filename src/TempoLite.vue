@@ -370,7 +370,7 @@
         <hr style="border-color: grey;"  v-if="radio !== null ">
         
         <div id="locations-of-interest" v-if="radio !== null">
-          <h3 class="mb-1">Featured Events for {{ dateStrings[radio] }}</h3>
+          <h3 class="mb-1">Featured Events for {{ dateStrings[radio+1] }}</h3>
           <v-radio-group
             v-if="radio !== null"
             v-model="sublocationRadio"

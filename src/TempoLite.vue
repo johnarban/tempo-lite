@@ -167,6 +167,20 @@
             </template>
             <v-card class="px-2">
               <div
+                id="opacity-slider-container"
+              >
+                <v-slider
+                  v-model="opacity"
+                  :min="0"
+                  :max="1"
+                  color="#c10124"
+                  density="compact"
+                  hide-details
+                >
+                </v-slider>
+                <div id="opacity-slider-label">Overlay opacity</div>
+              </div>
+              <div
                 class="d-flex flex-row align-center justify-space-between"
               >
                 <v-checkbox
@@ -201,37 +215,6 @@
                   </p>
                 </info-button>
               </div>
-              <div
-                id="opacity-slider-container"
-              >
-                <v-slider
-                  v-model="opacity"
-                  :min="0"
-                  :max="1"
-                  color="#c10124"
-                  density="compact"
-                  hide-details
-                >
-                </v-slider>
-                <div id="opacity-slider-label">Overlay opacity</div>
-              </div>
-              <br>
-              <v-select
-                v-model="selectedTimezone"
-                label="Timezone"
-                :items="timezoneOptions"
-                item-title="name"
-                item-value="tz"
-              ></v-select>
-              <v-checkbox
-                v-if="false"
-                :disabled="!highresAvailable"
-                v-model="useHighRes"
-                @keyup.enter="useHighRes = !useHighRes"
-                label="Use High Resolution Data"
-                color="#c10124"
-                hide-details
-              />
             </v-card>
           </v-menu>
 
@@ -475,7 +458,25 @@
         </div>
 
         <hr style="border-color: grey;">
-
+        <div id="bottom-options">
+          <br>
+          <v-select
+            v-model="selectedTimezone"
+            label="Timezone"
+            :items="timezoneOptions"
+            item-title="name"
+            item-value="tz"
+          ></v-select>
+          <v-checkbox
+            v-if="false"
+            :disabled="!highresAvailable"
+            v-model="useHighRes"
+            @keyup.enter="useHighRes = !useHighRes"
+            label="Use High Resolution Data"
+            color="#c10124"
+            hide-details
+          />
+        </div>
       </div>
       
       <div id="information">

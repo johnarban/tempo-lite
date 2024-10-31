@@ -412,40 +412,6 @@
             item-title="name"
             item-value="tz"
           ></v-select>
-          <div id="control-checkboxes">
-            <div class="d-flex flex-row align-center justify-space-between">
-            <v-checkbox
-              v-model="showFieldOfRegard"
-              @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
-              label="TEMPO Field of Regard"
-              color="#c10124"
-              hide-details
-            />
-              <info-button>
-                <p>
-                  The TEMPO satellite observes the atmosphere over North America, from the Atlantic Ocean to the Pacific Coast, and from roughly Mexico City to central Canada. 
-                </p>
-                <p>
-                   The TEMPO Field of Regard (in <span class="text-red">red</span>, currently <em>{{ showFieldOfRegard ? 'visible' : "hidden" }}</em>)
-                  is the area over which the satellite takes measurements. 
-                </p>
-                </info-button>
-              </div>
-            <div class="d-flex flex-row align-center justify-space-between">
-            <v-checkbox
-              v-model="showClouds"
-              @keyup.enter="showClouds = !showClouds"
-              :disabled="!cloudDataAvailable"
-              :label="cloudDataAvailable ? 'Show Cloud Mask' : 'No Cloud Data Available'"
-              color="#c10124"
-              hide-details
-            />
-              <info-button>
-                <p>
-                  The cloud mask shows where the satellite could not measure NO<sub>2</sub> because of cloud cover. 
-                </p>
-              </info-button>
-            </div>
             <v-checkbox
               v-if="false"
               :disabled="!highresAvailable"
@@ -455,21 +421,7 @@
               color="#c10124"
               hide-details
             />
-          <div
-            id="opacity-slider-container"
-          >
-            <v-slider
-              v-model="opacity"
-              :min="0"
-              :max="1"
-              color="#c10124"
-              density="compact"
-              hide-details
-            >
-            </v-slider>
-            <div id="opacity-slider-label">Overlay opacity</div>
-          </div> 
-          </div>
+
                   <!-- add text box that allows manually setting the custom image url -->
           <!-- <v-text-field
             v-model="customImageUrl"

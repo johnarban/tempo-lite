@@ -1085,7 +1085,10 @@ export default defineComponent({
         });
     },
     async geocodingInfoForSearch(searchText: string): Promise<MapBoxFeatureCollection | null> {
-      return geocodingInfoForSearch(searchText, { countries: ["US", "CA", "MX", "CU", "BM", "HT", "DO"] }).catch(_err => null);
+      return geocodingInfoForSearch(searchText, {
+        countries: ["US", "CA", "MX", "CU", "BM", "HT", "DO"],
+        limit: 10,
+      }).catch(_err => null);
     },
     resetMapBounds() {
       this.map?.setView([40.044, -98.789], 4);

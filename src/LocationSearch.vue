@@ -7,7 +7,7 @@
       :items="searchResults ? searchResults.features : []"
       :item-title="textForMapboxFeature"
       :bg-color="bgColor"
-      :label="locationLabel"
+      label="Enter city or zip"
       :density="small ? 'compact' : 'default'"
       hide-details
       solo
@@ -108,10 +108,6 @@ export default defineComponent({
     },
   },
   
-  
-  
-
-  
   data() {
     return {
       searchOpen: this.modelValue || this.stayOpen,
@@ -134,18 +130,6 @@ export default defineComponent({
         '--border-radius': this.searchOpen ? '7px' : '20px',
       };
     },
-    
-    locationLabel(): string {
-      if (this.locationJustUpdated) {
-        if (this.comboFocused || this.searchResults !== null || this.searchText !== null) {
-          return 'Enter a location';
-        } else {
-          return this.locationUpdatedText;
-        }
-      } else {
-        return this.searchErrorMessage ?? 'Enter a location';
-      }
-    }
   },
   
   
@@ -200,7 +184,7 @@ export default defineComponent({
     },
     
     setLocationFromSearchFeature(feature: MapBoxFeature | string) {
-      // if it's a  string do nothing
+      // if it's a string do nothing
       if (typeof feature === 'string') {
         return;
       }

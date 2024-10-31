@@ -230,10 +230,13 @@
           <div class="d-flex flex-row align-center">
             <v-radio-group v-model="radio">
               <date-picker
-                v-model="singleDateSelected"
-                @update:model-value="(value: Date) => {
-                  let index: number | null = datesOfInterest.map(d => d.getTime()).indexOf(value.getTime());
-                  radio = index < 0 ? null : index;
+                ref="calendar"
+                :model-value="singleDateSelected"
+                @internal-model-change="(value: Date) => {
+                  if (value != null && value.getTime() != singleDateSelected.getTime()) {
+                    singleDateSelected = value;
+                    $refs.calendar.closeMenu();
+                  }
                 }"
                 :allowed-dates="uniqueDays"
                 :clearable="false"
@@ -244,7 +247,9 @@
                 :preview-format="(date: Date | null) => date?.toDateString()"
                 no-today
                 dark
-              ></date-picker>
+              >
+                <template #action-buttons></template>
+              </date-picker>
             </v-radio-group>
           </div>        
           <!-- create a list of the uniqueDays -->
@@ -569,7 +574,6 @@ import augustFieldOfRegard from "./assets/august_for.json";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
 import { _preloadImages } from "./PreloadImages";
-
 
 
 type SheetType = "text" | "video" | null;
@@ -1300,10 +1304,11 @@ export default defineComponent({
       this.sublocationRadio = null;
     },
     
-    singleDateSelected(value: number) {
-      if (value !== null) {
-        this.setNearestDate(value);
-      }
+    singleDateSelected(value: Date) {
+      const timestamp = value.getTime();
+      this.setNearestDate(timestamp);
+      const index = this.datesOfInterest.map(d => d.getTime()).indexOf(timestamp);
+      this.radio = index < 0 ? null : index;
     },
     
     sublocationRadio(value: number | null) {

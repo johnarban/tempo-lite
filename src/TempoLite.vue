@@ -370,7 +370,7 @@
         <hr style="border-color: grey;"  v-if="radio !== null ">
         
         <div id="locations-of-interest" v-if="radio !== null">
-          <h3 class="mb-1">Featured Events for {{ dateStrings[radio+1] }}</h3>
+          <h3 class="mb-1">Featured Events for {{ dateStrings[radio] }}</h3>
           <v-radio-group
             v-if="radio !== null"
             v-model="sublocationRadio"
@@ -684,11 +684,11 @@ export default defineComponent({
       new Date(2024, 2, 28), // Mar 28
     ];
 
-    const dateStrings: Record<number,string> = {
-      1: 'Nov 1',
-      2: 'Nov 3',
-      3: 'Mar 28'
-    };
+    const dateStrings = [
+      'Nov 1',
+      'Nov 3',
+      'Mar 28',
+    ];
 
     const locationsOfInterest = [
       [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: timestamps.indexOf(1698848520000)}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: timestamps.indexOf(1698848520000)}],  // Nov 1

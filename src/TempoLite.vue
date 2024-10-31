@@ -150,6 +150,7 @@
 
           <v-menu
             id="map-controls"
+            v-model="showControls"
             :close-on-content-click="false"
           >
             <template v-slot:activator="{ props }">
@@ -157,8 +158,6 @@
                 <v-btn
                   v-bind="props"
                   class="ma-2"
-                  @click="showControls = !showControls"
-                  @keyup.enter="showControls = !showControls"
                   elevation="5"
                   :color="showControls ? accentColor : buttonColor"
                   icon="mdi-tune-variant"

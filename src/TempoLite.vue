@@ -242,7 +242,7 @@
                 :transitions="false"
                 :format="(date: Date | null) => date?.toDateString()"
                 :preview-format="(date: Date | null) => date?.toDateString()"
-                dark="true"
+                dark
               ></date-picker>
             </v-radio-group>
           </div>        
@@ -1306,6 +1306,7 @@ export default defineComponent({
       if (value !== null && this.radio != null) {
         const loi = this.locationsOfInterest[this.radio][value];
         this.map?.setView(loi.latlng, loi.zoom);
+        console.log(loi.index);
         this.timeIndex = loi.index;
       }
     },

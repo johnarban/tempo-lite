@@ -150,13 +150,11 @@
           <div id="map-show-hide-clouds">
             <v-btn
               class="ma-2"
-              v-if="cloudTimestamps.length > 0"
-              @click="showClouds = !showClouds"
-              @keyup.enter="showClouds = !showClouds"
+              @click="showControls = !showControls"
+              @keyup.enter="showControls = !showControls"
               elevation="5"
-              :color="cloudDataAvailable ? showClouds ? accentColor : buttonColor : 'grey'"
-              :disabled="!cloudDataAvailable"
-              :icon="`${(!showClouds || !cloudDataAvailable) ? 'mdi-cloud-off-outline' : 'mdi-cloud-outline'}`"
+              :color="showControls ? accentColor : buttonColor"
+              icon="mdi-tune-variant"
             >
             </v-btn>
           </div>
@@ -738,7 +736,7 @@ export default defineComponent({
       searchOpen: true,
       searchErrorMessage: null as string | null,
 
-      showControls: true,
+      showControls: false,
       showFieldOfRegard: true,
       showCredits: false,
       

@@ -147,17 +147,95 @@
           <div id="map"></div>
           <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
           <!-- show hide cloud data, disable if none is available -->
-          <div id="map-show-hide-clouds">
-            <v-btn
-              class="ma-2"
-              @click="showControls = !showControls"
-              @keyup.enter="showControls = !showControls"
-              elevation="5"
-              :color="showControls ? accentColor : buttonColor"
-              icon="mdi-tune-variant"
-            >
-            </v-btn>
-          </div>
+
+          <v-menu
+            id="map-controls"
+            :close-on-content-click="false"
+          >
+            <template v-slot:activator="{ props }">
+              <div id="map-show-hide-controls">
+                <v-btn
+                  v-bind="props"
+                  class="ma-2"
+                  @click="showControls = !showControls"
+                  @keyup.enter="showControls = !showControls"
+                  elevation="5"
+                  :color="showControls ? accentColor : buttonColor"
+                  icon="mdi-tune-variant"
+                >
+                </v-btn>
+              </div>
+            </template>
+            <v-card class="px-2">
+              <div
+                class="d-flex flex-row align-center justify-space-between"
+              >
+                <v-checkbox
+                  v-model="showFieldOfRegard"
+                  @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
+                  label="TEMPO Field of Regard"
+                  color="#c10124"
+                  hide-details
+                />
+                <info-button>
+                  <p>
+                    The TEMPO satellite observes the atmosphere over North America, from the Atlantic Ocean to the Pacific Coast, and from roughly Mexico City to central Canada. 
+                  </p>
+                  <p>
+                     The TEMPO Field of Regard (in <span class="text-red">red</span>, currently <em>{{ showFieldOfRegard ? 'visible' : "hidden" }}</em>)
+                    is the area over which the satellite takes measurements. 
+                  </p>
+                  </info-button>
+                </div>
+                <div class="d-flex flex-row align-center justify-space-between">
+                <v-checkbox
+                  v-model="showClouds"
+                  @keyup.enter="showClouds = !showClouds"
+                  :disabled="!cloudDataAvailable"
+                  :label="cloudDataAvailable ? 'Show Cloud Mask' : 'No Cloud Data Available'"
+                  color="#c10124"
+                  hide-details
+                />
+                <info-button>
+                  <p>
+                    The cloud mask shows where the satellite could not measure NO<sub>2</sub> because of cloud cover. 
+                  </p>
+                </info-button>
+              </div>
+              <div
+                id="opacity-slider-container"
+              >
+                <v-slider
+                  v-model="opacity"
+                  :min="0"
+                  :max="1"
+                  color="#c10124"
+                  density="compact"
+                  hide-details
+                >
+                </v-slider>
+                <div id="opacity-slider-label">Overlay opacity</div>
+              </div>
+              <br>
+              <v-select
+                v-model="selectedTimezone"
+                label="Timezone"
+                :items="timezoneOptions"
+                item-title="name"
+                item-value="tz"
+              ></v-select>
+              <v-checkbox
+                v-if="false"
+                :disabled="!highresAvailable"
+                v-model="useHighRes"
+                @keyup.enter="useHighRes = !useHighRes"
+                label="Use High Resolution Data"
+                color="#c10124"
+                hide-details
+              />
+            </v-card>
+          </v-menu>
+
           <location-search
             v-model="searchOpen"
             small
@@ -1626,7 +1704,7 @@ a {
     border: 2px solid black;
   }
   
-  #map-show-hide-clouds {
+  #map-show-hide-controls {
     z-index: 1000;
     position: absolute;
     top: 1rem;
@@ -1745,13 +1823,6 @@ a {
         bottom: -15px;
     }
   }
-}
-
-#control-checkboxes {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
 }
 
 #opacity-slider-container {

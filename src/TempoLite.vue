@@ -401,35 +401,6 @@
 
       </div>
       
-      <div id="bottom-options">
-          <br>
-          <v-select
-            v-model="selectedTimezone"
-            label="Timezone"
-            :items="timezoneOptions"
-            item-title="name"
-            item-value="tz"
-          ></v-select>
-            <v-checkbox
-              v-if="false"
-              :disabled="!highresAvailable"
-              v-model="useHighRes"
-              @keyup.enter="useHighRes = !useHighRes"
-              label="Use High Resolution Data"
-              color="#c10124"
-              hide-details
-            />
-
-                  <!-- add text box that allows manually setting the custom image url -->
-          <!-- <v-text-field
-            v-model="customImageUrl"
-            label="Custom Image URL"
-            hide-details
-          ></v-text-field> -->
-
-          
-        </div>
-      
       <div id="information">
       <article>
         <h2>TEMPO NO<sub>2</sub> Data</h2>
@@ -1516,28 +1487,15 @@ ul {
     grid-row: 3 / 4;
   }
 
-  #bottom-options {
-    margin-left: 1.5rem;
-    grid-column: 3 / 4;
-    grid-row: 3 / 5;
-    height: fit-content;
-  }
-  
   #information {
     padding: 1rem;
     grid-column: 2 / 3;
     grid-row: 4 / 6;
   }
 
-  // #body-logos { 
-  //   grid-column: 3 / 4;
-  //   grid-row: 5 / 6;
-  //   align-self: end;
-  //   justify-self: end;
-  // }
 }
 
-//  style the content 
+// style the content 
 #main-content {
   padding: 2rem;
 }

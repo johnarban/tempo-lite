@@ -1993,6 +1993,10 @@ button:focus-visible,
       grid-row: 2 / 3;
     }
     
+    #map-container #map-show-hide-controls {
+      right: 5px
+    }
+    
     #slider-row {
       grid-column: 1 / 2;
       grid-row: 3 / 4;

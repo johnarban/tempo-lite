@@ -324,7 +324,7 @@
               >
               </v-radio>
               <info-button>
-                <p v-html="event.info"></p>
+                <div style="display: inline-block; margin: 0; padding: 0;" v-html="event.info"></div>
               </info-button>
             </div>
             

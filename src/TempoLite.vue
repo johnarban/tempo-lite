@@ -224,7 +224,7 @@
         
 
        <div id="user-options">
-        <!-- {{ whichDataSet }} Data -->
+        {{ whichDataSet }} Data
         <div id="all-dates">
           <h2>Select a Date</h2>  
           <div class="d-flex flex-row align-center">
@@ -242,7 +242,7 @@
                 :transitions="false"
                 :format="(date: Date | null) => date?.toDateString()"
                 :preview-format="(date: Date | null) => date?.toDateString()"
-                dark="true"
+                :dark="true"
               ></date-picker>
             </v-radio-group>
           </div>        
@@ -641,8 +641,16 @@ interface LocationOfInterest {
   latlng: L.LatLngExpression;
   zoom: number;
   text: string;
-  index: number;
+  description: string;
+  time: string;
+  index?: number;
 }
+
+interface InterestingEvent {
+      date: Date;
+      dateString: string;
+      locations: LocationOfInterest[];
+    }
 
 const urlParams = new URLSearchParams(window.location.search);
 const hideIntro = urlParams.get("hideintro") === "true";
@@ -677,39 +685,68 @@ export default defineComponent({
         },
       }
     ) as L.Layer;
-      
-    const datesOfInterest = [
-      new Date(2023, 10, 1), // Nov 1
-      new Date(2023, 10, 3), // Nov 3
-      new Date(2024, 2, 28), // Mar 28
-    ];
-
-    const dateStrings = [
-      'Nov 1',
-      'Nov 3',
-      'Mar 28',
-    ];
-
-    const locationsOfInterest = [
-      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: timestamps.indexOf(1698848520000)}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: timestamps.indexOf(1698848520000)}],  // Nov 1
-      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: timestamps.indexOf(1699021320000)}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: timestamps.indexOf(1699014120000)}],  // Nov 3
-      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Oil and Gas Production", index: timestamps.indexOf(1711631040000)}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Fires", index: timestamps.indexOf(1711644240000)}],  // Mar 28
-    ] as LocationOfInterest[][];
     
-    const locationsOfInterestText = [
-      [
-        '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly.</p>', 
-        '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
-      ],  // Nov 1
-      [
-        '<p>Los Angeles clearly stands out. NO<sub>2</sub> values are even higher than the maximum of our color bar. You can clearly see the highways including Route 10 between San Bernardino and Mexicali and Route 15 leading from San Bernardino towards Las Vegas. A significant amount of NO<sub>2</sub> in California&rsquo;s central valley is a byproduct of agricultural activity there. Excess fertilizer in the soil gets broken down by microbes to produce nitrogen oxides which are very reactive. Emissions that don&rsquo;t come from combustion are typically much harder to see, but the Central Valley is an area where TEMPO data may reveal this agricultural source of pollution.</p>',
-        '<p>Air pollution is often transported, or moved, over great distances. In this data set large plumes can be seen over the Northeast. If you look closely you can see that many of these plumes appear to originate out of cities in the midwest including Nashville, St. Louis, and Memphis.</p>'
-      ],  // Nov 3
-      [
-        '<p>The Permian basin, near Odessa, has two large plumes of NO2. This is the largest oil and gas producing area in the USA. You can also see here how pollution from a source in one state (Texas) can be transported across state lines to New Mexico.</p>',
-        '<p>Two fires can be seen popping up south and east of Alexandria. These are most easily identified as hot spots of NO2 that appear quickly.</p>'
-      ],  // Mar 28
-    ];
+    
+
+
+    const interestingEvents = [
+      {
+        date: new Date(2023, 10, 1) ,
+        dateString: 'Nov 1',
+        locations: [
+          { latlng: [34.359786, -111.700124], 
+            zoom:7, 
+            text: "Arizona Urban Traffic and Fires", 
+            time: '2023-11-01T14:22:00.000Z',
+            description: '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly.</p>',
+          }, 
+          { latlng: [36.1716, -115.1391], 
+            zoom:7, 
+            text: "Las Vegas: Fairly Constant Levels All Day", 
+            time: '2023-11-01T14:22:00.000Z',
+            description: '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
+          }
+        ]
+      },  // Nov 1
+      {
+        date:  new Date(2023, 10, 3),
+        dateString: 'Nov 3',
+        locations: [
+          { latlng: [36.215934, -119.777500], 
+            zoom:6, 
+            text: "California Traffic and Agriculture", 
+            time: '2023-11-03T14:22:00.000Z',
+            description: '<p>Los Angeles clearly stands out. NO<sub>2</sub> values are even higher than the maximum of our color bar. You can clearly see the highways including Route 10 between San Bernardino and Mexicali and Route 15 leading from San Bernardino towards Las Vegas. A significant amount of NO<sub>2</sub> in California&rsquo;s central valley is a byproduct of agricultural activity there. Excess fertilizer in the soil gets broken down by microbes to produce nitrogen oxides which are very reactive. Emissions that don&rsquo;t come from combustion are typically much harder to see, but the Central Valley is an area where TEMPO data may reveal this agricultural source of pollution.</p>'
+          }, 
+          { latlng: [41.857260, -80.531177], 
+            zoom:5, 
+            text: "Northeast: Large Emissions Plumes", 
+            time: '2023-11-03T12:22:00.000Z',
+            description: '<p>Air pollution is often transported, or moved, over great distances. In this data set large plumes can be seen over the Northeast. If you look closely you can see that many of these plumes appear to originate out of cities in the midwest including Nashville, St. Louis, and Memphis.</p>'
+          }
+        ]
+      },  // Nov 3
+      {
+        date:  new Date(2024, 2, 28),
+        dateString: 'Mar 28',
+        locations: [
+          { latlng: [31.938392, -99.095785], 
+            zoom:6, 
+            text: "Texas Oil and Gas Production", 
+            time: '2024-03-28T13:04:00.000Z',
+            description: '<p>The Permian basin, near Odessa, has two large plumes of NO2. This is the largest oil and gas producing area in the USA. You can also see here how pollution from a source in one state (Texas) can be transported across state lines to New Mexico.</p>'
+          }, 
+          { latlng: [31.331933, -91.575283], 
+            zoom: 8, 
+            text: "LA/MS Fires", 
+            time: '2024-03-28T16:44:00.000Z',
+            description: '<p>Two fires can be seen popping up south and east of Alexandria. These are most easily identified as hot spots of NO2 that appear quickly.</p>'
+          }
+        ]
+      }  // Mar 28
+    ]  as InterestingEvent[];
+    
+
 
     const opacity = 0.9;
     return {
@@ -741,10 +778,7 @@ export default defineComponent({
       ),
       bounds: marchBounds.toBBoxString().split(",").map(parseFloat),
       fieldOfRegardLayer,
-      locationsOfInterest,
-      locationsOfInterestText,
-      datesOfInterest,
-      dateStrings,
+      interestingEvents,
 
       customImageUrl: "",
 
@@ -917,6 +951,33 @@ export default defineComponent({
     },
     date() {
       return new Date(this.timestamp);
+    },
+    
+    datesOfInterest(): Date[] {
+      console.log('computing dates of interest');
+      return this.interestingEvents.map(event => event.date);
+    },
+
+    dateStrings(): string[] {
+      console.log('computing date strings');
+      return this.interestingEvents.map(event => event.dateString);
+    },
+
+    locationsOfInterest(): LocationOfInterest[][] {
+      console.log('cpmputing locations of interest');
+      return this.interestingEvents.map(event => 
+        event.locations.map(loc => ({
+          ...loc,
+          index: this.timestamps.indexOf(this.nearestDate(new Date(loc.time)))
+        }))
+      );
+    },
+
+    locationsOfInterestText(): string[][] {
+      console.log('computing locations of interest text');
+      return this.interestingEvents.map(event => 
+        event.locations.map(loc => loc.description)
+      );
     },
     
     dateIsDST() {
@@ -1159,6 +1220,12 @@ export default defineComponent({
       return '';
     }, 
     
+    nearestDate(date: Date): number {
+      const onedayinms = 1000 * 60 * 60 * 24;
+      const mod = this.timestamps.filter(ts => ((ts - date.getTime()) < onedayinms) && (ts - date.getTime()) > 0);
+      return mod[0];
+    },
+    
     setNearestDate(date: number | null) {
       if (date == null) {
         return;
@@ -1306,7 +1373,11 @@ export default defineComponent({
       if (value !== null && this.radio != null) {
         const loi = this.locationsOfInterest[this.radio][value];
         this.map?.setView(loi.latlng, loi.zoom);
-        this.timeIndex = loi.index;
+        if (loi.index) {
+          this.timeIndex = loi.index;
+        } else {
+          throw new Error("No index for location of interest");
+        }
       }
     },
 

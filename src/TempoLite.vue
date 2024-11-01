@@ -147,19 +147,77 @@
           <div id="map"></div>
           <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
           <!-- show hide cloud data, disable if none is available -->
-          <div id="map-show-hide-clouds">
-            <v-btn
-              class="ma-2"
-              v-if="cloudTimestamps.length > 0"
-              @click="showClouds = !showClouds"
-              @keyup.enter="showClouds = !showClouds"
-              elevation="5"
-              :color="cloudDataAvailable ? showClouds ? accentColor : buttonColor : 'grey'"
-              :disabled="!cloudDataAvailable"
-              :icon="`${(!showClouds || !cloudDataAvailable) ? 'mdi-cloud-off-outline' : 'mdi-cloud-outline'}`"
-            >
-            </v-btn>
-          </div>
+
+          <v-menu
+            id="map-controls"
+            v-model="showControls"
+            :close-on-content-click="false"
+          >
+            <template v-slot:activator="{ props }">
+              <div id="map-show-hide-controls">
+                <v-btn
+                  v-bind="props"
+                  class="ma-2"
+                  elevation="5"
+                  :color="showControls ? accentColor : buttonColor"
+                  icon="mdi-tune-variant"
+                >
+                </v-btn>
+              </div>
+            </template>
+            <v-card class="px-2">
+              <div
+                id="opacity-slider-container"
+              >
+                <v-slider
+                  v-model="opacity"
+                  :min="0"
+                  :max="1"
+                  color="#c10124"
+                  density="compact"
+                  hide-details
+                >
+                </v-slider>
+                <div id="opacity-slider-label">Overlay opacity</div>
+              </div>
+              <div
+                class="d-flex flex-row align-center justify-space-between"
+              >
+                <v-checkbox
+                  v-model="showFieldOfRegard"
+                  @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
+                  label="TEMPO Field of Regard"
+                  color="#c10124"
+                  hide-details
+                />
+                <info-button>
+                  <p>
+                    The TEMPO satellite observes the atmosphere over North America, from the Atlantic Ocean to the Pacific Coast, and from roughly Mexico City to central Canada. 
+                  </p>
+                  <p>
+                     The TEMPO Field of Regard (in <span class="text-red">red</span>, currently <em>{{ showFieldOfRegard ? 'visible' : "hidden" }}</em>)
+                    is the area over which the satellite takes measurements. 
+                  </p>
+                  </info-button>
+                </div>
+                <div class="d-flex flex-row align-center justify-space-between">
+                <v-checkbox
+                  v-model="showClouds"
+                  @keyup.enter="showClouds = !showClouds"
+                  :disabled="!cloudDataAvailable"
+                  :label="cloudDataAvailable ? 'Show Cloud Mask' : 'No Cloud Data Available'"
+                  color="#c10124"
+                  hide-details
+                />
+                <info-button>
+                  <p>
+                    The cloud mask shows where the satellite could not measure NO<sub>2</sub> because of cloud cover. 
+                  </p>
+                </info-button>
+              </div>
+            </v-card>
+          </v-menu>
+
           <location-search
             v-model="searchOpen"
             small
@@ -169,7 +227,7 @@
             :search-provider="geocodingInfoForSearch"
             @set-location="(feature: MapBoxFeature) => {
               if (feature !== null) {
-                map?.setView([feature.center[1], feature.center[0]], 7);
+                map?.setView([feature.center[1], feature.center[0]], 12);
               }
             }"
             @error="(error: string) => searchErrorMessage = error"
@@ -230,10 +288,13 @@
           <div class="d-flex flex-row align-center">
             <v-radio-group v-model="radio">
               <date-picker
-                v-model="singleDateSelected"
-                @update:model-value="(value: Date) => {
-                  const index = datesOfInterest.findIndex(d => d.getTime() === value.getTime())
-                  radio = index < 0 ? null : index;
+                ref="calendar"
+                :model-value="singleDateSelected"
+                @internal-model-change="(value: Date) => {
+                  if (value != null && value.getTime() != singleDateSelected.getTime()) {
+                    singleDateSelected = value;
+                    $refs.calendar.closeMenu();
+                  }
                 }"
                 :allowed-dates="uniqueDays"
                 :clearable="false"
@@ -242,8 +303,11 @@
                 :transitions="false"
                 :format="(date: Date | null) => date?.toDateString()"
                 :preview-format="(date: Date | null) => date?.toDateString()"
-                :dark="true"
-              ></date-picker>
+                no-today
+                dark
+              >
+                <template #action-buttons></template>
+              </date-picker>
             </v-radio-group>
           </div>        
           <!-- create a list of the uniqueDays -->
@@ -358,10 +422,7 @@
         </div>
 
         <hr style="border-color: grey;">
-
-      </div>
-      
-      <div id="bottom-options">
+        <div id="bottom-options">
           <br>
           <v-select
             v-model="selectedTimezone"
@@ -370,73 +431,17 @@
             item-title="name"
             item-value="tz"
           ></v-select>
-          <div id="control-checkboxes">
-            <div class="d-flex flex-row align-center justify-space-between">
-            <v-checkbox
-              v-model="showFieldOfRegard"
-              @keyup.enter="showFieldOfRegard = !showFieldOfRegard"
-              label="TEMPO Field of Regard"
-              color="#c10124"
-              hide-details
-            />
-              <info-button>
-                <p>
-                  The TEMPO satellite observes the atmosphere over North America, from the Atlantic Ocean to the Pacific Coast, and from roughly Mexico City to central Canada. 
-                </p>
-                <p>
-                   The TEMPO Field of Regard (in <span class="text-red">red</span>, currently <em>{{ showFieldOfRegard ? 'visible' : "hidden" }}</em>)
-                  is the area over which the satellite takes measurements. 
-                </p>
-                </info-button>
-              </div>
-            <div class="d-flex flex-row align-center justify-space-between">
-            <v-checkbox
-              v-model="showClouds"
-              @keyup.enter="showClouds = !showClouds"
-              :disabled="!cloudDataAvailable"
-              :label="cloudDataAvailable ? 'Show Cloud Mask' : 'No Cloud Data Available'"
-              color="#c10124"
-              hide-details
-            />
-              <info-button>
-                <p>
-                  The cloud mask shows where the satellite could not measure NO<sub>2</sub> because of cloud cover. 
-                </p>
-              </info-button>
-            </div>
-            <v-checkbox
-              v-if="false"
-              :disabled="!highresAvailable"
-              v-model="useHighRes"
-              @keyup.enter="useHighRes = !useHighRes"
-              label="Use High Resolution Data"
-              color="#c10124"
-              hide-details
-            />
-          <div
-            id="opacity-slider-container"
-          >
-            <v-slider
-              v-model="opacity"
-              :min="0"
-              :max="1"
-              color="#c10124"
-              density="compact"
-              hide-details
-            >
-            </v-slider>
-            <div id="opacity-slider-label">Overlay opacity</div>
-          </div> 
-          </div>
-                  <!-- add text box that allows manually setting the custom image url -->
-          <!-- <v-text-field
-            v-model="customImageUrl"
-            label="Custom Image URL"
+          <v-checkbox
+            v-if="false"
+            :disabled="!highresAvailable"
+            v-model="useHighRes"
+            @keyup.enter="useHighRes = !useHighRes"
+            label="Use High Resolution Data"
+            color="#c10124"
             hide-details
-          ></v-text-field> -->
-
-          
+          />
         </div>
+      </div>
       
       <div id="information">
       <article>
@@ -532,7 +537,6 @@ import augustFieldOfRegard from "./assets/august_for.json";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
 import { _preloadImages } from "./PreloadImages";
-
 
 
 type SheetType = "text" | "video" | null;
@@ -810,7 +814,7 @@ export default defineComponent({
       searchOpen: true,
       searchErrorMessage: null as string | null,
 
-      showControls: true,
+      showControls: false,
       showFieldOfRegard: true,
       showCredits: false,
       
@@ -1136,7 +1140,10 @@ export default defineComponent({
         });
     },
     async geocodingInfoForSearch(searchText: string): Promise<MapBoxFeatureCollection | null> {
-      return geocodingInfoForSearch(searchText, { countries: ["US", "CA", "MX", "CU", "BM", "HT", "DO"] }).catch(_err => null);
+      return geocodingInfoForSearch(searchText, {
+        countries: ["US", "CA", "MX", "CU", "BM", "HT", "DO"],
+        limit: 10,
+      }).catch(_err => null);
     },
     resetMapBounds() {
       this.map?.setView([40.044, -98.789], 4);
@@ -1371,10 +1378,11 @@ export default defineComponent({
       this.sublocationRadio = null;
     },
     
-    singleDateSelected(value: number) {
-      if (value !== null) {
-        this.setNearestDate(value);
-      }
+    singleDateSelected(value: Date) {
+      const timestamp = value.getTime();
+      this.setNearestDate(timestamp);
+      const index = this.datesOfInterest.map(d => d.getTime()).indexOf(timestamp);
+      this.radio = index < 0 ? null : index;
     },
     
     sublocationRadio(value: number | null) {
@@ -1635,28 +1643,15 @@ ul {
     grid-row: 3 / 4;
   }
 
-  #bottom-options {
-    margin-left: 1.5rem;
-    grid-column: 3 / 4;
-    grid-row: 3 / 5;
-    height: fit-content;
-  }
-  
   #information {
     padding: 1rem;
     grid-column: 2 / 3;
     grid-row: 4 / 6;
   }
 
-  // #body-logos { 
-  //   grid-column: 3 / 4;
-  //   grid-row: 5 / 6;
-  //   align-self: end;
-  //   justify-self: end;
-  // }
 }
 
-//  style the content 
+// style the content 
 #main-content {
   padding: 2rem;
 }
@@ -1787,7 +1782,7 @@ a {
     border: 2px solid black;
   }
   
-  #map-show-hide-clouds {
+  #map-show-hide-controls {
     z-index: 1000;
     position: absolute;
     top: 1rem;
@@ -1906,13 +1901,6 @@ a {
         bottom: -15px;
     }
   }
-}
-
-#control-checkboxes {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
 }
 
 #opacity-slider-container {
@@ -2081,6 +2069,10 @@ button:focus-visible,
     #map-container {
       grid-column: 1 / 2;
       grid-row: 2 / 3;
+    }
+    
+    #map-container #map-show-hide-controls {
+      right: 5px
     }
     
     #slider-row {

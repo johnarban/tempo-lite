@@ -282,7 +282,7 @@
         
 
        <div id="user-options">
-        <!-- {{ whichDataSet }} Data -->
+        {{ whichDataSet }} Data
         <div id="all-dates">
           <h2>Select a Date</h2>  
           <div class="d-flex flex-row align-center">
@@ -380,54 +380,18 @@
             v-model="radio"
             row
           >
-            <div class="d-flex flex-row align-center">
+            <div v-for = "(event, index) in interestingEvents" :key="index" class="d-flex flex-row align-center">
               <v-radio
-                label="November 1, 2023"
-                :value="0"
-                @keyup.enter="radio = 0"
+                :label="event.label"
+                :value="index"
+                @keyup.enter="radio = index"
               >
               </v-radio>
               <info-button>
-                <p>
-                  Because the TEMPO instrument measures sunlight reflected and scattered from Earth’s 
-                surface and atmosphere, it can’t “see” through the clouds&mdash;so these
-                areas appear blank on the map.
-                </p>
-                <p>
-                  But right away you’ll see that there 
-                are high concentrations of NO<sub>2</sub> around many urban centers, 
-                and sometimes along major highways.
-                </p>
+                <div style="display: inline-block; margin: 0; padding: 0;" v-html="event.info"></div>
               </info-button>
             </div>
-            <div class="d-flex flex-row align-center">
-              <v-radio
-                label="November 3, 2023"
-                :value="1"
-                @keyup.enter="radio = 1"
-              ></v-radio>
-              <info-button>
-                Levels of NO<sub>2</sub> change quickly from day to day, 
-                and even from hour to hour as wind transports 
-                plumes of pollution.
-              </info-button>
-            </div>
-            <div class="d-flex flex-row align-center">
-              <v-radio
-                label="March 28, 2024"
-                :value="2"
-                @keyup.enter="radio = 2"
-              ></v-radio>
-              <info-button>
-                Breathing air with a high concentration of NO<sub>2</sub>, 
-                and the resulting smog it forms when it reacts with other pollutants, 
-                can irritate human respiratory systems. 
-                People with asthma, as well as children and the elderly, 
-                are generally at greater risk for the health effects of air pollution. 
-                TEMPO data can help communities make informed 
-                decisions and take action to improve air quality.
-              </info-button>
-            </div>
+            
           </v-radio-group>
         </div>
         
@@ -645,8 +609,18 @@ interface LocationOfInterest {
   latlng: L.LatLngExpression;
   zoom: number;
   text: string;
-  index: number;
+  description: string;
+  time: string;
+  index?: number;
 }
+
+interface InterestingEvent {
+      date: Date;
+      dateString: string;
+      locations: LocationOfInterest[];
+      label?: string;
+      info?: string;
+    }
 
 const urlParams = new URLSearchParams(window.location.search);
 const hideIntro = urlParams.get("hideintro") === "true";
@@ -681,39 +655,97 @@ export default defineComponent({
         },
       }
     ) as L.Layer;
-      
-    const datesOfInterest = [
-      new Date(2023, 10, 1), // Nov 1
-      new Date(2023, 10, 3), // Nov 3
-      new Date(2024, 2, 28), // Mar 28
-    ];
-
-    const dateStrings = [
-      'Nov 1',
-      'Nov 3',
-      'Mar 28',
-    ];
-
-    const locationsOfInterest = [
-      [{ latlng: [34.359786, -111.700124], zoom:7, text: "Arizona Urban Traffic and Fires", index: timestamps.indexOf(1698848520000)}, { latlng: [36.1716, -115.1391], zoom:7, text: "Las Vegas: Fairly Constant Levels All Day", index: timestamps.indexOf(1698848520000)}],  // Nov 1
-      [{ latlng: [36.215934, -119.777500], zoom:6, text: "California Traffic and Agriculture", index: timestamps.indexOf(1699021320000)}, { latlng: [41.857260, -80.531177], zoom:5, text: "Northeast: Large Emissions Plumes", index: timestamps.indexOf(1699014120000)}],  // Nov 3
-      [{ latlng: [31.938392, -99.095785], zoom:6, text: "Texas Oil and Gas Production", index: timestamps.indexOf(1711631040000)}, { latlng: [31.331933, -91.575283], zoom: 8, text: "LA/MS Fires", index: timestamps.indexOf(1711644240000)}],  // Mar 28
-    ] as LocationOfInterest[][];
     
-    const locationsOfInterestText = [
-      [
-        '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly.</p>', 
-        '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
-      ],  // Nov 1
-      [
-        '<p>Los Angeles clearly stands out. NO<sub>2</sub> values are even higher than the maximum of our color bar. You can clearly see the highways including Route 10 between San Bernardino and Mexicali and Route 15 leading from San Bernardino towards Las Vegas. A significant amount of NO<sub>2</sub> in California&rsquo;s central valley is a byproduct of agricultural activity there. Excess fertilizer in the soil gets broken down by microbes to produce nitrogen oxides which are very reactive. Emissions that don&rsquo;t come from combustion are typically much harder to see, but the Central Valley is an area where TEMPO data may reveal this agricultural source of pollution.</p>',
-        '<p>Air pollution is often transported, or moved, over great distances. In this data set large plumes can be seen over the Northeast. If you look closely you can see that many of these plumes appear to originate out of cities in the midwest including Nashville, St. Louis, and Memphis.</p>'
-      ],  // Nov 3
-      [
-        '<p>The Permian basin, near Odessa, has two large plumes of NO2. This is the largest oil and gas producing area in the USA. You can also see here how pollution from a source in one state (Texas) can be transported across state lines to New Mexico.</p>',
-        '<p>Two fires can be seen popping up south and east of Alexandria. These are most easily identified as hot spots of NO2 that appear quickly.</p>'
-      ],  // Mar 28
-    ];
+    
+
+
+    const interestingEvents = [
+      {
+        date: new Date(2023, 10, 1) ,
+        dateString: 'Nov 1',
+        label: "November 1, 2023",
+        info: `
+          <p>
+            Because the TEMPO instrument measures sunlight reflected and scattered from Earth’s 
+          surface and atmosphere, it can’t “see” through the clouds&mdash;so these
+          areas appear blank on the map.
+          </p>
+          <p>
+            But right away you’ll see that there 
+          are high concentrations of NO<sub>2</sub> around many urban centers, 
+          and sometimes along major highways.
+          </p>
+          `,
+        locations: [
+          { latlng: [34.359786, -111.700124], 
+            zoom:7, 
+            text: "Arizona Urban Traffic and Fires", 
+            time: '2023-11-01T14:22:00.000Z',
+            description: '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly.</p>',
+          }, 
+          { latlng: [36.1716, -115.1391], 
+            zoom:7, 
+            text: "Las Vegas: Fairly Constant Levels All Day", 
+            time: '2023-11-01T14:22:00.000Z',
+            description: '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
+          }
+        ]
+      }, 
+      {
+        date:  new Date(2023, 10, 3),
+        dateString: 'Nov 3',
+        label: "November 3, 2023",
+        info: `
+          Levels of NO<sub>2</sub> change quickly from day to day, 
+          and even from hour to hour as wind transports 
+          plumes of pollution.
+          `,
+        locations: [
+          { latlng: [36.215934, -119.777500], 
+            zoom:6, 
+            text: "California Traffic and Agriculture", 
+            time: '2023-11-03T14:22:00.000Z',
+            description: '<p>Los Angeles clearly stands out. NO<sub>2</sub> values are even higher than the maximum of our color bar. You can clearly see the highways including Route 10 between San Bernardino and Mexicali and Route 15 leading from San Bernardino towards Las Vegas. A significant amount of NO<sub>2</sub> in California&rsquo;s central valley is a byproduct of agricultural activity there. Excess fertilizer in the soil gets broken down by microbes to produce nitrogen oxides which are very reactive. Emissions that don&rsquo;t come from combustion are typically much harder to see, but the Central Valley is an area where TEMPO data may reveal this agricultural source of pollution.</p>'
+          }, 
+          { latlng: [41.857260, -80.531177], 
+            zoom:5, 
+            text: "Northeast: Large Emissions Plumes", 
+            time: '2023-11-03T12:22:00.000Z',
+            description: '<p>Air pollution is often transported, or moved, over great distances. In this data set large plumes can be seen over the Northeast. If you look closely you can see that many of these plumes appear to originate out of cities in the midwest including Nashville, St. Louis, and Memphis.</p>'
+          }
+        ]
+      }, 
+      {
+        date:  new Date(2024, 2, 28),
+        dateString: 'Mar 28',
+        label: "March 28, 2024",
+        info: `
+          Breathing air with a high concentration of NO<sub>2</sub>, 
+          and the resulting smog it forms when it reacts with other pollutants, 
+          can irritate human respiratory systems. 
+          People with asthma, as well as children and the elderly, 
+          are generally at greater risk for the health effects of air pollution. 
+          TEMPO data can help communities make informed 
+          decisions and take action to improve air quality.
+          `,
+        locations: [
+          { latlng: [31.938392, -99.095785], 
+            zoom:6, 
+            text: "Texas Oil and Gas Production", 
+            time: '2024-03-28T13:04:00.000Z',
+            description: '<p>The Permian basin, near Odessa, has two large plumes of NO2. This is the largest oil and gas producing area in the USA. You can also see here how pollution from a source in one state (Texas) can be transported across state lines to New Mexico.</p>'
+          }, 
+          { latlng: [31.331933, -91.575283], 
+            zoom: 8, 
+            text: "LA/MS Fires", 
+            time: '2024-03-28T16:44:00.000Z',
+            description: '<p>Two fires can be seen popping up south and east of Alexandria. These are most easily identified as hot spots of NO2 that appear quickly.</p>'
+          }
+        ]
+      }  // Mar 28
+    ]  as InterestingEvent[];
+    
+
 
     const opacity = 0.9;
     return {
@@ -745,10 +777,7 @@ export default defineComponent({
       ),
       bounds: marchBounds.toBBoxString().split(",").map(parseFloat),
       fieldOfRegardLayer,
-      locationsOfInterest,
-      locationsOfInterestText,
-      datesOfInterest,
-      dateStrings,
+      interestingEvents,
 
       customImageUrl: "",
 
@@ -921,6 +950,29 @@ export default defineComponent({
     },
     date() {
       return new Date(this.timestamp);
+    },
+    
+    datesOfInterest(): Date[] {
+      return this.interestingEvents.map(event => event.date);
+    },
+
+    dateStrings(): string[] {
+      return this.interestingEvents.map(event => event.dateString);
+    },
+
+    locationsOfInterest(): LocationOfInterest[][] {
+      return this.interestingEvents.map(event => 
+        event.locations.map(loc => ({
+          ...loc,
+          index: this.nearestDateIndex(new Date(loc.time)),
+        }))
+      );
+    },
+
+    locationsOfInterestText(): string[][] {
+      return this.interestingEvents.map(event => 
+        event.locations.map(loc => loc.description)
+      );
     },
     
     dateIsDST() {
@@ -1166,6 +1218,29 @@ export default defineComponent({
       return '';
     }, 
     
+    nearestDate(date: Date): number {
+      const onedayinms = 1000 * 60 * 60 * 24;
+      const time = date.getTime();
+      const timestamp = this.timestamps.find(ts => ((ts - time) < onedayinms) && (ts - time) >= 0);
+      if (timestamp !== undefined) {
+        return timestamp;
+      } else {
+        // Return a default value or handle the error appropriately
+        console.warn("No matching timestamp found, returning default value.");
+        return this.timestamps[0]; // Default to the first timestamp
+      }
+    },
+
+    nearestDateIndex(date: Date): number {
+      const onedayinms = 1000 * 60 * 60 * 24;
+      const timestamp = date.getTime();
+      const index = this.timestamps.findIndex(ts => ((ts - timestamp) < onedayinms) && (ts - timestamp) >= 0);
+      if (index === null) {
+        console.log("No matching timestamp found, returning default index.");
+      }
+      return index ?? 0;
+    },
+    
     setNearestDate(date: number | null) {
       if (date == null) {
         return;
@@ -1314,8 +1389,11 @@ export default defineComponent({
       if (value !== null && this.radio != null) {
         const loi = this.locationsOfInterest[this.radio][value];
         this.map?.setView(loi.latlng, loi.zoom);
-        console.log(loi.index);
-        this.timeIndex = loi.index;
+        if (loi.index !== undefined) {
+          this.timeIndex = loi.index;
+        } else {
+          console.warn('No index found for location of interest');
+        }
       }
     },
 

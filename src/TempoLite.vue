@@ -316,54 +316,18 @@
             v-model="radio"
             row
           >
-            <div class="d-flex flex-row align-center">
+            <div v-for = "(event, index) in interestingEvents" :key="index" class="d-flex flex-row align-center">
               <v-radio
-                label="November 1, 2023"
-                :value="0"
-                @keyup.enter="radio = 0"
+                :label="event.label"
+                :value="index"
+                @keyup.enter="radio = index"
               >
               </v-radio>
               <info-button>
-                <p>
-                  Because the TEMPO instrument measures sunlight reflected and scattered from Earth’s 
-                surface and atmosphere, it can’t “see” through the clouds&mdash;so these
-                areas appear blank on the map.
-                </p>
-                <p>
-                  But right away you’ll see that there 
-                are high concentrations of NO<sub>2</sub> around many urban centers, 
-                and sometimes along major highways.
-                </p>
+                <p v-html="event.info"></p>
               </info-button>
             </div>
-            <div class="d-flex flex-row align-center">
-              <v-radio
-                label="November 3, 2023"
-                :value="1"
-                @keyup.enter="radio = 1"
-              ></v-radio>
-              <info-button>
-                Levels of NO<sub>2</sub> change quickly from day to day, 
-                and even from hour to hour as wind transports 
-                plumes of pollution.
-              </info-button>
-            </div>
-            <div class="d-flex flex-row align-center">
-              <v-radio
-                label="March 28, 2024"
-                :value="2"
-                @keyup.enter="radio = 2"
-              ></v-radio>
-              <info-button>
-                Breathing air with a high concentration of NO<sub>2</sub>, 
-                and the resulting smog it forms when it reacts with other pollutants, 
-                can irritate human respiratory systems. 
-                People with asthma, as well as children and the elderly, 
-                are generally at greater risk for the health effects of air pollution. 
-                TEMPO data can help communities make informed 
-                decisions and take action to improve air quality.
-              </info-button>
-            </div>
+            
           </v-radio-group>
         </div>
         
@@ -650,6 +614,8 @@ interface InterestingEvent {
       date: Date;
       dateString: string;
       locations: LocationOfInterest[];
+      label?: string;
+      info?: string;
     }
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -693,6 +659,19 @@ export default defineComponent({
       {
         date: new Date(2023, 10, 1) ,
         dateString: 'Nov 1',
+        label: "November 1, 2023",
+        info: `
+          <p>
+            Because the TEMPO instrument measures sunlight reflected and scattered from Earth’s 
+          surface and atmosphere, it can’t “see” through the clouds&mdash;so these
+          areas appear blank on the map.
+          </p>
+          <p>
+            But right away you’ll see that there 
+          are high concentrations of NO<sub>2</sub> around many urban centers, 
+          and sometimes along major highways.
+          </p>
+          `,
         locations: [
           { latlng: [34.359786, -111.700124], 
             zoom:7, 
@@ -707,10 +686,16 @@ export default defineComponent({
             description: '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
           }
         ]
-      },  // Nov 1
+      }, 
       {
         date:  new Date(2023, 10, 3),
         dateString: 'Nov 3',
+        label: "November 3, 2023",
+        info: `
+          Levels of NO<sub>2</sub> change quickly from day to day, 
+          and even from hour to hour as wind transports 
+          plumes of pollution.
+          `,
         locations: [
           { latlng: [36.215934, -119.777500], 
             zoom:6, 
@@ -725,10 +710,20 @@ export default defineComponent({
             description: '<p>Air pollution is often transported, or moved, over great distances. In this data set large plumes can be seen over the Northeast. If you look closely you can see that many of these plumes appear to originate out of cities in the midwest including Nashville, St. Louis, and Memphis.</p>'
           }
         ]
-      },  // Nov 3
+      }, 
       {
         date:  new Date(2024, 2, 28),
         dateString: 'Mar 28',
+        label: "March 28, 2024",
+        info: `
+          Breathing air with a high concentration of NO<sub>2</sub>, 
+          and the resulting smog it forms when it reacts with other pollutants, 
+          can irritate human respiratory systems. 
+          People with asthma, as well as children and the elderly, 
+          are generally at greater risk for the health effects of air pollution. 
+          TEMPO data can help communities make informed 
+          decisions and take action to improve air quality.
+          `,
         locations: [
           { latlng: [31.938392, -99.095785], 
             zoom:6, 

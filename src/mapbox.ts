@@ -33,6 +33,7 @@ export interface MapBoxForwardGeocodingOptions {
   // https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
   countries?: string[];
   types?: string[];
+  limit?: number;
 }
 
 const RELEVANT_FEATURE_TYPES = ["postcode", "place", "region", "country"];
@@ -116,6 +117,7 @@ export async function geocodingInfoForSearch(searchText: string, options?: MapBo
   if (options?.countries) {
     search.set("country", options.countries.join(","));
   }
+  search.set("limit", options?.limit?.toString() ?? "5");
   const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${searchText}.json?${search.toString()}`;
   return fetch(url).then(response => response.json());
 }

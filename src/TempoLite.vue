@@ -949,17 +949,14 @@ export default defineComponent({
     },
     
     datesOfInterest(): Date[] {
-      console.log('computing dates of interest');
       return this.interestingEvents.map(event => event.date);
     },
 
     dateStrings(): string[] {
-      console.log('computing date strings');
       return this.interestingEvents.map(event => event.dateString);
     },
 
     locationsOfInterest(): LocationOfInterest[][] {
-      console.log('cpmputing locations of interest');
       return this.interestingEvents.map(event => 
         event.locations.map(loc => ({
           ...loc,
@@ -969,7 +966,6 @@ export default defineComponent({
     },
 
     locationsOfInterestText(): string[][] {
-      console.log('computing locations of interest text');
       return this.interestingEvents.map(event => 
         event.locations.map(loc => loc.description)
       );
@@ -1218,7 +1214,13 @@ export default defineComponent({
     nearestDate(date: Date): number {
       const onedayinms = 1000 * 60 * 60 * 24;
       const mod = this.timestamps.filter(ts => ((ts - date.getTime()) < onedayinms) && (ts - date.getTime()) > 0);
-      return mod[0];
+      if (mod.length > 0) {
+        return mod[0];
+      } else {
+        // Return a default value or handle the error appropriately
+        console.warn("No matching timestamp found, returning default value.");
+        return this.timestamps[0]; // Default to the first timestamp
+      }
     },
     
     setNearestDate(date: number | null) {
@@ -1368,10 +1370,10 @@ export default defineComponent({
       if (value !== null && this.radio != null) {
         const loi = this.locationsOfInterest[this.radio][value];
         this.map?.setView(loi.latlng, loi.zoom);
-        if (loi.index) {
+        if (loi.index !== undefined) {
           this.timeIndex = loi.index;
         } else {
-          throw new Error("No index for location of interest");
+          console.warn('No index found for location of interest');
         }
       }
     },

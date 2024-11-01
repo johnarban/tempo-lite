@@ -169,7 +169,7 @@
             :search-provider="geocodingInfoForSearch"
             @set-location="(feature: MapBoxFeature) => {
               if (feature !== null) {
-                map?.setView([feature.center[1], feature.center[0]], 7);
+                map?.setView([feature.center[1], feature.center[0]], 12);
               }
             }"
             @error="(error: string) => searchErrorMessage = error"
@@ -461,7 +461,7 @@
               hide-details
             >
             </v-slider>
-            <div id="opacity-slider-label">Overlay opacity</div>
+            <div id="opacity-slider-label">TEMPO data opacity</div>
           </div> 
           </div>
                   <!-- add text box that allows manually setting the custom image url -->

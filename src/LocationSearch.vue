@@ -138,12 +138,12 @@ export default defineComponent({
     locationLabel(): string {
       if (this.locationJustUpdated) {
         if (this.comboFocused || this.searchResults !== null || this.searchText !== null) {
-          return 'Enter a location';
+          return 'Enter city or zip';
         } else {
           return this.locationUpdatedText;
         }
       } else {
-        return this.searchErrorMessage ?? 'Enter a location';
+        return this.searchErrorMessage ?? 'Enter city or zip';
       }
     }
   },

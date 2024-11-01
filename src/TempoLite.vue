@@ -232,7 +232,7 @@
               <date-picker
                 v-model="singleDateSelected"
                 @update:model-value="(value: Date) => {
-                  let index: number | null = datesOfInterest.map(d => d.getTime()).indexOf(value.getTime());
+                  const index = datesOfInterest.findIndex(d => d.getTime() === value.getTime())
                   radio = index < 0 ? null : index;
                 }"
                 :allowed-dates="uniqueDays"
@@ -960,7 +960,7 @@ export default defineComponent({
       return this.interestingEvents.map(event => 
         event.locations.map(loc => ({
           ...loc,
-          index: this.timestamps.indexOf(this.nearestDate(new Date(loc.time)))
+          index: this.nearestDateIndex(new Date(loc.time)),
         }))
       );
     },
@@ -1213,14 +1213,25 @@ export default defineComponent({
     
     nearestDate(date: Date): number {
       const onedayinms = 1000 * 60 * 60 * 24;
-      const mod = this.timestamps.filter(ts => ((ts - date.getTime()) < onedayinms) && (ts - date.getTime()) > 0);
-      if (mod.length > 0) {
-        return mod[0];
+      const time = date.getTime();
+      const timestamp = this.timestamps.find(ts => ((ts - time) < onedayinms) && (ts - time) >= 0);
+      if (timestamp !== undefined) {
+        return timestamp;
       } else {
         // Return a default value or handle the error appropriately
         console.warn("No matching timestamp found, returning default value.");
         return this.timestamps[0]; // Default to the first timestamp
       }
+    },
+
+    nearestDateIndex(date: Date): number {
+      const onedayinms = 1000 * 60 * 60 * 24;
+      const timestamp = date.getTime();
+      const index = this.timestamps.findIndex(ts => ((ts - timestamp) < onedayinms) && (ts - timestamp) >= 0);
+      if (index === null) {
+        console.log("No matching timestamp found, returning default index.");
+      }
+      return index ?? 0;
     },
     
     setNearestDate(date: number | null) {

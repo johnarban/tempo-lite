@@ -228,7 +228,7 @@
             @set-location="(feature: MapBoxFeature) => {
               if (feature !== null) {
                 map?.setView([feature.center[1], feature.center[0]], 12);
-                setMarker([feature.center[1], feature.center[0]])
+                setMarker([feature.center[1], feature.center[0]]);
               }
             }"
             @error="(error: string) => searchErrorMessage = error"
@@ -1103,7 +1103,11 @@ export default defineComponent({
         iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
         shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
       });
-      this.locationMarker = new L.Marker(latlng,{icon: icon});
+      if (this.locationMarker == null) {
+        this.locationMarker = new L.Marker(latlng,{icon: icon});
+      } else {
+        this.locationMarker.setLatLng(latlng);
+      }
       if (this.showLocationMarker) {
         this.locationMarker.addTo(this.map as Map);
       }

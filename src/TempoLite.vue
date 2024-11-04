@@ -228,6 +228,7 @@
             @set-location="(feature: MapBoxFeature) => {
               if (feature !== null) {
                 map?.setView([feature.center[1], feature.center[0]], 12);
+                setMarker([feature.center[1], feature.center[0]])
               }
             }"
             @error="(error: string) => searchErrorMessage = error"
@@ -827,6 +828,9 @@ export default defineComponent({
       }),
       cloudTimestamps,
       showClouds: false,
+      
+      showLocationMarker: true,
+      locationMarker: null as L.Marker | null,
     };
   },
 
@@ -868,7 +872,7 @@ export default defineComponent({
       maxZoom: 20,
       attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       // crs: L.CRS.EPSG4326
-      pane: 'labels'
+      // pane: 'labels'
     }).addTo(this.map as Map);
 
     
@@ -1090,6 +1094,20 @@ export default defineComponent({
   },
 
   methods: {
+    
+    setMarker(latlng: L.LatLngExpression) {
+      console.log(L.Icon.Default.prototype.options);
+      const icon = L.icon({
+        ...L.Icon.Default.prototype.options,
+        iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+      });
+      this.locationMarker = new L.Marker(latlng,{icon: icon});
+      if (this.showLocationMarker) {
+        this.locationMarker.addTo(this.map as Map);
+      }
+    },
     
     cividis(x: number): string {
       return cividis(x);
@@ -1357,6 +1375,18 @@ export default defineComponent({
         this.fieldOfRegardLayer.addTo(this.map as Map);
       } else if (this.map) {
         this.map.removeLayer(this.fieldOfRegardLayer as L.Layer);
+      }
+    },
+    
+    showLocationMarker(show: boolean) {
+      if (this.locationMarker) {
+        if (show) {
+          this.locationMarker.addTo(this.map as Map);
+          return;
+        } else {
+          this.locationMarker.remove();
+          return;
+        }
       }
     },
     

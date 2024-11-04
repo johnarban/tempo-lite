@@ -282,7 +282,6 @@
         
 
        <div id="user-options">
-        {{ whichDataSet }} Data
         <div id="all-dates">
           <h2>Select a Date</h2>  
           <div class="d-flex flex-row align-center">

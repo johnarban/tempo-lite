@@ -157,28 +157,48 @@
               <div id="map-show-hide-controls">
                 <v-btn
                   v-bind="props"
-                  class="ma-2"
-                  elevation="5"
-                  :color="showControls ? accentColor : buttonColor"
-                  icon="mdi-tune-variant"
+                  class="mx-2 mt-5"
+                  elevation="2"
+                  color="white"
+                  icon
+                  style="outline: 2px solid #b6b6b6;"
+                  rounded="0"
+                  size="x-small"
                 >
+                  <template v-slot:default>
+                    <v-icon
+                      color="black"
+                      size="x-large"
+                    >mdi-tune-variant</v-icon>
+                  </template>
                 </v-btn>
               </div>
             </template>
-            <v-card class="px-2">
+            <v-card class="controls-card">
+              <font-awesome-icon
+                style="position:absolute;right:16px;cursor:pointer"
+                icon="square-xmark"
+                size="xl"
+                @click="showControls = false"
+                @keyup.enter="showControls = false"
+                :color="accentColor2"
+                tabindex="0"
+              ></font-awesome-icon>
               <div
                 id="opacity-slider-container"
+                class="mt-5"
               >
+                <div id="opacity-slider-label">TEMPO data opacity</div>
                 <v-slider
-                  v-model="opacity"
-                  :min="0"
-                  :max="1"
-                  color="#c10124"
-                  density="compact"
-                  hide-details
-                >
+                    v-model="opacity"
+                    :min="0"
+                    :max="1"
+                    color="#c10124"
+                    density="compact"
+                    hide-details
+                    class="mb-4"
+                  >
                 </v-slider>
-                <div id="opacity-slider-label">Overlay opacity</div>
               </div>
               <div
                 class="d-flex flex-row align-center justify-space-between"
@@ -195,7 +215,7 @@
                     The TEMPO satellite observes the atmosphere over North America, from the Atlantic Ocean to the Pacific Coast, and from roughly Mexico City to central Canada. 
                   </p>
                   <p>
-                     The TEMPO Field of Regard (in <span class="text-red">red</span>, currently <em>{{ showFieldOfRegard ? 'visible' : "hidden" }}</em>)
+                    The TEMPO Field of Regard (in <span class="text-red">red</span>, currently <em>{{ showFieldOfRegard ? 'visible' : "hidden" }}</em>)
                     is the area over which the satellite takes measurements. 
                   </p>
                   </info-button>
@@ -1977,6 +1997,10 @@ button:focus-visible,
   border-radius: .125rem;
 }
 
+.controls-card {
+  padding: 1rem;
+  border: 1px solid #068ede;
+}
 
 //  mobile styles
 
@@ -2020,7 +2044,6 @@ button:focus-visible,
   }
 }
 
-    
 @media (max-width: 750px) {
   :root {
     --map-height: 60vh;

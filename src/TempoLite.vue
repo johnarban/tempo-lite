@@ -530,7 +530,21 @@
 
       </article>
       </div>
-      
+      <div id="custom-controls">
+        <v-text-field
+          v-model="customImageUrl"
+          label="Custom Image URL"
+          placeholder="Enter a URL to a custom image"
+          hide-details
+        ></v-text-field>
+        <v-checkbox
+          v-model="useCustomImageUrl"
+          label="Use Custom Image"
+          :color="useCustomImageUrl ? accentColor : buttonColor"
+          hide-details
+        ></v-checkbox>
+      </div>
+
     </div>
     <div id="body-logos">
       <a href="https://www.si.edu/" target="_blank" rel="noopener noreferrer" class="mr-1" 
@@ -644,6 +658,11 @@ interface InterestingEvent {
 const urlParams = new URLSearchParams(window.location.search);
 const hideIntro = urlParams.get("hideintro") === "true";
 const WINDOW_DONTSHOWINTRO = hideIntro ? true: window.localStorage.getItem("dontShowIntro") === 'true';
+
+let customImageUrl = urlParams.get("url");
+if (!customImageUrl) {
+  customImageUrl = '';
+}
 
 
 function zpad(n: number, width: number = 2, character: string = "0"): string {
@@ -798,7 +817,8 @@ export default defineComponent({
       fieldOfRegardLayer,
       interestingEvents,
 
-      customImageUrl: "",
+      customImageUrl: customImageUrl,
+      useCustomImageUrl: customImageUrl !== "",
 
       // timezoneOptions: [
       //   { tz: 'US/Eastern', name: 'Eastern Daylight' },
@@ -907,6 +927,7 @@ export default defineComponent({
     this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1];
     this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
     this.cloudOverlay.setUrl(this.cloudUrl).addTo(this.map as Map);
+    this.updateBounds();
     
     this.updateFieldOfRegard();
     if (this.showFieldOfRegard) {
@@ -1036,7 +1057,7 @@ export default defineComponent({
     },
     
     imageUrl(): string {
-      if (this.customImageUrl) {
+      if (this.customImageUrl && this.useCustomImageUrl) {
         return this.customImageUrl;
       }
       const url = this.getTempoDataUrl(this.timestamp);
@@ -1083,6 +1104,10 @@ export default defineComponent({
     
     imageBounds() {
       // currently the 2023 data is all V01
+      if (this.useCustomImageUrl) {
+        return this.newBounds;
+      }
+      
       if (this.date.getUTCFullYear() === 2023) {
         return this.novDecBounds;
       } else if (this.date.getUTCFullYear() === 2024 && this.date.getUTCMonth() === 2) {
@@ -1666,6 +1691,15 @@ ul {
     padding: 1rem;
     grid-column: 2 / 3;
     grid-row: 4 / 6;
+  }
+  
+  #custom-controls {
+    grid-column: 3 / 4;
+    grid-row: 3 / 4;
+    
+    input {
+      margin-inline: 1rem;
+    }
   }
 
 }

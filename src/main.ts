@@ -6,6 +6,8 @@ import TempoLite from "./TempoLite.vue";
 import Colorbar from './ColorBar.vue';
 import ColorBarHorizontal from "./ColorBarHorizontal.vue";
 import InfoButton from "./InfoButton.vue";
+import OpenLayersMap from "./OpenLayersMap.vue";
+
 import vuetify from "../plugins/vuetify";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -71,6 +73,7 @@ createApp(TempoLite, {})
   .component('info-button', InfoButton)
   .component('colorbar-horizontal', ColorBarHorizontal)
   .component('date-picker', VueDatePicker)
+  .component('open-layers-map', OpenLayersMap)
 
   // Mount
   .mount("#app");

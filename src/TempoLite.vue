@@ -144,7 +144,14 @@
         </template>
         </colorbar-horizontal>
         <div id="map-contents" style="width:100%; height: 100%;">
-          <div id="map"></div>
+          <!-- <div id="map"></div> -->
+          <open-layers-map
+          :image-url="imageUrl"
+          :projection="currentImageProj"
+          :bounds="imageBounds.toBBoxString().split(',').map(parseFloat)"
+          :geojson="geojson"
+          @mapready="mapReady"
+        />
           <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
           <!-- show hide cloud data, disable if none is available -->
 
@@ -247,7 +254,7 @@
             :search-provider="geocodingInfoForSearch"
             @set-location="(feature: MapBoxFeature) => {
               if (feature !== null) {
-                map?.setView([feature.center[1], feature.center[0]], 12);
+                // map?.setView([feature.center[1], feature.center[0]], 12);
               }
             }"
             @error="(error: string) => searchErrorMessage = error"
@@ -530,21 +537,65 @@
 
       </article>
       </div>
+      
       <div id="custom-controls">
+        <!-- add a little display about current image url, bounds, prjections, etc -->
+         <div>
+          <p>Current Image URL: <img :src="imageUrl" height="40px"/></p>
+          <p>Current Bounds: {{ imageBounds }}</p>
+          <p>Current Map Projection: {{ currentMapProj }}</p>
+          <p>Current Image Projection: {{ imageProjection }}</p>
+          <!-- add coastlines button -->
+           <v-btn @click="addCoastlines" color="#c10124" elevation="0" class="mt-3">
+            Add Coastlines
+          </v-btn>
+         </div>
         <v-text-field
           v-model="customImageUrl"
           label="Custom Image URL"
           placeholder="Enter a URL to a custom image"
           hide-details
         ></v-text-field>
+        <!-- updte bounds button -->
+        <v-btn @click="updateBounds" color="#c10124" elevation="0" class="mt-3">
+          Update Bounds
+        </v-btn>
+        <v-radio-group v-model="customImageUrl" row>
+          <v-radio
+            label="Web Mercator"
+            :value="customUrls.webmercator.url"
+          ></v-radio>
+          <v-radio
+            label="Equirectangular Large"
+            :value="customUrls.large.url"
+          ></v-radio>
+          <v-radio
+            label="Equirectangular"
+            :value="customUrls.small.url"
+          ></v-radio>
+        </v-radio-group>
         <v-checkbox
           v-model="useCustomImageUrl"
           label="Use Custom Image"
           :color="useCustomImageUrl ? accentColor : buttonColor"
           hide-details
         ></v-checkbox>
-      </div>
 
+        <v-btn @click="resetMapBounds" color="#c10124" elevation="0" class="mt-3">
+          Reset Map Bounds
+        </v-btn>
+        <!-- toggle proj -->
+        <v-btn
+          @click="toggleProjection"
+          color="#fd43aa"
+          elevation="0"
+          class="mt-3"
+          :style="{ backgroundColor: currentMapProj === 'EPSG:3857' ? '#fd43aa' : '#ccc' }"
+        >
+          <v-icon left>{{ currentMapProj === 'EPSG:3857' ? 'mdi-checkbox-marked-circle' : 'mdi-checkbox-blank-circle-outline' }}</v-icon>
+          Current Map Projection: {{ currentMapProj }}
+        </v-btn>
+      </div>
     </div>
     <div id="body-logos">
       <a href="https://www.si.edu/" target="_blank" rel="noopener noreferrer" class="mr-1" 
@@ -558,7 +609,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import L, { Map } from "leaflet";
+import L from "leaflet";
 import "leaflet.zoomhome";
 import { getTimezoneOffset } from "date-fns-tz";
 import  { cividis } from "./cividis";
@@ -571,7 +622,17 @@ import augustFieldOfRegard from "./assets/august_for.json";
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
 import { _preloadImages } from "./PreloadImages";
 
+import { Map, View } from 'ol';
+import TileLayer from "ol/layer/Tile";
+import VectorLayer from 'ol/layer/Vector';
+import ImageLayer from "ol/layer/Image";
+import { Vector, ImageStatic } from "ol/source";
 
+import { GeoJSON } from 'ol/format';
+import { Style, Stroke } from 'ol/style';
+import {  fromLonLat } from "ol/proj";
+import { fromExtent } from "ol/geom/Polygon";
+import Feature from "ol/Feature";
 type SheetType = "text" | "video" | null;
 type Timeout = ReturnType<typeof setTimeout>;
 
@@ -581,6 +642,7 @@ interface TimezoneInfo {
 }
 
 import { getTimestamps } from "./timestamps";
+
 
 const erdTimestamps: number[] = [];
 const newTimestamps: number[] = [];
@@ -638,8 +700,10 @@ const fosterTimestamps = [
 
 const timestamps = fosterTimestamps;
 
+
+
 interface LocationOfInterest {
-  latlng: L.LatLngExpression;
+  latlng: [number, number];
   zoom: number;
   text: string;
   description: string;
@@ -664,10 +728,30 @@ if (!customImageUrl) {
   customImageUrl = '';
 }
 
+const customUrls = {
+  'webmercator':
+    {
+      'url':'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/released/images/resized_images/tempo_2024-11-17T18h23m.png',
+      'projection': 'EPSG:3857',
+    },
+
+  'small':
+  {
+    'url':'https://github.com/johnarban/wwt_interactives/blob/main/images/tempo-data/no_reproject_small.png?raw=true',
+    'projection': 'EPSG:4326',
+  },
+  'large':
+  {
+    'url':'https://github.com/johnarban/wwt_interactives/blob/main/images/tempo-data/no_reproject_large.png?raw=true',
+    'projection': 'EPSG:4326',
+  }
+};
+
 
 function zpad(n: number, width: number = 2, character: string = "0"): string {
   return n.toString().padStart(width, character);
 }
+
 
 export default defineComponent({
   data() {
@@ -682,19 +766,17 @@ export default defineComponent({
       new L.LatLng(72.99, -13.01)
     );
 
-    const fieldOfRegardLayer = L.geoJSON(
-      fieldOfRegard as GeoJSON.GeometryCollection,
-      {
-        style: {
-          color: "#c10124",
-          fillColor: "transparent",
-          weight: 1,
-          opacity: 0.8,
-        },
-      }
-    ) as L.Layer;
-    
-    
+    // const fieldOfRegardLayer = L.geoJSON(
+    //   fieldOfRegard as GeoJSON.GeometryCollection,
+    //   {
+    //     style: {
+    //       color: "#c10124",
+    //       fillColor: "transparent",
+    //       weight: 1,
+    //       opacity: 0.8,
+    //     },
+    //   }
+    // ) as L.Layer;
 
 
     const interestingEvents = [
@@ -807,18 +889,21 @@ export default defineComponent({
       touchscreen: false,
       playInterval: null as Timeout | null,
       map: null as Map | null,
-      basemap: null as L.TileLayer.WMS | null | L.TileLayer,
+      basemap: null as L.TileLayer.WMS | null | L.TileLayer | TileLayer,
       novDecBounds,
       marchBounds: new L.LatLngBounds(
         new L.LatLng(14.01, -167.99),
         new L.LatLng(72.99, -13.01)
       ),
       bounds: marchBounds.toBBoxString().split(",").map(parseFloat),
-      fieldOfRegardLayer,
+      fieldOfRegardLayer: null as VectorLayer | null,
       interestingEvents,
 
       customImageUrl: customImageUrl,
       useCustomImageUrl: customImageUrl !== "",
+      customUrls,
+      bboxLayer: null as VectorLayer | null,
+      
 
       // timezoneOptions: [
       //   { tz: 'US/Eastern', name: 'Eastern Daylight' },
@@ -837,16 +922,28 @@ export default defineComponent({
       maxIndex: timestamps.length - 1,
       timeValues: [...Array(timestamps.length).keys()],
       playing: false,
-      imageOverlay: new L.ImageOverlay("", novDecBounds, {
+      // imageOverlay: new L.ImageOverlay("", novDecBounds, {
+      //   opacity,
+      //   interactive: false,
+      // }),
+      imageOverlay: new ImageLayer({
+        source: new ImageStatic({
+          url: "",
+          projection: 'EPSG:3857',
+          imageExtent: marchBounds.toBBoxString().split(",").map(parseFloat),
+          interpolate: false,
+        }),
         opacity,
-        interactive: false,
-      }),
+      }) as ImageLayer<ImageStatic>,
       opacity,
       timestamps,
       erdTimestamps,
       newTimestamps,
       fosterTimestamps,      
       preload: true,
+      // test3857: 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/released/images/resized_images/tempo_2024-11-17T15h23m.png',
+      // test4326: 'https://github.com/johnarban/wwt_interactives/blob/main/images/tempo-data/no2_equirectangular.png?raw=true',
+      // testImageUrl: 'test4326',
       
       singleDateSelected: new Date(),
 
@@ -860,12 +957,28 @@ export default defineComponent({
       loadedImagesProgress: 0,
       useHighRes: false,
       
-      cloudOverlay: new L.ImageOverlay("", novDecBounds, {
+      cloudOverlay: new ImageLayer({
+        source: new ImageStatic({
+          url: "",
+          projection: 'EPSG:3857',
+          imageExtent: marchBounds.toBBoxString().split(",").map(parseFloat),
+          interpolate: false,
+        }),
         opacity,
-        interactive: false,
-      }),
+      }) as ImageLayer<ImageStatic>,
       cloudTimestamps,
       showClouds: false,
+      currentMapProj: 'EPSG:3857' as 'EPSG:4326' | 'EPSG:3857',
+      currentImageProj: 'EPSG:3857',
+      initialCenter: [-98.789,40.044], // lon, lat
+      initialView: new View({
+        center: [-98.789,40.044],
+        zoom: 4,
+        minZoom: 0,
+        maxZoom: 20,
+        projection: 'EPSG:3857'
+      }),
+      geojson: null,
     };
   },
 
@@ -878,61 +991,9 @@ export default defineComponent({
 
   mounted() {
     this.showSplashScreen = false;
-    this.map = L.map("map", { zoomControl: false }).setView([40.044, -98.789], 4, {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      crs: L.CRS.EPSG4326
-    });
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const zoomHome = L.Control.zoomHome();
-    const originalZH = zoomHome._zoomHome.bind(zoomHome);
-    zoomHome._zoomHome = (_e: Event) => {
-      originalZH();
-      this.sublocationRadio = null;
-    };
-    zoomHome.addTo(this.map);
-    this.addCoastlines();
-
-    // this.basemap = new L.TileLayer.WMS('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
-    //   crs: L.CRS.EPSG4326
-    // }).addTo(this.map as Map);
-    
-    const labelPane = this.map.createPane("labels");
-    labelPane.style.zIndex = "650";
-    labelPane.style.pointerEvents = "none";
-    
-    this.basemap = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_lines/{z}/{x}/{y}{r}.png', {
-      minZoom: 0,
-      maxZoom: 20,
-      attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      // crs: L.CRS.EPSG4326
-      pane: 'labels'
-    }).addTo(this.map as Map);
-
-    
-
-    // L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png', {
-    //   attribution: 'OpenStreetMap, CartoDB',
-    //   pane: 'labels'
-    // }).addTo(this.map as Map);
-    
-    L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_labels/{z}/{x}/{y}{r}.png', {
-      minZoom: 0,
-      maxZoom: 20,
-      attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      pane: 'labels'
-    }).addTo(this.map as Map);
-
+  
     this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1];
-    this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
-    this.cloudOverlay.setUrl(this.cloudUrl).addTo(this.map as Map);
-    this.updateBounds();
-    
-    this.updateFieldOfRegard();
-    if (this.showFieldOfRegard) {
-      this.fieldOfRegardLayer.addTo(this.map as Map);
-    }
+    // this.addCoastlines();
   },
 
   computed: {
@@ -1130,10 +1191,96 @@ export default defineComponent({
       return this.newTimestamps.includes(this.timestamp);
     },
     
+    imageProjection() {
+      if (this.useCustomImageUrl && this.customImageUrl.includes('no_reproject')) {
+        return this.customUrls.large.projection;
+      }
+      return 'EPSG:3857';
+    },
     
   },
 
   methods: {
+    // add geojson layer to openlayers map
+    addGeoJSONLayer(geojson: GeoJSON.GeoJsonObject, style: Style = new Style()) {
+      const format = new GeoJSON();
+      const features = format.readFeatures(geojson, {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:3857',
+      });
+      const vectorSource = new Vector({
+        features,
+      });
+      const vectorLayer = new VectorLayer({
+        zIndex: 500,
+        source: vectorSource,
+        style: style,
+      });
+      if (this.map) { 
+        console.log(this.map);
+        this.map.addLayer(vectorLayer);
+      } else {
+        console.error('map not defined');
+      }
+      return vectorLayer;
+    },
+    
+    mapReady(map: Map) {
+      this.map = map;
+      this.addCoastlines();
+      this.fieldOfRegardLayer = this.addGeoJSONLayer(fieldOfRegard as GeoJSON.GeometryCollection,
+        new Style({
+          stroke: new Stroke({
+            color: "#f00",
+            width: 0.5,
+          }),
+        })
+      );
+      this.fieldOfRegardLayer.setVisible(this.showFieldOfRegard);
+      this.updateFieldOfRegard();
+    },
+    
+    updateBbox() {
+      console.log('updatng bbox');
+      const source = this.imageOverlay.getSource();
+      const bboxSource = this.bboxLayer?.getSource();
+      if (source && bboxSource) {
+        const extent = source.getImageExtent();
+        bboxSource.clear();
+        const polygon = fromExtent(extent);
+        bboxSource.addFeature(new Feature(polygon));
+      }
+    },
+    
+    coordsForProj(extent: number[]): number[] {
+      return this.convertBoundsToMeters(extent);
+    },
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    updateImageLayerUrl(layer: any, url: string) {
+      console.log(layer.getSource().getImageExtent());
+      const newSource = new ImageStatic({
+        url: url,
+        projection: layer.getSource().projection,
+        imageExtent: layer.getSource().getImageExtent(),
+        interpolate: false,
+      });
+      layer.setSource(newSource);
+      this.updateBbox();
+    },
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    updateImageLayerBounds(layer: any, bounds: L.LatLngBounds, _proj: string | null = null) {
+      console.log('using this projection', this.imageProjection);
+      const source = layer.getSource();
+      const newSource = new ImageStatic({
+        url: source.getUrl(),
+        projection: this.imageProjection,
+        imageExtent: this.convertBoundsToMeters(bounds.toBBoxString().split(",").map(parseFloat)),
+        interpolate: false,
+      });
+      layer.setSource(newSource);
+    },
     
     cividis(x: number): string {
       return cividis(x);
@@ -1178,9 +1325,12 @@ export default defineComponent({
       fetch("coastlines.geojson")
         .then(response => response.json())
         .then(data => {
-          L.geoJson(data, {
-            style: { color: "black", weight: 1, opacity: 0.8 }
-          }).addTo(this.map as Map);
+          this.addGeoJSONLayer(data, new Style({
+            stroke: new Stroke({
+              color: "#000",
+              width: 1.5,
+            }),
+          }));
         });
     },
     async geocodingInfoForSearch(searchText: string): Promise<MapBoxFeatureCollection | null> {
@@ -1190,8 +1340,36 @@ export default defineComponent({
       }).catch(_err => null);
     },
     resetMapBounds() {
-      this.map?.setView([40.044, -98.789], 4);
+      console.log(`resetting map bounds to ${this.initialCenter}: ${this.convertBoundsToMeters(this.initialCenter)}`);
+      if (this.map) {
+        this.map.setView(new View({
+          center:this.convertBoundsToMeters(this.initialCenter), 
+          zoom:4,
+          projection: this.currentMapProj,
+        })
+        );
+      }
     },
+    toggleProjection() {
+      // switch between EPSG:4326 and EPSG:3857
+      const view = this.map?.getView();
+      if (this.currentMapProj === 'EPSG:4326') {
+        this.currentMapProj = 'EPSG:3857';
+      } else {
+        this.currentMapProj = 'EPSG:4326';
+      }
+      if (view) {
+        const newView = new View({
+          center: view.getCenter(),
+          zoom: view.getZoom(),
+          projection: this.currentMapProj,
+        });
+        this.map?.setView(newView);
+        console.log(newView);
+        
+      }
+    },
+    
     play() {
       this.playInterval = setInterval(() => {
         if (this.timeIndex >= this.maxIndex) {
@@ -1211,9 +1389,11 @@ export default defineComponent({
         clearInterval(this.playInterval);
       }
     },
-    updateBounds() {
-      this.imageOverlay.setBounds(this.imageBounds);
-      this.cloudOverlay.setBounds(this.imageBounds);
+    updateBounds(proj: string | null = null) {
+      // this.imageOverlay.setBounds(this.imageBounds);
+      // this.cloudOverlay.setBounds(this.imageBounds);
+      this.updateImageLayerBounds(this.imageOverlay, this.imageBounds, proj);
+      this.updateImageLayerBounds(this.cloudOverlay, this.imageBounds, proj);
     },
     
     // preloadImages(images: string[]) {
@@ -1298,13 +1478,29 @@ export default defineComponent({
       this.imagePreload();
     },
     
+    // update a OpenLayers VectorLayer with new GeoJSON data
+    updateGeoJSONLayer(layer: VectorLayer, geojson: GeoJSON.GeoJsonObject) {
+      const format = new GeoJSON();
+      const features = format.readFeatures(geojson, {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:3857',
+      });
+      const source = layer.getSource();
+      if (source) {
+        source.clear();
+        source.addFeatures(features);
+      }
+    },
+    
     updateFieldOfRegard() {
       if (this.date.getUTCFullYear() === 2023 && this.date.getUTCMonth() === 7) {
-        (this.fieldOfRegardLayer as L.GeoJSON).clearLayers();
-        (this.fieldOfRegardLayer as L.GeoJSON).addData(augustFieldOfRegard as GeoJSON.GeometryCollection);
+        // (this.fieldOfRegardLayer as L.GeoJSON).clearLayers();
+        // (this.fieldOfRegardLayer as L.GeoJSON).addData(augustFieldOfRegard as GeoJSON.GeometryCollection);
+        this.updateGeoJSONLayer(this.fieldOfRegardLayer as VectorLayer, augustFieldOfRegard as GeoJSON.GeoJsonObject);
       } else {
-        (this.fieldOfRegardLayer as L.GeoJSON).clearLayers();
-        (this.fieldOfRegardLayer as L.GeoJSON).addData(fieldOfRegard as GeoJSON.GeometryCollection);
+        // (this.fieldOfRegardLayer as L.GeoJSON).clearLayers();
+        // (this.fieldOfRegardLayer as L.GeoJSON).addData(fieldOfRegard as GeoJSON.GeometryCollection);
+        this.updateGeoJSONLayer(this.fieldOfRegardLayer as VectorLayer, fieldOfRegard as GeoJSON.GeoJsonObject);
       }
     },
     
@@ -1340,8 +1536,13 @@ export default defineComponent({
 
     moveForwardOneDay() {
       this.singleDateSelected = this.uniqueDays[this.getUniqueDayIndex(this.singleDateSelected) + 1];
-    }
-    
+    },
+    convertBoundsToMeters(bounds: number[]): number[] {
+      const [minLon, minLat, maxLon, maxLat] = bounds;
+      const bottomLeft = fromLonLat([minLon, minLat]);
+      const topRight = fromLonLat([maxLon, maxLat]);
+      return [...bottomLeft, ...topRight];
+    },
   },
 
   watch: {
@@ -1379,28 +1580,45 @@ export default defineComponent({
       }
     },
     imageUrl(url: string) {
-      this.updateBounds();
-      this.imageOverlay.setUrl(url);
+      console.log('updating image url', url);
+      let proj = '';
+      if (url.includes('no_reproject')) {
+        proj = 'EPSG:4326';
+        this.currentImageProj = 'EPSG:4326';
+      } else {
+        proj = 'EPSG:3857';
+        this.currentImageProj = 'EPSG:3857';
+      }
+      this.updateBounds(proj);
+      this.updateImageLayerUrl(this.imageOverlay, url);
       this.updateFieldOfRegard();
+      
     },
     
     cloudUrl(url: string) {
-      this.cloudOverlay.setUrl(url);
+      this.updateImageLayerUrl(this.cloudOverlay, url);
+      // this.cloudOverlay.setUrl(url);
     },
     
     useHighRes() {
       this.imagePreload();
     },
     
+  
+    
     imageBounds(bounds: L.LatLngBounds) {
+      this.updateBounds();
       console.log(this.whichDataSet, bounds.toBBoxString());
     },
     
     showFieldOfRegard (show: boolean) {
       if (show) {
-        this.fieldOfRegardLayer.addTo(this.map as Map);
-      } else if (this.map) {
-        this.map.removeLayer(this.fieldOfRegardLayer as L.Layer);
+        // this.fieldOfRegardLayer.addTo(this.map as Map);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.fieldOfRegardLayer?.setVisible(true);
+      } else if (this.map && this.fieldOfRegardLayer) {
+        // this.map.removeLayer(this.fieldOfRegardLayer as VectorLayer);
+        this.fieldOfRegardLayer.setVisible(false);
       }
     },
     
@@ -1432,7 +1650,7 @@ export default defineComponent({
     sublocationRadio(value: number | null) {
       if (value !== null && this.radio != null) {
         const loi = this.locationsOfInterest[this.radio][value];
-        this.map?.setView(loi.latlng, loi.zoom);
+        this.map?.setView(new View({center:[loi.latlng[0], loi.latlng[1]], zoom:loi.zoom}));
         if (loi.index !== undefined) {
           this.timeIndex = loi.index;
         } else {
@@ -1442,6 +1660,7 @@ export default defineComponent({
     },
 
     opacity(value: number) {
+      // FIXME
       this.imageOverlay.setOpacity(value);
       this.cloudOverlay.setOpacity(value);
     }
@@ -1515,6 +1734,10 @@ a {
 
 ul {
   margin-left: 1rem;
+}
+
+canvas {
+  background-color: #dddddd;
 }
 
 #intro-background {
@@ -2065,9 +2288,9 @@ button:focus-visible,
       margin-left: 3rem;
     }
     
-    a[href="https://tempo.si.edu"] > img {
-      height: 70px!important;
-      width: auto !important;
+    a[href="https://tempo.si.edu"]:has(img) {
+      grid-column: 1 / 2;
+      grid-row: 1 / 2;
     }
     
     #user-options {

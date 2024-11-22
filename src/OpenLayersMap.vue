@@ -16,7 +16,6 @@ import VectorSource from "ol/source/Vector";
 import { GeoJSON } from "ol/format";
 import { Style, Stroke } from "ol/style";
 import { setUserProjection } from "ol/proj";
-import { el } from "vuetify/lib/locale/index.mjs";
 
 type Props = {
   imageUrl: string | null;

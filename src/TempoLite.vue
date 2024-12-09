@@ -127,13 +127,12 @@
 
       <h1 id="title">What is in the Air You Breathe?</h1>
       </div>
-      <snackbar-alert>
-        <ul>
-          <li> Images from Nov, 19<sup>th</sup> onward are created 
-            using the average, rather than the nearest pixel value 
-            when reprojecting. 
+      <snackbar-alert label="What's new">
+        <ol class="snackbar-alert-ol">
+          <li class="change-item" v-for="change in changes" :key="change.date" :data-date="change.date">
+            <span style="font-weight:bold;">{{ change.date }}</span>: {{ change.text }}
           </li>
-        </ul>
+        </ol>
         <!-- <template v-slot:activator="{ onClick, id }">
           <v-btn :id="id" @click="onClick" color="primary">
             Custom Activator
@@ -859,6 +858,7 @@ export default defineComponent({
       }),
       cloudTimestamps,
       showClouds: false,
+      changes
     };
   },
 

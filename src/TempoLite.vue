@@ -647,7 +647,7 @@ const WINDOW_DONTSHOWINTRO = hideIntro ? true: window.localStorage.getItem("dont
 
 const initLat = parseFloat(urlParams.get("lat") || '40.044');
 const initLon = parseFloat(urlParams.get("lon") || '-98.789');
-const initZoom = parseFloat(urlParams.get("z") || '4');
+const initZoom = parseFloat(urlParams.get("zoom") || '4');
 const initTime = urlParams.get("t");
 
 function zpad(n: number, width: number = 2, character: string = "0"): string {

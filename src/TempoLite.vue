@@ -851,7 +851,7 @@ export default defineComponent({
         opacity,
         interactive: false,
       }),
-      esriURL: 'https://gis.earthdata.nasa.gov/image/rest/services/C2930763263-LARC_CLOUD/TEMPO_NO2_L3_V03_HOURLY_TROPOSPHERIC_VERTICAL_COLUMN_BETA/ImageServer',
+      esriURL: 'https://gis.earthdata.nasa.gov/image/rest/services/C2930763263-LARC_CLOUD/TEMPO_NO2_L3_V03_HOURLY_TROPOSPHERIC_VERTICAL_COLUMN/ImageServer',
       esriTimesteps: [] as number[],
       esriImageLayer: null as esri.ImageMapLayer | null,
       esriOpacity: opacity,

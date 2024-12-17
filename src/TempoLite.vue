@@ -253,7 +253,7 @@
             @error="(error: string) => searchErrorMessage = error"
           ></location-search>
           <use-clipboard v-slot="{ copy, copied }" :source="currentUrl">
-            <v-tooltip :text="copied ? 'Link Copied' : 'Copy Link to Share'">
+            <v-tooltip :text="copied ? 'Link Copied' : 'Copy link to share view'">
               <template v-slot:activator="{ props }">
                 <v-btn
                   class="share-button"

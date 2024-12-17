@@ -264,25 +264,14 @@
             }"
             @error="(error: string) => searchErrorMessage = error"
           ></location-search>
-          <use-clipboard v-slot="{ copy, copied }" :source="currentUrl">
-            <v-tooltip :text="copied ? 'Link Copied' : 'Copy link to share view'">
-              <template v-slot:activator="{ props }">
-                <v-btn
-                  class="share-button"
-                  icon
-                  @click="copy()"
-                  @keyup.enter="copy()"
-                  v-bind="props"
-                  color="#ffffff66"
+          <share-button
+            :source="currentUrl"
+            buttonColor="#ffffff66"
+            iconColor="#333"
                   elevation="0"
                   size="small"
                   rounded="1"
-                >
-                  <v-icon color="#333">mdi-share-variant</v-icon>
-                </v-btn>
-              </template>
-            </v-tooltip>
-          </use-clipboard>
+          />
         </div>
         </div>
         <colorbar 

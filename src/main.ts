@@ -9,6 +9,8 @@ import ColorBarHorizontal from "./ColorBarHorizontal.vue";
 import InfoButton from "./InfoButton.vue";
 import vuetify from "../plugins/vuetify";
 import SnackbarAlert from "./SnackbarAlert.vue";
+import ShareButton from "./ShareButton.vue";
+
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -76,6 +78,7 @@ createApp(TempoLite, {})
   .component('date-picker', VueDatePicker)
   .component('use-clipboard', UseClipboard as Vue.Component)
   .component('snackbar-alert', SnackbarAlert)
+  .component('share-button', ShareButton)
 
   // Mount
   .mount("#app");

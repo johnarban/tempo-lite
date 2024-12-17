@@ -127,6 +127,18 @@
 
       <h1 id="title">What is in the Air You Breathe?</h1>
       </div>
+      <snackbar-alert label="What's new">
+        <ol class="snackbar-alert-ol">
+          <li class="change-item" v-for="change in changes" :key="change.date" :data-date="change.date">
+            <span style="font-weight:bold;">{{ change.date }}</span>: {{ change.text }}
+          </li>
+        </ol>
+        <!-- <template v-slot:activator="{ onClick, id }">
+          <v-btn :id="id" @click="onClick" color="primary">
+            Custom Activator
+          </v-btn>
+        </template> -->
+      </snackbar-alert>
       <div id="where" class="big-label">where</div>
       <div id="map-container">
         <colorbar-horizontal
@@ -576,6 +588,8 @@ import augustFieldOfRegard from "./assets/august_for.json";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
 import { _preloadImages } from "./PreloadImages";
+import changes from "./changes";
+
 
 
 type SheetType = "text" | "video" | null;
@@ -877,6 +891,7 @@ export default defineComponent({
       cloudTimestamps,
       showClouds: false,
       currentUrl: window.location.href,
+      changes
     };
   },
 
@@ -2321,5 +2336,18 @@ button:focus-visible,
   backdrop-filter: blur(5px);
   padding-inline: 5px;
   border-radius: 10px;
+}
+.cds-snackbar-alert {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  pointer-events: auto;
+  z-index: 999;
+}
+
+@media (max-width: 750px) {
+  .cds-snackbar-alert {
+    top: -1rem;
+  }
 }
 </style>

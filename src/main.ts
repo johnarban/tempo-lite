@@ -24,6 +24,7 @@ import {
 
 import VueDatePicker from "@vuepic/vue-datepicker";
 import '@vuepic/vue-datepicker/dist/main.css';
+import { UseClipboard } from "@vueuse/components";
 
 library.add(faBookOpen);
 library.add(faPlay);
@@ -71,6 +72,7 @@ createApp(TempoLite, {})
   .component('info-button', InfoButton)
   .component('colorbar-horizontal', ColorBarHorizontal)
   .component('date-picker', VueDatePicker)
+  .component('use-clipboard', UseClipboard as Vue.Component)
 
   // Mount
   .mount("#app");

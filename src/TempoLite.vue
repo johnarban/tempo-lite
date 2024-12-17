@@ -237,7 +237,7 @@
               </div>
             </v-card>
           </v-menu>
-
+          <div id="location-and-sharing">
           <location-search
             v-model="searchOpen"
             small
@@ -252,6 +252,26 @@
             }"
             @error="(error: string) => searchErrorMessage = error"
           ></location-search>
+          <use-clipboard v-slot="{ copy, copied }" :source="currentUrl">
+            <v-tooltip :text="copied ? 'Link Copied' : 'Copy Link to Share'">
+              <template v-slot:activator="{ props }">
+                <v-btn
+                  class="share-button"
+                  icon
+                  @click="copy()"
+                  @keyup.enter="copy()"
+                  v-bind="props"
+                  color="#ffffff66"
+                  elevation="0"
+                  size="small"
+                  rounded="1"
+                >
+                  <v-icon color="#333">mdi-share-variant</v-icon>
+                </v-btn>
+              </template>
+            </v-tooltip>
+          </use-clipboard>
+        </div>
         </div>
         <colorbar 
           v-if="$vuetify.display.width > 750"
@@ -856,6 +876,7 @@ export default defineComponent({
       }),
       cloudTimestamps,
       showClouds: false,
+      currentUrl: window.location.href,
     };
   },
 
@@ -1146,6 +1167,7 @@ export default defineComponent({
         const url = new URL(location.origin);
         const searchParams = new URLSearchParams(state);
         url.search = searchParams.toString();
+        this.currentUrl = url.toString();
         window.history.replaceState(null,'',url);
       }
     },
@@ -1866,12 +1888,17 @@ a {
     flex-shrink: 1;
   }
   
-  .forward-geocoding-container {
+  #location-and-sharing {
     position: absolute;
     bottom: 0;
-    left: 0;
-    
     z-index: 1000;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    width:fit-content;
+  }
+  .forward-geocoding-container {
     width: 250px;
     border: 2px solid black;
   }
@@ -2285,5 +2312,14 @@ button:focus-visible,
   image-rendering: crisp-edges;               /* CSS4 Proposed  */
   image-rendering: pixelated;                 /* CSS4 Proposed  */
   -ms-interpolation-mode: nearest-neighbor;   /* IE8+           */
+}
+
+.share-button {
+  z-index: 1000;
+  background-color: rgb(255 255 255);
+  border: 1px solid black;
+  backdrop-filter: blur(5px);
+  padding-inline: 5px;
+  border-radius: 10px;
 }
 </style>

@@ -127,7 +127,7 @@
 
       <h1 id="title">What is in the Air You Breathe?</h1>
       </div>
-      <snackbar-alert label="What's new">
+      <snackbar-alert label="What's new" v-model="showChanges" hide-button>
         <ol class="snackbar-alert-ol">
           <li class="change-item" v-for="change in changes" :key="change.date" :data-date="change.date">
             <span style="font-weight:bold;">{{ change.date }}</span>: {{ change.text }}
@@ -137,8 +137,64 @@
           <v-btn :id="id" @click="onClick" color="primary">
             Custom Activator
           </v-btn>
-        </template> -->
+        </template>  -->
       </snackbar-alert>
+
+      <div id="menu-area">
+        <share-button
+            :source="currentUrl"
+            buttonColor="black"
+            iconColor="yellow"
+            elevation="0"
+            size="small"
+            rounded="1"
+          />
+        <v-btn aria-role="menu" aria-label="Show menu" class="menu-button" variant="outlined" rounded="lg" color="yellow" elevation="5">
+          <v-icon size="x-large">mdi-menu</v-icon>
+          <v-menu
+            activator="parent"
+            >
+            <v-list>
+              <v-list-item 
+                tabindex="0"
+                aria-label="Show what's new"
+                @click="showChanges = true"
+                @keyup.enter="showChanges = true"
+                >
+                View Changes
+              </v-list-item>
+              
+              <v-list-item 
+                tabindex="0"
+                aria-label="Show user guide"
+                @click="showUserGuide = true"
+                @keyup.enter="showUserGuide = true"
+                >
+                User Guide
+              </v-list-item>
+              
+              <v-list-item 
+                tabindex="0"
+                aria-label="Show dialog telling about the data"
+                @click="showAboutData = true"
+                @keyup.enter="showAboutData = true"
+                >
+                About the Data
+              </v-list-item>
+              
+              <v-list-item 
+                tabindex="0" 
+                aria-label="Show credits"
+                @click="showCredits = true"
+                @keyup.enter="showCredits = true"
+                >
+                  Credits
+              </v-list-item>
+              
+            </v-list>
+          </v-menu>
+        </v-btn>
+      </div>
       <div id="where" class="big-label">where</div>
       <div id="map-container">
         <colorbar-horizontal
@@ -264,14 +320,6 @@
             }"
             @error="(error: string) => searchErrorMessage = error"
           ></location-search>
-          <share-button
-            :source="currentUrl"
-            buttonColor="#ffffff66"
-            iconColor="#333"
-                  elevation="0"
-                  size="small"
-                  rounded="1"
-          />
         </div>
         </div>
         <colorbar 
@@ -543,6 +591,81 @@
               </v-card>
             </v-dialog>
           </a>
+          <v-dialog
+            id="user-guide-dialog"
+            v-model="showUserGuide"
+            :scrim="false"
+            location="center center"
+          >
+            <v-card class="dialog-card">
+              <font-awesome-icon
+                  style="position:absolute;right:16px;cursor:pointer;padding:0.5em;margin:-0.5em"
+                  icon="square-xmark"
+                  size="xl"
+                  @click="showUserGuide = false"
+                  @keyup.enter="showUserGuide = false"
+                  :color="accentColor2"
+                  tabindex="0"
+                ></font-awesome-icon>
+              <v-card-title tabindex="0"><h3>User Guide</h3></v-card-title>
+              <v-card-text>
+                <p>
+                  Do consectetur consequat dolore esse nulla .
+                </p>
+
+                <p>
+                  Reprehenderit sint ipsum laborum in reprehenderit sunt eu pariatur ipsum tempor .
+                </p>
+
+                <p>
+                  Ex laboris fugiat ad duis eu ipsum cupidatat veniam fugiat .
+                </p>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
+          
+          
+          <v-dialog
+            id="aboud-data-dialog"
+            v-model="showAboutData"
+            :scrim="false"
+            location="center center"
+          >
+            <v-card class="dialog-card">
+              <font-awesome-icon
+                  style="position:absolute;right:16px;cursor:pointer;padding:0.5em;margin:-0.5em"
+                  icon="square-xmark"
+                  size="xl"
+                  @click="showAboutData = false"
+                  @keyup.enter="showAboutData = false"
+                  :color="accentColor2"
+                  tabindex="0"
+                ></font-awesome-icon>
+              <v-card-title tabindex="0"><h3>Data source and processing</h3></v-card-title>
+              <v-card-text>
+                <p>
+                  This visualization of the TEMPO satellite NO<sub>2</sub> Tropospheric Column Density data is derived from Level 3 data files obtained from the 
+                  <a href="https://asdc.larc.nasa.gov/project/TEMPO" target="_blank" rel="noopener noreferrer">NASA ASDC TEMPO Data Products Page</a>.
+                </p>
+                <br />
+                <p>
+                  The data has been processed and visualized by the CosmicDS team at the Harvard-Smithsonian Center for Astrophysics. The images displayed have undergone preprocessing to filter out erroneous data, and a 50% cloud cover mask has been applied. 
+                  For performance optimization, the data resolution has been halved and reprojected to a Web Mercator projection to ensure compatibility with 
+                  <a href="https://leafletjs.com/" target="_blank" rel="noopener noreferrer">Leaflet.js</a>.
+                </p>
+                <br />
+                <p>
+                  The data is rendered using the color map provided by NASA's Scientific Visualization Studio.
+                </p>
+                <br />
+                <p>
+                  All data processing scripts are available on 
+                  <a href="https://github.com/johnarban/tempo_processing_scripts" target="_blank" rel="noopener noreferrer">GitHub</a>.
+                </p>
+              </v-card-text>
+            </v-card>
+          </v-dialog>
+
           <!-- make small inline show introduction link button -->
           <a href="#" @click="inIntro = true" @keyup.enter="inIntro = true" style="right: 0;">
             Show Introduction
@@ -578,7 +701,6 @@ import augustFieldOfRegard from "./assets/august_for.json";
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
 import { _preloadImages } from "./PreloadImages";
 import changes from "./changes";
-
 
 
 type SheetType = "text" | "video" | null;
@@ -869,6 +991,8 @@ export default defineComponent({
       showControls: false,
       showFieldOfRegard: true,
       showCredits: false,
+      showUserGuide: false,
+      showAboutData: false,
       
       loadedImagesProgress: 0,
       useHighRes: false,
@@ -880,7 +1004,8 @@ export default defineComponent({
       cloudTimestamps,
       showClouds: false,
       currentUrl: window.location.href,
-      changes
+      changes,
+      showChanges: false,
     };
   },
 
@@ -1740,6 +1865,16 @@ ul {
     grid-row: 1 / 2;
     gap: 10px;
   }
+  
+  #menu-area {
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+    // border: 1px solid red;
+    display: flex;
+    justify-self: flex-end;
+    gap: 2rem;
+    align-items: center;
+  }
 
   #where {
     display: none;
@@ -2338,5 +2473,14 @@ button:focus-visible,
   .cds-snackbar-alert {
     top: -1rem;
   }
+}
+
+.menu-button, .share-button {
+  outline: 2px solid yellow;
+  border: none;
+}
+
+.menu-link {
+  text-decoration: none;
 }
 </style>

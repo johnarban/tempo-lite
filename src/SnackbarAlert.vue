@@ -21,6 +21,8 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
   name: "SnackbarAlert",
+  
+  emits: ['update:modelValue'],
 
   props: {
     msg: {
@@ -33,31 +35,60 @@ export default defineComponent({
       required: false,
       default: false
     },
+    label: {
+      type: String,
+      required: false,
+      default: "Recent changes"
+    },
+    modelValue: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    hideButton: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
   },
 
   data() {
     return {
       snackbar: false,
-      dialog: false,
     };
   },
   
   methods: {
     openDialog() {
+      if (this.snackbar) return;
+      
       this.snackbar = true;
+      this.$emit('update:modelValue', true);
       this.$nextTick(() => {
         (this.$refs.snackbarMessage as HTMLElement).focus();
       });
     },
     closeDialog() {
       this.snackbar = false;
+      this.$emit('update:modelValue', false);
       // make sure the focus goes back to the right place
       this.$nextTick(() => {
         this.$el.querySelector('#snackbar-activator')?.focus();
         this.$el.querySelector('#snackbar-activator-slot')?.focus();
       });
     },
+  },
+  
+  watch: {
+    modelValue(val: boolean) {
+      if (val) {
+        this.openDialog();
+      } else {
+        this.closeDialog();
+      }
+    }
   }
+
 
 });
 </script>
@@ -65,12 +96,12 @@ export default defineComponent({
 <template>
   <div class="cds-snackbar-alert ma-2" v-if="!hide">
     
-    <slot name="activator" :onClick="openDialog" id="snackbar-activator-slot">
+    <slot v-if="!hideButton" name="activator" :onClick="openDialog" id="snackbar-activator-slot">
       <v-btn @click="openDialog" color="#333" id="snackbar-activator" size="small">
         <template v-slot:prepend>
           <v-icon color="red" icon="mdi-alert-octagram"></v-icon>
         </template>
-        Recent changes
+        {{ label }}
       </v-btn>
     </slot>
     

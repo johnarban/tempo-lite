@@ -547,7 +547,7 @@ import { ref, computed, watch, onMounted, nextTick, Ref } from "vue";
 import  L, { Map } from "leaflet";
 
 import { getTimezoneOffset } from "date-fns-tz";
-import { cbarNO2, cbarNO2ColorsRevised2023 } from "./revised_cmap";
+import { cbarNO2 } from "./revised_cmap";
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
 import { _preloadImages } from "./PreloadImages";
 import { getTimestamps } from "./timestamps";
@@ -565,8 +565,6 @@ const WINDOW_DONTSHOWINTRO = hideIntro ? true : window.localStorage.getItem("don
 const sheet = ref<SheetType>(null);
 const accentColor = ref("#068ede");
 const accentColor2 = ref("#ffd302");
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const buttonColor = ref("#ffffff");
 const introSlide = ref(1);
 const inIntro = ref(!WINDOW_DONTSHOWINTRO);
 const dontShowIntro = ref(WINDOW_DONTSHOWINTRO);
@@ -601,24 +599,7 @@ const showTextSheet = computed({
   }
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const showVideoSheet = computed({
-  get() {
-    return sheet.value === "video";
-  },
-  set(value: boolean) {
-    selectSheet('video');
-    if (!value) {
-      const video = document.querySelector("#info-video") as HTMLVideoElement;
-      video.pause();
-    }
-  }
-});
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function closeSplashScreen() {
-  showSplashScreen.value = false;
-}
 
 function selectSheet(name: SheetType) {
   if (sheet.value === name) {
@@ -646,7 +627,6 @@ watch(dontShowIntro, (val: boolean) => {
 
 
 
-
 const novDecBounds = new LatLngBounds(
   new LatLng(17.025, -154.975),
   new LatLng(63.975, -24.475)
@@ -665,13 +645,6 @@ const newBounds = computed(() => {
     new LatLng(bounds.value[3], bounds.value[2])
   );
 });
-
-
-
-// const map = ref<Map | null>(null);
-// const basemap = ref<L.TileLayer.WMS | null | L.TileLayer>(null);
-
-
 
 
 
@@ -887,11 +860,6 @@ const whichDataSet = computed(() => {
 
 
 
-// watch(imageBounds, (bounds: L.LatLngBounds) => {
-//   console.log(whichDataSet.value, bounds.toBBoxString());
-// });
-
-
 
 
 
@@ -905,11 +873,6 @@ function cbarNO2RGB(x: number): string {
   return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]},1)`;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function cbarNO2ColorsRevised2023RGB(x: number): string {
-  const rgb = cbarNO2ColorsRevised2023(0, 1, x);
-  return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]},1)`;
-}
 
 
 

@@ -544,7 +544,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, nextTick, Ref } from "vue";
-import  { Map } from "leaflet";
+import  L, { Map } from "leaflet";
 
 import { getTimezoneOffset } from "date-fns-tz";
 import { cbarNO2, cbarNO2ColorsRevised2023 } from "./revised_cmap";
@@ -668,8 +668,8 @@ const newBounds = computed(() => {
 
 
 
-const map = ref<Map | null>(null);
-const basemap = ref<L.TileLayer.WMS | null | L.TileLayer>(null);
+// const map = ref<Map | null>(null);
+// const basemap = ref<L.TileLayer.WMS | null | L.TileLayer>(null);
 
 
 
@@ -733,17 +733,25 @@ const imageBounds = computed(() => {
 
 
 const { imageOverlay, cloudOverlay } = useOverlays(imageUrl, cloudUrl, showClouds, opacity, imageBounds);
+import 'leaflet.zoomhome';
 
+
+const { map, initializeMap, addCoastlines } = useMap();
 const { showFieldOfRegard, updateFieldOfRegard, addFieldOfRegard } = useFieldOfRegard(date, map as Ref<Map>);
-
-const initMap = useMap();
 onMounted(() => {
   showSplashScreen.value = false;
-  const zoomHomecallback = () => { sublocationRadio.value = null;};
-  initMap.initializeMap('map', zoomHomecallback);
-  map.value = initMap.map.value;
-  basemap.value = initMap.basemap.value;
-  initMap.addCoastlines();
+  
+  initializeMap('map');
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const zoomHome = L.Control.zoomHome();
+  const originalZH = zoomHome._zoomHome.bind(zoomHome);
+  zoomHome._zoomHome = (_e: Event) => {
+    originalZH();
+    sublocationRadio.value = null;
+  };
+  zoomHome.addTo(map.value);
+  addCoastlines();
   singleDateSelected.value = uniqueDays.value[uniqueDays.value.length - 1];
   imageOverlay.value.setUrl(imageUrl.value).addTo(map.value  as Map);
   cloudOverlay.value.setUrl(cloudUrl.value).addTo(map.value  as Map);

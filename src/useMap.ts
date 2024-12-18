@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import L, { Map } from 'leaflet';
+import 'leaflet.zoomhome';
 
 export function useMap() {
   const map = ref<Map | null>(null);
@@ -20,31 +21,14 @@ export function useMap() {
         }).addTo(map.value as Map);
       });
   }
-
-  function initializeMap(id="map", zoomHomeCallback?: () => void) {
-    map.value = L.map(id, { zoomControl: false }).setView([40.044, -98.789], 4, {
+  
+  function onMapLoad() {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-      crs: L.CRS.EPSG4326
-    });
+    const labelPane = map.value.createPane("labels");
+    labelPane.style.zIndex = "650";
+    labelPane.style.pointerEvents = "none";
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const zoomHome = L.Control.zoomHome();
-    const originalZH = zoomHome._zoomHome.bind(zoomHome);
-    zoomHome._zoomHome = (_e: Event) => {
-      originalZH();
-      if (zoomHomeCallback) {
-        zoomHomeCallback();
-      }
-    };
-    zoomHome.addTo(map.value);
-    
-    if (map.value) {
-      const labelPane = map.value.createPane("labels");
-      labelPane.style.zIndex = "650";
-      labelPane.style.pointerEvents = "none";
-    }
 
     basemap.value = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_lines/{z}/{x}/{y}{r}.png', {
       minZoom: 0,
@@ -60,7 +44,23 @@ export function useMap() {
       pane: 'labels'
     }).addTo(map.value as Map);
   }
+    
 
+  function initializeMap(id="map") {
+    map.value = L.map(id, { zoomControl: false }).setView([40.044, -98.789], 4, {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+      crs: L.CRS.EPSG4326
+    });
+    
+    map.value.whenReady(onMapLoad);
+
+    
+  }
+  
+  // onMounted(() => {
+  //   initializeMap();
+  // });
   
   return {
     map,

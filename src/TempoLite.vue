@@ -254,11 +254,11 @@
           ></location-search>
         </div>
         <colorbar 
-          v-if="$vuetify.display.width > 750"
+          v-if="displayWidth > 750"
           label="Amount of NO2"
           backgroundColor="transparent"
           :nsteps="255"
-          :cmap="cbarNO2"
+          :cmap="cbarNO2RGB"
           start-value="1"
           end-value="150"
           :extend="true"
@@ -548,13 +548,13 @@ import L, { Map } from "leaflet";
 import "leaflet.zoomhome";
 import { getTimezoneOffset } from "date-fns-tz";
 import { cbarNO2, cbarNO2ColorsRevised2023 } from "./revised_cmap";
-import fieldOfRegard from "./assets/TEMPO_FOR.json";
-import augustFieldOfRegard from "./assets/august_for.json";
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
 import { _preloadImages } from "./PreloadImages";
 import { getTimestamps } from "./timestamps";
 import { useDisplay } from 'vuetify';
 import { useTempoFilenames } from "./useTempoFilenames";
+import { SheetType, Timeout, LocationOfInterest, InterestingEvent } from "./types";
+import { useFieldOfRegard } from "./useFieldOfRegard";
 
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -575,7 +575,7 @@ const dontShowIntro = ref(WINDOW_DONTSHOWINTRO);
 
 const touchscreen = ref(false);
 
-const {smAndDown} = useDisplay();
+const {smAndDown, width: displayWidth } = useDisplay();
 const smallSize = computed(() => {
   return smAndDown;
 });
@@ -645,27 +645,6 @@ watch(dontShowIntro, (val: boolean) => {
 });
 
 
-type SheetType = "text" | "video" | null;
-type Timeout = ReturnType<typeof setTimeout>;
-
-
-
-interface LocationOfInterest {
-  latlng: L.LatLngExpression;
-  zoom: number;
-  text: string;
-  description: string;
-  time: string;
-  index?: number;
-}
-
-interface InterestingEvent {
-  date: Date;
-  dateString: string;
-  locations: LocationOfInterest[];
-  label?: string;
-  info?: string;
-}
 
 const erdTimestamps = ref<number[]>([]);
 const newTimestamps = ref<number[]>([]);
@@ -674,30 +653,18 @@ const fosterTimestamps = ref<number[]>([
   1698838920000, 1698841320000, 1698843720000, 1698846120000, 1698848520000, 1698852120000, 1698855720000, 1698859320000, 1698862920000, 1698866520000, 1698870120000, 1698873720000, 1698876120000, 1698878520000, 1698880920000, 1699011720000, 1699014120000, 1699016520000, 1699018920000, 1699021320000, 1699024920000, 1699028520000, 1699032120000, 1699035720000, 1699039320000, 1699042920000, 1699046520000, 1699048920000, 1699051320000, 1699053720000, 1711626180000, 1711628640000, 1711631040000, 1711633440000, 1711637040000, 1711640640000, 1711644240000, 1711647840000, 1711651440000, 1711655040000, 1711658640000, 1711662240000, 1711665840000, 1711668240000,
 ]);
 
-
+import { LatLng, LatLngBounds } from "./types";
 
 const showSplashScreen = ref(new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false");
-const novDecBounds = new L.LatLngBounds(
-  new L.LatLng(17.025, -154.975),
-  new L.LatLng(63.975, -24.475)
+const novDecBounds = new LatLngBounds(
+  new LatLng(17.025, -154.975),
+  new LatLng(63.975, -24.475)
 );
 
-const marchBounds = new L.LatLngBounds(
-  new L.LatLng(14.01, -167.99),
-  new L.LatLng(72.99, -13.01)
+const marchBounds = new LatLngBounds(
+  new LatLng(14.01, -167.99),
+  new LatLng(72.99, -13.01)
 );
-
-const fieldOfRegardLayer = L.geoJSON(
-  fieldOfRegard as GeoJSON.GeometryCollection,
-  {
-    style: {
-      color: "#c10124",
-      fillColor: "transparent",
-      weight: 1,
-      opacity: 0.8,
-    },
-  }
-) as L.Layer;
 
 const opacity = ref(0.9);
 const sheet = ref<SheetType>(null);
@@ -707,7 +674,6 @@ const playInterval = ref<Timeout | null>(null);
 const map = ref<Map | null>(null);
 const basemap = ref<L.TileLayer.WMS | null | L.TileLayer>(null);
 const bounds = ref(marchBounds.toBBoxString().split(",").map(parseFloat));
-const fieldOfRegardLayerRef = ref(fieldOfRegardLayer);
 
 const customImageUrl = ref("");
 
@@ -727,7 +693,6 @@ const searchOpen = ref(true);
 const searchErrorMessage = ref<string | null>(null);
 
 const showControls = ref(false);
-const showFieldOfRegard = ref(true);
 const showCredits = ref(false);
 
 const loadedImagesProgress = ref(0);
@@ -874,7 +839,7 @@ const thumbLabel = computed(() => {
 });
 
 
-
+const { showFieldOfRegard, fieldOfRegardLayerRef, updateFieldOfRegard } = useFieldOfRegard(date, map);
 
 /* HANDLE LOCATION OF INTEREST SELECTION */
 
@@ -1055,15 +1020,6 @@ function pause() {
 }
 
 
-function updateFieldOfRegard() {
-  if (date.value.getUTCFullYear() === 2023 && date.value.getUTCMonth() === 7) {
-    (fieldOfRegardLayerRef.value as L.GeoJSON).clearLayers();
-    (fieldOfRegardLayerRef.value as L.GeoJSON).addData(augustFieldOfRegard as GeoJSON.GeometryCollection);
-  } else {
-    (fieldOfRegardLayerRef.value as L.GeoJSON).clearLayers();
-    (fieldOfRegardLayerRef.value as L.GeoJSON).addData(fieldOfRegard as GeoJSON.GeometryCollection);
-  }
-}
 const preload = ref(true);
 function imagePreload() {
   if (!preload.value) {

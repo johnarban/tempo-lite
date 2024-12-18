@@ -584,7 +584,6 @@ const fosterTimestamps = ref<number[]>([
   1698838920000, 1698841320000, 1698843720000, 1698846120000, 1698848520000, 1698852120000, 1698855720000, 1698859320000, 1698862920000, 1698866520000, 1698870120000, 1698873720000, 1698876120000, 1698878520000, 1698880920000, 1699011720000, 1699014120000, 1699016520000, 1699018920000, 1699021320000, 1699024920000, 1699028520000, 1699032120000, 1699035720000, 1699039320000, 1699042920000, 1699046520000, 1699048920000, 1699051320000, 1699053720000, 1711626180000, 1711628640000, 1711631040000, 1711633440000, 1711637040000, 1711640640000, 1711644240000, 1711647840000, 1711651440000, 1711655040000, 1711658640000, 1711662240000, 1711665840000, 1711668240000,
 ]);
 
-const timestamps = ref<number[]>(fosterTimestamps.value);
 
 const urlParams = new URLSearchParams(window.location.search);
 const hideIntro = urlParams.get("hideintro") === "true";
@@ -617,9 +616,6 @@ const fieldOfRegardLayer = L.geoJSON(
   }
 ) as L.Layer;
 
-import _interestingEvents from "./locationsOfInterest";
-const interestingEvents = ref<InterestingEvent[]>(_interestingEvents as InterestingEvent[]);
-
 const opacity = ref(0.9);
 const sheet = ref<SheetType>(null);
 
@@ -632,8 +628,7 @@ const introSlide = ref(1);
 const inIntro = ref(!WINDOW_DONTSHOWINTRO);
 const dontShowIntro = ref(WINDOW_DONTSHOWINTRO);
 
-const radio = ref<number | null>(null);
-const sublocationRadio = ref<number | null>(null);
+
 
 const touchscreen = ref(false);
 const playInterval = ref<Timeout | null>(null);
@@ -644,17 +639,17 @@ const fieldOfRegardLayerRef = ref(fieldOfRegardLayer);
 
 const customImageUrl = ref("");
 
-const selectedTimezone = ref("US/Eastern");
 
-const timeIndex = ref(0);
-const minIndex = ref(0);
-const maxIndex = ref(timestamps.value.length - 1);
+
+
+
+
 const playing = ref(false);
 const imageOverlay = ref(new L.ImageOverlay("", novDecBounds, {
   opacity: opacity.value,
   interactive: false,
 }));
-const singleDateSelected = ref(new Date());
+
 
 const searchOpen = ref(true);
 const searchErrorMessage = ref<string | null>(null);
@@ -765,6 +760,61 @@ const showVideoSheet = computed({
   }
 });
 
+/* MANAGE TIME AND DATE SELECTION */
+const selectedTimezone = ref("US/Eastern");
+const timeIndex = ref(0);
+const minIndex = ref(0);
+const timestamps = ref<number[]>(fosterTimestamps.value);
+const maxIndex = ref(timestamps.value.length - 1);
+const singleDateSelected = ref(new Date());
+
+
+const uniqueDays = computed(() => {
+  const offset = (date: Date) => getTimezoneOffset("US/Eastern", date);
+  const easternDates = timestamps.value.map(ts => new Date(ts + offset(new Date(ts))));
+  const days = easternDates.map(date => (new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())).getTime());
+  const unique = Array.from(new Set(days));
+  return unique.map(ts => new Date(ts));
+});
+
+
+function getUniqueDayIndex(date: Date): number {
+  return uniqueDays.value.findIndex(day => day.getTime() === date.getTime());
+}
+
+function moveBackwardOneDay() {
+  singleDateSelected.value = uniqueDays.value[getUniqueDayIndex(singleDateSelected.value) - 1];
+}
+
+function moveForwardOneDay() {
+  singleDateSelected.value = uniqueDays.value[getUniqueDayIndex(singleDateSelected.value) + 1];
+}
+
+
+async function updateTimestamps() {
+  return getTimestamps().then((ts) => {
+    erdTimestamps.value = ts.early_release;
+    newTimestamps.value = ts.released;
+    timestamps.value = timestamps.value.concat(erdTimestamps.value, newTimestamps.value).sort();
+    cloudTimestamps.value = ts.clouds;
+  });
+}
+
+// runs only once
+watch(timestamps, () => {
+  singleDateSelected.value = uniqueDays.value[uniqueDays.value.length - 1];
+});
+
+// only get's changed directly with the radio button or forward/backward buttons
+watch(singleDateSelected, (value: Date) => {
+  const timestamp = value.getTime();
+  setNearestDate(timestamp);
+  const index = datesOfInterest.value.map(d => d.getTime()).indexOf(timestamp);
+  radio.value = index < 0 ? null : index;
+});
+
+
+// The timestamp of the currently selected date
 const timestamp = computed(() => {
   return timestamps.value[timeIndex.value];
 });
@@ -773,27 +823,9 @@ const date = computed(() => {
   return new Date(timestamp.value);
 });
 
-const datesOfInterest = computed(() => {
-  return interestingEvents.value.map(event => event.date);
-});
 
 const dateStrings = computed(() => {
   return interestingEvents.value.map(event => event.dateString);
-});
-
-const locationsOfInterest = computed(() => {
-  return interestingEvents.value.map(event =>
-    event.locations.map(loc => ({
-      ...loc,
-      index: nearestDateIndex(new Date(loc.time)),
-    }))
-  );
-});
-
-const locationsOfInterestText = computed(() => {
-  return interestingEvents.value.map(event =>
-    event.locations.map(loc => loc.description)
-  );
 });
 
 const dateIsDST = computed(() => {
@@ -829,6 +861,65 @@ const thumbLabel = computed(() => {
   return `${date.value.getUTCMonth() + 1}/${dateWithOffset.getUTCDate()}/${dateWithOffset.getUTCFullYear()} ${hourValue}:${dateWithOffset.getUTCMinutes().toString().padStart(2, '0')} ${amPm}`;
 });
 
+
+
+
+/* HANDLE LOCATION OF INTEREST SELECTION */
+
+const radio = ref<number | null>(null);
+const sublocationRadio = ref<number | null>(null);
+
+import _interestingEvents from "./locationsOfInterest";
+const interestingEvents = ref<InterestingEvent[]>(_interestingEvents as InterestingEvent[]);
+
+const datesOfInterest = computed(() => {
+  return interestingEvents.value.map(event => event.date);
+});
+
+const locationsOfInterest = computed(() => {
+  return interestingEvents.value.map(event =>
+    event.locations.map(loc => ({
+      ...loc,
+      index: nearestDateIndex(new Date(loc.time)),
+    }))
+  );
+});
+
+const locationsOfInterestText = computed(() => {
+  return interestingEvents.value.map(event =>
+    event.locations.map(loc => loc.description)
+  );
+});
+
+
+watch(radio, (value: number | null) => {
+  if (value == null) {
+    setNearestDate(singleDateSelected.value.getTime());
+    sublocationRadio.value = null;
+    return;
+  }
+  const date = datesOfInterest.value[value] ?? singleDateSelected.value;
+  singleDateSelected.value = date;
+  setNearestDate(date.getTime());
+  sublocationRadio.value = null;
+});
+
+watch(sublocationRadio, (value: number | null) => {
+  if (value !== null && radio.value != null) {
+    const loi = locationsOfInterest.value[radio.value][value];
+    map.value?.setView(loi.latlng, loi.zoom);
+    if (loi.index !== undefined) {
+      timeIndex.value = loi.index;
+    } else {
+      console.warn('No index found for location of interest');
+    }
+  }
+});
+
+
+/* HANDLE IMAGE AND CLOUD DATA OVERLAYS */
+
+
 const imageName = computed(() => {
   return getTempoFilename(date.value);
 });
@@ -841,16 +932,14 @@ const imageUrl = computed(() => {
   return url + imageName.value;
 });
 
-const cloudUrl = computed(() => {
-  if (!showClouds.value) {
-    return '';
-  }
-
-  if (cloudTimestamps.value.includes(timestamp.value)) {
-    return getCloudFilename(date.value);
-  }
-  return '';
+watch(imageUrl, (url: string) => {
+  updateBounds();
+  imageOverlay.value.setUrl(url);
+  updateFieldOfRegard();
 });
+
+const cloudUrl = computed(() =>  (showClouds.value && cloudTimestamps.value.includes(timestamp.value)) ? getCloudFilename(date.value) : '');
+watch(cloudUrl, cloudOverlay.value.setUrl);
 
 const cloudDataAvailable = computed(() => {
   return cloudTimestamps.value.includes(timestamp.value);
@@ -860,17 +949,49 @@ const whichDataSet = computed(() => {
   if (fosterTimestamps.value.includes(timestamp.value)) {
     return 'TEMPO-lite';
   }
-
   if (erdTimestamps.value.includes(timestamp.value)) {
     return 'Early Release (V01)';
   }
-
   if (newTimestamps.value.includes(timestamp.value)) {
     return 'Level 3 (V03)';
   }
-
   return 'Unknown';
 });
+
+
+
+
+function getCloudFilename(date: Date): string {
+  const filename = getTempoFilename(date);
+  if (useHighRes.value) {
+    return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/' + filename;
+  } else {
+    return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/resized_images/' + filename;
+  }
+}
+
+function getTempoFilename(date: Date): string {
+  return `tempo_${date.getUTCFullYear()}-${zpad(date.getUTCMonth() + 1)}-${zpad(date.getUTCDate())}T${zpad(date.getUTCHours())}h${zpad(date.getUTCMinutes())}m.png`;
+}
+
+function getTempoDataUrl(timestamp: number): string {
+  if (fosterTimestamps.value.includes(timestamp)) {
+    return 'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/';
+  }
+
+  if (erdTimestamps.value.includes(timestamp)) {
+    return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/early_release/images/';
+  }
+
+  if (newTimestamps.value.includes(timestamp)) {
+    if (useHighRes.value) {
+      return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/released/images/';
+    }
+    return "https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/released/images/resized_images/";
+  }
+
+  return '';
+}
 
 const newBounds = computed(() => {
   return new L.LatLngBounds(
@@ -878,6 +999,7 @@ const newBounds = computed(() => {
     new L.LatLng(bounds.value[3], bounds.value[2])
   );
 });
+
 
 const imageBounds = computed(() => {
   if (date.value.getUTCFullYear() === 2023) {
@@ -889,13 +1011,23 @@ const imageBounds = computed(() => {
   }
 });
 
-const uniqueDays = computed(() => {
-  const offset = (date: Date) => getTimezoneOffset("US/Eastern", date);
-  const easternDates = timestamps.value.map(ts => new Date(ts + offset(new Date(ts))));
-  const days = easternDates.map(date => (new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())).getTime());
-  const unique = Array.from(new Set(days));
-  return unique.map(ts => new Date(ts));
+function updateBounds() {
+  imageOverlay.value.setBounds(imageBounds.value);
+  cloudOverlay.value.setBounds(imageBounds.value);
+}
+
+watch(imageBounds, (bounds: L.LatLngBounds) => {
+  console.log(whichDataSet.value, bounds.toBBoxString());
 });
+
+
+
+
+watch(opacity, (value: number) => {
+  imageOverlay.value.setOpacity(value);
+  cloudOverlay.value.setOpacity(value);
+});
+
 
 const highresAvailable = computed(() => {
   return newTimestamps.value.includes(timestamp.value);
@@ -981,52 +1113,6 @@ function pause() {
   }
 }
 
-function updateBounds() {
-  imageOverlay.value.setBounds(imageBounds.value);
-  cloudOverlay.value.setBounds(imageBounds.value);
-}
-
-async function updateTimestamps() {
-  return getTimestamps().then((ts) => {
-    erdTimestamps.value = ts.early_release;
-    newTimestamps.value = ts.released;
-    timestamps.value = timestamps.value.concat(erdTimestamps.value, newTimestamps.value).sort();
-    cloudTimestamps.value = ts.clouds;
-  });
-}
-
-function getCloudFilename(date: Date): string {
-  const filename = getTempoFilename(date);
-  if (useHighRes.value) {
-    return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/' + filename;
-  } else {
-    return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/resized_images/' + filename;
-  }
-}
-
-function getTempoFilename(date: Date): string {
-  return `tempo_${date.getUTCFullYear()}-${zpad(date.getUTCMonth() + 1)}-${zpad(date.getUTCDate())}T${zpad(date.getUTCHours())}h${zpad(date.getUTCMinutes())}m.png`;
-}
-
-function getTempoDataUrl(timestamp: number): string {
-  if (fosterTimestamps.value.includes(timestamp)) {
-    return 'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/';
-  }
-
-  if (erdTimestamps.value.includes(timestamp)) {
-    return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/early_release/images/';
-  }
-
-  if (newTimestamps.value.includes(timestamp)) {
-    if (useHighRes.value) {
-      return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/released/images/';
-    }
-    return "https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/released/images/resized_images/";
-  }
-
-  return '';
-}
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function nearestDate(date: Date): number {
   const onedayinms = 1000 * 60 * 60 * 24;
@@ -1094,17 +1180,7 @@ function imagePreload() {
   });
 }
 
-function getUniqueDayIndex(date: Date): number {
-  return uniqueDays.value.findIndex(day => day.getTime() === date.getTime());
-}
 
-function moveBackwardOneDay() {
-  singleDateSelected.value = uniqueDays.value[getUniqueDayIndex(singleDateSelected.value) - 1];
-}
-
-function moveForwardOneDay() {
-  singleDateSelected.value = uniqueDays.value[getUniqueDayIndex(singleDateSelected.value) + 1];
-}
 
 watch(introSlide, (val: number) => {
   inIntro.value = val < 4;
@@ -1137,23 +1213,12 @@ watch(playing, (playVal: boolean) => {
   }
 });
 
-watch(imageUrl, (url: string) => {
-  updateBounds();
-  imageOverlay.value.setUrl(url);
-  updateFieldOfRegard();
-});
-
-watch(cloudUrl, (url: string) => {
-  cloudOverlay.value.setUrl(url);
-});
 
 watch(useHighRes, () => {
   imagePreload();
 });
 
-watch(imageBounds, (bounds: L.LatLngBounds) => {
-  console.log(whichDataSet.value, bounds.toBBoxString());
-});
+
 
 watch(showFieldOfRegard, (show: boolean) => {
   if (show) {
@@ -1163,45 +1228,7 @@ watch(showFieldOfRegard, (show: boolean) => {
   }
 });
 
-watch(timestamps, () => {
-  singleDateSelected.value = uniqueDays.value[uniqueDays.value.length - 1];
-});
 
-watch(radio, (value: number | null) => {
-  if (value == null) {
-    setNearestDate(singleDateSelected.value.getTime());
-    sublocationRadio.value = null;
-    return;
-  }
-  const date = datesOfInterest.value[value] ?? singleDateSelected.value;
-  singleDateSelected.value = date;
-  setNearestDate(date.getTime());
-  sublocationRadio.value = null;
-});
-
-watch(singleDateSelected, (value: Date) => {
-  const timestamp = value.getTime();
-  setNearestDate(timestamp);
-  const index = datesOfInterest.value.map(d => d.getTime()).indexOf(timestamp);
-  radio.value = index < 0 ? null : index;
-});
-
-watch(sublocationRadio, (value: number | null) => {
-  if (value !== null && radio.value != null) {
-    const loi = locationsOfInterest.value[radio.value][value];
-    map.value?.setView(loi.latlng, loi.zoom);
-    if (loi.index !== undefined) {
-      timeIndex.value = loi.index;
-    } else {
-      console.warn('No index found for location of interest');
-    }
-  }
-});
-
-watch(opacity, (value: number) => {
-  imageOverlay.value.setOpacity(value);
-  cloudOverlay.value.setOpacity(value);
-});
 </script>
 
 <style lang="less">

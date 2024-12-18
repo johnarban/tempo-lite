@@ -247,7 +247,7 @@
             :search-provider="geocodingInfoForSearchLimited"
             @set-location="(feature: MapBoxFeature) => {
               if (feature !== null) {
-                map?.setView([feature.center[1], feature.center[0]], 12);
+                setView([feature.center[1], feature.center[0]], 12);
               }
             }"
             @error="(error: string) => searchErrorMessage = error"
@@ -709,7 +709,7 @@ const { imageOverlay, cloudOverlay } = useOverlays(imageUrl, cloudUrl, showCloud
 import 'leaflet.zoomhome';
 
 
-const { map, initializeMap, addCoastlines } = useMap();
+const { map, initializeMap, addCoastlines, setView } = useMap();
 const { showFieldOfRegard, updateFieldOfRegard, addFieldOfRegard } = useFieldOfRegard(date, map as Ref<Map>);
 onMounted(() => {
   showSplashScreen.value = false;
@@ -829,7 +829,7 @@ watch(radio, (value: number | null) => {
 watch(sublocationRadio, (value: number | null) => {
   if (value !== null && radio.value != null) {
     const loi = locationsOfInterest.value[radio.value][value];
-    map.value?.setView(loi.latlng, loi.zoom);
+    setView(loi.latlng, loi.zoom);
     if (loi.index !== undefined) {
       timeIndex.value = loi.index;
     } else {
@@ -885,7 +885,7 @@ async function geocodingInfoForSearchLimited(searchText: string): Promise<MapBox
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function resetMapBounds() {
-  map.value?.setView([40.044, -98.789], 4);
+  setView([40.044, -98.789], 4);
 }
 
 const playing = ref(false);

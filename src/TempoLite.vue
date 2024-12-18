@@ -543,47 +543,46 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, nextTick } from "vue";
-import L, { Map } from "leaflet";
-import "leaflet.zoomhome";
+import { ref, computed, watch, onMounted, nextTick, Ref } from "vue";
+import  { Map } from "leaflet";
+
 import { getTimezoneOffset } from "date-fns-tz";
 import { cbarNO2, cbarNO2ColorsRevised2023 } from "./revised_cmap";
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
 import { _preloadImages } from "./PreloadImages";
 import { getTimestamps } from "./timestamps";
+import { SheetType, Timeout, InterestingEvent, LatLng, LatLngBounds } from "./types";
 import { useDisplay } from 'vuetify';
 import { useTempoFilenames } from "./useTempoFilenames";
-import { SheetType, Timeout, LocationOfInterest, InterestingEvent } from "./types";
 import { useFieldOfRegard } from "./useFieldOfRegard";
-
+import { useOverlays } from "./useOverlays";
+import { useMap } from "./useMap";
 
 const urlParams = new URLSearchParams(window.location.search);
 const hideIntro = urlParams.get("hideintro") === "true";
 const WINDOW_DONTSHOWINTRO = hideIntro ? true : window.localStorage.getItem("dontShowIntro") === 'true';
 
-
+const sheet = ref<SheetType>(null);
 const accentColor = ref("#068ede");
 const accentColor2 = ref("#ffd302");
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const buttonColor = ref("#ffffff");
 const introSlide = ref(1);
-
 const inIntro = ref(!WINDOW_DONTSHOWINTRO);
 const dontShowIntro = ref(WINDOW_DONTSHOWINTRO);
-
-
-
 const touchscreen = ref(false);
-
 const {smAndDown, width: displayWidth } = useDisplay();
-const smallSize = computed(() => {
-  return smAndDown;
-});
-
+const smallSize = computed(() =>  smAndDown);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const mobile = computed(() => {
-  return smallSize.value && touchscreen.value;
-});
+const mobile = computed(() => { return smallSize.value && touchscreen.value; });
+const showSplashScreen = ref(new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false");
+touchscreen.value = ('ontouchstart' in window) || ('ontouchstart' in document.documentElement) || !!window.navigator.msPointerEnabled;
+const searchOpen = ref(true);
+const searchErrorMessage = ref<string | null>(null);
+const showControls = ref(false);
+const showCredits = ref(false);
+const customImageUrl = ref("");
+
 
 const cssVars = computed(() => {
   return {
@@ -632,7 +631,6 @@ function selectSheet(name: SheetType) {
   }
 }
 
-
 watch(introSlide, (val: number) => {
   inIntro.value = val < 4;
 });
@@ -646,16 +644,9 @@ watch(dontShowIntro, (val: boolean) => {
 
 
 
-const erdTimestamps = ref<number[]>([]);
-const newTimestamps = ref<number[]>([]);
-const cloudTimestamps = ref<number[]>([]);
-const fosterTimestamps = ref<number[]>([
-  1698838920000, 1698841320000, 1698843720000, 1698846120000, 1698848520000, 1698852120000, 1698855720000, 1698859320000, 1698862920000, 1698866520000, 1698870120000, 1698873720000, 1698876120000, 1698878520000, 1698880920000, 1699011720000, 1699014120000, 1699016520000, 1699018920000, 1699021320000, 1699024920000, 1699028520000, 1699032120000, 1699035720000, 1699039320000, 1699042920000, 1699046520000, 1699048920000, 1699051320000, 1699053720000, 1711626180000, 1711628640000, 1711631040000, 1711633440000, 1711637040000, 1711640640000, 1711644240000, 1711647840000, 1711651440000, 1711655040000, 1711658640000, 1711662240000, 1711665840000, 1711668240000,
-]);
 
-import { LatLng, LatLngBounds } from "./types";
 
-const showSplashScreen = ref(new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false");
+
 const novDecBounds = new LatLngBounds(
   new LatLng(17.025, -154.975),
   new LatLng(63.975, -24.475)
@@ -666,113 +657,35 @@ const marchBounds = new LatLngBounds(
   new LatLng(72.99, -13.01)
 );
 
-const opacity = ref(0.9);
-const sheet = ref<SheetType>(null);
-
-
-const playInterval = ref<Timeout | null>(null);
-const map = ref<Map | null>(null);
-const basemap = ref<L.TileLayer.WMS | null | L.TileLayer>(null);
 const bounds = ref(marchBounds.toBBoxString().split(",").map(parseFloat));
 
-const customImageUrl = ref("");
-
-
-
-
-
-
-const playing = ref(false);
-const imageOverlay = ref(new L.ImageOverlay("", novDecBounds, {
-  opacity: opacity.value,
-  interactive: false,
-}));
-
-
-const searchOpen = ref(true);
-const searchErrorMessage = ref<string | null>(null);
-
-const showControls = ref(false);
-const showCredits = ref(false);
-
-const loadedImagesProgress = ref(0);
-const useHighRes = ref(false);
-
-const cloudOverlay = ref(new L.ImageOverlay("", novDecBounds, {
-  opacity: opacity.value,
-  interactive: false,
-}));
-const showClouds = ref(false);
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-touchscreen.value = ('ontouchstart' in window) || ('ontouchstart' in document.documentElement) || !!window.navigator.msPointerEnabled;
-updateTimestamps();
-
-
-onMounted(() => {
-  showSplashScreen.value = false;
-  map.value = L.map("map", { zoomControl: false }).setView([40.044, -98.789], 4, {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    crs: L.CRS.EPSG4326
-  });
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const zoomHome = L.Control.zoomHome();
-  const originalZH = zoomHome._zoomHome.bind(zoomHome);
-  zoomHome._zoomHome = (_e: Event) => {
-    originalZH();
-    sublocationRadio.value = null;
-  };
-  zoomHome.addTo(map.value);
-  addCoastlines();
-
-  const labelPane = map.value.createPane("labels");
-  labelPane.style.zIndex = "650";
-  labelPane.style.pointerEvents = "none";
-
-  basemap.value = L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_lines/{z}/{x}/{y}{r}.png', {
-    minZoom: 0,
-    maxZoom: 20,
-    attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    pane: 'labels'
-  }).addTo(map.value  as Map);
-
-  L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_labels/{z}/{x}/{y}{r}.png', {
-    minZoom: 0,
-    maxZoom: 20,
-    attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    pane: 'labels'
-  }).addTo(map.value as Map);
-
-  singleDateSelected.value = uniqueDays.value[uniqueDays.value.length - 1];
-  imageOverlay.value.setUrl(imageUrl.value).addTo(map.value  as Map);
-  cloudOverlay.value.setUrl(cloudUrl.value).addTo(map.value  as Map);
-
-  updateFieldOfRegard();
-  if (showFieldOfRegard.value) {
-    fieldOfRegardLayerRef.value.addTo(map.value  as Map);
-  }
+const newBounds = computed(() => {
+  return new LatLngBounds(
+    new LatLng(bounds.value[1], bounds.value[0]),
+    new LatLng(bounds.value[3], bounds.value[2])
+  );
 });
 
-/* MANAGE TIME AND DATE SELECTION */
-
-import { useUniqueTimeSelection } from "./useUniqueTimeSelection";
-const timestamps = ref<number[]>(fosterTimestamps.value);
-const selectedTimezone = ref("US/Eastern");
-const { timeIndex,
-  timestamp,
-  singleDateSelected,
-  maxIndex,
-  minIndex,
-  uniqueDays,
-  setNearestDate,
-  moveBackwardOneDay,
-  moveForwardOneDay,
-  nearestDateIndex } = useUniqueTimeSelection(timestamps);
 
 
+const map = ref<Map | null>(null);
+const basemap = ref<L.TileLayer.WMS | null | L.TileLayer>(null);
+
+
+
+
+
+
+const useHighRes = ref(false);
+const showClouds = ref(false);
+const opacity = ref(0.9);
+
+const erdTimestamps = ref<number[]>([]);
+const newTimestamps = ref<number[]>([]);
+const cloudTimestamps = ref<number[]>([]);
+const fosterTimestamps = ref<number[]>([
+  1698838920000, 1698841320000, 1698843720000, 1698846120000, 1698848520000, 1698852120000, 1698855720000, 1698859320000, 1698862920000, 1698866520000, 1698870120000, 1698873720000, 1698876120000, 1698878520000, 1698880920000, 1699011720000, 1699014120000, 1699016520000, 1699018920000, 1699021320000, 1699024920000, 1699028520000, 1699032120000, 1699035720000, 1699039320000, 1699042920000, 1699046520000, 1699048920000, 1699051320000, 1699053720000, 1711626180000, 1711628640000, 1711631040000, 1711633440000, 1711637040000, 1711640640000, 1711644240000, 1711647840000, 1711651440000, 1711655040000, 1711658640000, 1711662240000, 1711665840000, 1711668240000,
+]);
 
 async function updateTimestamps() {
   return getTimestamps().then((ts) => {
@@ -782,6 +695,65 @@ async function updateTimestamps() {
     cloudTimestamps.value = ts.clouds;
   });
 }
+
+updateTimestamps();
+
+import { useUniqueTimeSelection } from "./useUniqueTimeSelection";
+const timestamps = ref<number[]>(fosterTimestamps.value);
+const { 
+  timeIndex,
+  timestamp,
+  date,
+  singleDateSelected,
+  maxIndex,
+  minIndex,
+  uniqueDays,
+  setNearestDate,
+  moveBackwardOneDay,
+  moveForwardOneDay,
+  nearestDateIndex } = useUniqueTimeSelection(timestamps);
+
+const cloudDataAvailable = computed(() => {
+  return cloudTimestamps.value.includes(timestamp.value);
+});
+
+const { imageUrl, cloudUrl, getCloudFilename, getTempoDataUrl, getTempoFilename } = useTempoFilenames(timestamp, customImageUrl, useHighRes, fosterTimestamps, erdTimestamps, newTimestamps, cloudTimestamps);
+
+
+const imageBounds = computed(() => {
+  if (date.value.getUTCFullYear() === 2023) {
+    return novDecBounds;
+  } else if (date.value.getUTCFullYear() === 2024 && date.value.getUTCMonth() === 2) {
+    return marchBounds;
+  } else {
+    return newBounds.value;
+  }
+});
+
+
+
+const { imageOverlay, cloudOverlay } = useOverlays(imageUrl, cloudUrl, showClouds, opacity, imageBounds);
+
+const { showFieldOfRegard, updateFieldOfRegard, addFieldOfRegard } = useFieldOfRegard(date, map as Ref<Map>);
+
+const initMap = useMap();
+// const { addCoastlines } = initMap;
+onMounted(() => {
+  showSplashScreen.value = false;
+  const zoomHomecallback = () => { sublocationRadio.value = null;};
+  initMap.initializeMap('map', zoomHomecallback);
+  map.value = initMap.map.value;
+  basemap.value = initMap.basemap.value;
+  // addCoastlines();
+  singleDateSelected.value = uniqueDays.value[uniqueDays.value.length - 1];
+  imageOverlay.value.setUrl(imageUrl.value).addTo(map.value  as Map);
+  cloudOverlay.value.setUrl(cloudUrl.value).addTo(map.value  as Map);
+  updateFieldOfRegard();
+  addFieldOfRegard();
+});
+
+
+
 
 
 // only get's changed directly with the radio button or forward/backward buttons
@@ -794,17 +766,11 @@ watch(singleDateSelected, (value: Date) => {
 });
 
 
-// The timestamp of the currently selected date
-
-const date = computed(() => {
-  return new Date(timestamp.value);
-});
-
-
 const dateStrings = computed(() => {
   return interestingEvents.value.map(event => event.dateString);
 });
 
+const selectedTimezone = ref("US/Eastern");
 const dateIsDST = computed(() => {
   const standardOffset = getTimezoneOffset(selectedTimezone.value, new Date(date.value.getUTCFullYear(), 0, 1));
   const currentOffset = getTimezoneOffset(selectedTimezone.value, date.value);
@@ -839,7 +805,6 @@ const thumbLabel = computed(() => {
 });
 
 
-const { showFieldOfRegard, fieldOfRegardLayerRef, updateFieldOfRegard } = useFieldOfRegard(date, map);
 
 /* HANDLE LOCATION OF INTEREST SELECTION */
 
@@ -897,24 +862,9 @@ watch(sublocationRadio, (value: number | null) => {
 /* HANDLE IMAGE AND CLOUD DATA OVERLAYS */
 
 
-const { imageUrl, cloudUrl, getCloudFilename, getTempoDataUrl, getTempoFilename } = useTempoFilenames(timestamp, customImageUrl, useHighRes, fosterTimestamps, erdTimestamps, newTimestamps, cloudTimestamps);
-
-
-watch(imageUrl, (url: string) => {
-  updateBounds();
-  imageOverlay.value.setUrl(url);
-  updateFieldOfRegard();
-});
-
-watch([cloudUrl, showClouds], ([url, show]) => {
-  cloudOverlay.value.setUrl(show ? url : '');
-});
-
-const cloudDataAvailable = computed(() => {
-  return cloudTimestamps.value.includes(timestamp.value);
-});
 
 // convenience function only for debugging
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const whichDataSet = computed(() => {
   if (fosterTimestamps.value.includes(timestamp.value)) {
     return 'TEMPO-lite';
@@ -929,40 +879,13 @@ const whichDataSet = computed(() => {
 });
 
 
-const newBounds = computed(() => {
-  return new L.LatLngBounds(
-    new L.LatLng(bounds.value[1], bounds.value[0]),
-    new L.LatLng(bounds.value[3], bounds.value[2])
-  );
-});
 
-
-const imageBounds = computed(() => {
-  if (date.value.getUTCFullYear() === 2023) {
-    return novDecBounds;
-  } else if (date.value.getUTCFullYear() === 2024 && date.value.getUTCMonth() === 2) {
-    return marchBounds;
-  } else {
-    return newBounds.value;
-  }
-});
-
-function updateBounds() {
-  imageOverlay.value.setBounds(imageBounds.value);
-  cloudOverlay.value.setBounds(imageBounds.value);
-}
-
-watch(imageBounds, (bounds: L.LatLngBounds) => {
-  console.log(whichDataSet.value, bounds.toBBoxString());
-});
+// watch(imageBounds, (bounds: L.LatLngBounds) => {
+//   console.log(whichDataSet.value, bounds.toBBoxString());
+// });
 
 
 
-
-watch(opacity, (value: number) => {
-  imageOverlay.value.setOpacity(value);
-  cloudOverlay.value.setOpacity(value);
-});
 
 
 const highresAvailable = computed(() => {
@@ -981,15 +904,7 @@ function cbarNO2ColorsRevised2023RGB(x: number): string {
   return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]},1)`;
 }
 
-function addCoastlines() {
-  fetch("coastlines.geojson")
-    .then(response => response.json())
-    .then(data => {
-      L.geoJson(data, {
-        style: { color: "black", weight: 1, opacity: 0.8 }
-      }).addTo(map.value as Map);
-    });
-}
+
 
 async function geocodingInfoForSearchLimited(searchText: string): Promise<MapBoxFeatureCollection | null> {
   return geocodingInfoForSearch(searchText, {
@@ -1002,6 +917,9 @@ async function geocodingInfoForSearchLimited(searchText: string): Promise<MapBox
 function resetMapBounds() {
   map.value?.setView([40.044, -98.789], 4);
 }
+
+const playing = ref(false);
+const playInterval = ref<Timeout | null>(null);
 
 function play() {
   playInterval.value = setInterval(() => {
@@ -1019,8 +937,17 @@ function pause() {
   }
 }
 
+watch(playing, (playVal: boolean) => {
+  if (playVal) {
+    play();
+  } else {
+    pause();
+  }
+});
+
 
 const preload = ref(true);
+const loadedImagesProgress = ref(0);
 function imagePreload() {
   if (!preload.value) {
     return;
@@ -1043,17 +970,6 @@ function imagePreload() {
   });
 }
 
-
-
-function blurActiveElement() {
-  const active = document.activeElement;
-  if (active instanceof HTMLElement) {
-    active.blur();
-  }
-}
-
-
-
 watch(loadedImagesProgress, (val: number) => {
   playing.value = false;
   const btn = document.querySelector('#play-pause-button');
@@ -1066,13 +982,13 @@ watch(loadedImagesProgress, (val: number) => {
   }
 });
 
-watch(playing, (playVal: boolean) => {
-  if (playVal) {
-    play();
-  } else {
-    pause();
+
+function blurActiveElement() {
+  const active = document.activeElement;
+  if (active instanceof HTMLElement) {
+    active.blur();
   }
-});
+}
 
 
 watch(useHighRes, () => {
@@ -1080,14 +996,6 @@ watch(useHighRes, () => {
 });
 
 
-
-watch(showFieldOfRegard, (show: boolean) => {
-  if (show) {
-    fieldOfRegardLayerRef.value.addTo(map.value as Map);
-  } else if (map.value) {
-    map.value.removeLayer(fieldOfRegardLayerRef.value as L.Layer);
-  }
-});
 
 
 </script>

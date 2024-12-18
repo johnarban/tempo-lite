@@ -39,10 +39,19 @@ export function useFieldOfRegard(date: Ref<Date>, map: Ref<L.Map | null>) {
   });
 
   watch(date, updateFieldOfRegard);
+  
+  function addFieldOfRegard() {
+    if (showFieldOfRegard.value && map.value) {
+      fieldOfRegardLayerRef.value.addTo(map.value);
+    }
+  }
+  
+  
 
   return {
     showFieldOfRegard,
     fieldOfRegardLayerRef,
     updateFieldOfRegard,
+    addFieldOfRegard,
   };
 }

@@ -7,6 +7,7 @@ function isBad(value: unknown): value is null | undefined {
   return value === null || value === undefined;
 }
 
+
 export const useUniqueTimeSelection = (timestamps: Ref<number[]>) => {
   const timeIndex = ref(0);
   const singleDateSelected = ref<Date>(new Date());
@@ -52,6 +53,9 @@ export const useUniqueTimeSelection = (timestamps: Ref<number[]>) => {
     return val;
   });
   
+  const date = computed(() => {
+    return new Date(timestamp.value);
+  });
   
   
   function getUniqueDayIndex(date: Date | null | undefined): number {
@@ -98,6 +102,7 @@ export const useUniqueTimeSelection = (timestamps: Ref<number[]>) => {
   return {
     timeIndex,
     timestamp,
+    date,
     singleDateSelected,
     maxIndex,
     minIndex,

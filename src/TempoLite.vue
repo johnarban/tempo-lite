@@ -585,7 +585,7 @@ import { useTempoFilenames } from "./useTempoFilenames";
 import { useFieldOfRegard } from "./useFieldOfRegard";
 import { useOverlays } from "./useOverlays";
 import { useMap } from "./useMap";
-
+import { useSyncedValues } from "./useSyncedValues";
 
 const urlParams = new URLSearchParams(window.location.search);
 const hideIntro = urlParams.get("hideintro") === "true";
@@ -746,8 +746,11 @@ import 'leaflet.zoomhome';
 
 import { no2Url, useEsriLayer} from './useEsriLayer';
 
-const { esriImageLayer, noEsriData, getEsriTimeSteps } = useEsriLayer(no2Url, timestamp, opacity);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { esriImageLayer, noEsriData, esriOpacity, esriTimesteps, getEsriTimeSteps } = useEsriLayer(no2Url, timestamp, opacity);
 getEsriTimeSteps();
+useSyncedValues(opacity, esriOpacity, singleOpacity);
+
 
 const { map, initializeMap, addCoastlines, setView } = useMap();
 const { showFieldOfRegard, updateFieldOfRegard, addFieldOfRegard } = useFieldOfRegard(date, map as Ref<Map>);

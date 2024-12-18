@@ -80,8 +80,7 @@ export function useEsriLayer(url: Ref<string>, timestamp: Ref<number>, opacity: 
     updateEsriTimeRange();
   });
 
-  watch(opacity, (value: number) => {
-    esriOpacity.value = value;
+  watch(esriOpacity, (_value: number) => {
     updateEsriOpacity();
   });
 
@@ -98,6 +97,7 @@ export function useEsriLayer(url: Ref<string>, timestamp: Ref<number>, opacity: 
     esriImageLayer,
     esriOpacity,
     noEsriData,
+    esriTimesteps,
     getEsriTimeSteps,
     updateEsriTimeRange,
     updateEsriOpacity,

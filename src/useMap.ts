@@ -11,7 +11,7 @@ export function useMap() {
     }
   }
   
-  function addCoastlines() {
+  async function addCoastlines() {
     fetch("coastlines.geojson")
       .then(response => response.json())
       .then(data => {

@@ -737,14 +737,13 @@ const { imageOverlay, cloudOverlay } = useOverlays(imageUrl, cloudUrl, showCloud
 const { showFieldOfRegard, updateFieldOfRegard, addFieldOfRegard } = useFieldOfRegard(date, map as Ref<Map>);
 
 const initMap = useMap();
-// const { addCoastlines } = initMap;
 onMounted(() => {
   showSplashScreen.value = false;
   const zoomHomecallback = () => { sublocationRadio.value = null;};
   initMap.initializeMap('map', zoomHomecallback);
   map.value = initMap.map.value;
   basemap.value = initMap.basemap.value;
-  // addCoastlines();
+  initMap.addCoastlines();
   singleDateSelected.value = uniqueDays.value[uniqueDays.value.length - 1];
   imageOverlay.value.setUrl(imageUrl.value).addTo(map.value  as Map);
   cloudOverlay.value.setUrl(cloudUrl.value).addTo(map.value  as Map);

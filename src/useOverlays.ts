@@ -37,9 +37,15 @@ export function useOverlays(
     imageOverlay.value.setBounds(bounds);
     cloudOverlay.value.setBounds(bounds);
   });
+  
+  function addOverlays(map: L.Map) {
+    imageOverlay.value.addTo(map);
+    cloudOverlay.value.addTo(map);
+  }
 
   return {
     imageOverlay,
-    cloudOverlay
+    cloudOverlay,
+    addOverlays,
   };
 }

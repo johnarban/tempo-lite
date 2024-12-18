@@ -1,4 +1,4 @@
-import L, { extend } from "leaflet";
+import L from "leaflet";
 
 export type SheetType = "text" | "video" | null;
 export type Timeout = ReturnType<typeof setTimeout>;

@@ -554,6 +554,96 @@ import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "
 import { _preloadImages } from "./PreloadImages";
 import { getTimestamps } from "./timestamps";
 import { useDisplay } from 'vuetify';
+import { useTempoFilenames } from "./useTempoFilenames";
+
+
+const urlParams = new URLSearchParams(window.location.search);
+const hideIntro = urlParams.get("hideintro") === "true";
+const WINDOW_DONTSHOWINTRO = hideIntro ? true : window.localStorage.getItem("dontShowIntro") === 'true';
+
+
+const accentColor = ref("#068ede");
+const accentColor2 = ref("#ffd302");
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const buttonColor = ref("#ffffff");
+const introSlide = ref(1);
+
+const inIntro = ref(!WINDOW_DONTSHOWINTRO);
+const dontShowIntro = ref(WINDOW_DONTSHOWINTRO);
+
+
+
+const touchscreen = ref(false);
+
+const {smAndDown} = useDisplay();
+const smallSize = computed(() => {
+  return smAndDown;
+});
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const mobile = computed(() => {
+  return smallSize.value && touchscreen.value;
+});
+
+const cssVars = computed(() => {
+  return {
+    '--accent-color': accentColor.value,
+    '--accent-color-2': accentColor2.value,
+    '--app-content-height': showTextSheet.value ? '66%' : '100%',
+  };
+});
+
+const showTextSheet = computed({
+  get() {
+    return sheet.value === 'text';
+  },
+  set(_value: boolean) {
+    selectSheet('text');
+  }
+});
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const showVideoSheet = computed({
+  get() {
+    return sheet.value === "video";
+  },
+  set(value: boolean) {
+    selectSheet('video');
+    if (!value) {
+      const video = document.querySelector("#info-video") as HTMLVideoElement;
+      video.pause();
+    }
+  }
+});
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function closeSplashScreen() {
+  showSplashScreen.value = false;
+}
+
+function selectSheet(name: SheetType) {
+  if (sheet.value === name) {
+    sheet.value = null;
+    nextTick(() => {
+      blurActiveElement();
+    });
+  } else {
+    sheet.value = name;
+  }
+}
+
+
+watch(introSlide, (val: number) => {
+  inIntro.value = val < 4;
+});
+
+watch(dontShowIntro, (val: boolean) => {
+  window.localStorage.setItem("dontShowIntro", val.toString());
+  if (!val) {
+    inIntro.value = true;
+  }
+});
+
 
 type SheetType = "text" | "video" | null;
 type Timeout = ReturnType<typeof setTimeout>;
@@ -585,13 +675,6 @@ const fosterTimestamps = ref<number[]>([
 ]);
 
 
-const urlParams = new URLSearchParams(window.location.search);
-const hideIntro = urlParams.get("hideintro") === "true";
-const WINDOW_DONTSHOWINTRO = hideIntro ? true : window.localStorage.getItem("dontShowIntro") === 'true';
-
-function zpad(n: number, width: number = 2, character: string = "0"): string {
-  return n.toString().padStart(width, character);
-}
 
 const showSplashScreen = ref(new URLSearchParams(window.location.search).get("splash")?.toLowerCase() !== "false");
 const novDecBounds = new L.LatLngBounds(
@@ -619,18 +702,7 @@ const fieldOfRegardLayer = L.geoJSON(
 const opacity = ref(0.9);
 const sheet = ref<SheetType>(null);
 
-const accentColor = ref("#068ede");
-const accentColor2 = ref("#ffd302");
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const buttonColor = ref("#ffffff");
-const introSlide = ref(1);
 
-const inIntro = ref(!WINDOW_DONTSHOWINTRO);
-const dontShowIntro = ref(WINDOW_DONTSHOWINTRO);
-
-
-
-const touchscreen = ref(false);
 const playInterval = ref<Timeout | null>(null);
 const map = ref<Map | null>(null);
 const basemap = ref<L.TileLayer.WMS | null | L.TileLayer>(null);
@@ -719,76 +791,22 @@ onMounted(() => {
   }
 });
 
-const {smAndDown} = useDisplay();
-const smallSize = computed(() => {
-  return smAndDown;
-});
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const mobile = computed(() => {
-  return smallSize.value && touchscreen.value;
-});
-
-const cssVars = computed(() => {
-  return {
-    '--accent-color': accentColor.value,
-    '--accent-color-2': accentColor2.value,
-    '--app-content-height': showTextSheet.value ? '66%' : '100%',
-  };
-});
-
-const showTextSheet = computed({
-  get() {
-    return sheet.value === 'text';
-  },
-  set(_value: boolean) {
-    selectSheet('text');
-  }
-});
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const showVideoSheet = computed({
-  get() {
-    return sheet.value === "video";
-  },
-  set(value: boolean) {
-    selectSheet('video');
-    if (!value) {
-      const video = document.querySelector("#info-video") as HTMLVideoElement;
-      video.pause();
-    }
-  }
-});
-
 /* MANAGE TIME AND DATE SELECTION */
-const selectedTimezone = ref("US/Eastern");
-const timeIndex = ref(0);
-const minIndex = ref(0);
+
+import { useUniqueTimeSelection } from "./useUniqueTimeSelection";
 const timestamps = ref<number[]>(fosterTimestamps.value);
-const maxIndex = ref(timestamps.value.length - 1);
-const singleDateSelected = ref(new Date());
+const selectedTimezone = ref("US/Eastern");
+const { timeIndex,
+  timestamp,
+  singleDateSelected,
+  maxIndex,
+  minIndex,
+  uniqueDays,
+  setNearestDate,
+  moveBackwardOneDay,
+  moveForwardOneDay,
+  nearestDateIndex } = useUniqueTimeSelection(timestamps);
 
-
-const uniqueDays = computed(() => {
-  const offset = (date: Date) => getTimezoneOffset("US/Eastern", date);
-  const easternDates = timestamps.value.map(ts => new Date(ts + offset(new Date(ts))));
-  const days = easternDates.map(date => (new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())).getTime());
-  const unique = Array.from(new Set(days));
-  return unique.map(ts => new Date(ts));
-});
-
-
-function getUniqueDayIndex(date: Date): number {
-  return uniqueDays.value.findIndex(day => day.getTime() === date.getTime());
-}
-
-function moveBackwardOneDay() {
-  singleDateSelected.value = uniqueDays.value[getUniqueDayIndex(singleDateSelected.value) - 1];
-}
-
-function moveForwardOneDay() {
-  singleDateSelected.value = uniqueDays.value[getUniqueDayIndex(singleDateSelected.value) + 1];
-}
 
 
 async function updateTimestamps() {
@@ -800,24 +818,18 @@ async function updateTimestamps() {
   });
 }
 
-// runs only once
-watch(timestamps, () => {
-  singleDateSelected.value = uniqueDays.value[uniqueDays.value.length - 1];
-});
 
 // only get's changed directly with the radio button or forward/backward buttons
 watch(singleDateSelected, (value: Date) => {
+  console.log('singleDateSelected changed (TempoLite.vue)');
   const timestamp = value.getTime();
-  setNearestDate(timestamp);
   const index = datesOfInterest.value.map(d => d.getTime()).indexOf(timestamp);
+  imagePreload();
   radio.value = index < 0 ? null : index;
 });
 
 
 // The timestamp of the currently selected date
-const timestamp = computed(() => {
-  return timestamps.value[timeIndex.value];
-});
 
 const date = computed(() => {
   return new Date(timestamp.value);
@@ -920,17 +932,8 @@ watch(sublocationRadio, (value: number | null) => {
 /* HANDLE IMAGE AND CLOUD DATA OVERLAYS */
 
 
-const imageName = computed(() => {
-  return getTempoFilename(date.value);
-});
+const { imageUrl, cloudUrl, getCloudFilename, getTempoDataUrl, getTempoFilename } = useTempoFilenames(timestamp, customImageUrl, useHighRes, fosterTimestamps, erdTimestamps, newTimestamps, cloudTimestamps);
 
-const imageUrl = computed(() => {
-  if (customImageUrl.value) {
-    return customImageUrl.value;
-  }
-  const url = getTempoDataUrl(timestamp.value);
-  return url + imageName.value;
-});
 
 watch(imageUrl, (url: string) => {
   updateBounds();
@@ -938,13 +941,15 @@ watch(imageUrl, (url: string) => {
   updateFieldOfRegard();
 });
 
-const cloudUrl = computed(() =>  (showClouds.value && cloudTimestamps.value.includes(timestamp.value)) ? getCloudFilename(date.value) : '');
-watch(cloudUrl, cloudOverlay.value.setUrl);
+watch([cloudUrl, showClouds], ([url, show]) => {
+  cloudOverlay.value.setUrl(show ? url : '');
+});
 
 const cloudDataAvailable = computed(() => {
   return cloudTimestamps.value.includes(timestamp.value);
 });
 
+// convenience function only for debugging
 const whichDataSet = computed(() => {
   if (fosterTimestamps.value.includes(timestamp.value)) {
     return 'TEMPO-lite';
@@ -958,40 +963,6 @@ const whichDataSet = computed(() => {
   return 'Unknown';
 });
 
-
-
-
-function getCloudFilename(date: Date): string {
-  const filename = getTempoFilename(date);
-  if (useHighRes.value) {
-    return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/' + filename;
-  } else {
-    return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/clouds/images/resized_images/' + filename;
-  }
-}
-
-function getTempoFilename(date: Date): string {
-  return `tempo_${date.getUTCFullYear()}-${zpad(date.getUTCMonth() + 1)}-${zpad(date.getUTCDate())}T${zpad(date.getUTCHours())}h${zpad(date.getUTCMinutes())}m.png`;
-}
-
-function getTempoDataUrl(timestamp: number): string {
-  if (fosterTimestamps.value.includes(timestamp)) {
-    return 'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/';
-  }
-
-  if (erdTimestamps.value.includes(timestamp)) {
-    return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/early_release/images/';
-  }
-
-  if (newTimestamps.value.includes(timestamp)) {
-    if (useHighRes.value) {
-      return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/released/images/';
-    }
-    return "https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/released/images/resized_images/";
-  }
-
-  return '';
-}
 
 const newBounds = computed(() => {
   return new L.LatLngBounds(
@@ -1033,13 +1004,6 @@ const highresAvailable = computed(() => {
   return newTimestamps.value.includes(timestamp.value);
 });
 
-// function cividis(x: number): string {
-//   return cividis(x);
-// }
-
-// function svs(x: number): string {
-//   return svs(x);
-// }
 
 function cbarNO2RGB(x: number): string {
   const rgb = cbarNO2(0, 1, x);
@@ -1050,29 +1014,6 @@ function cbarNO2RGB(x: number): string {
 function cbarNO2ColorsRevised2023RGB(x: number): string {
   const rgb = cbarNO2ColorsRevised2023(0, 1, x);
   return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]},1)`;
-}
-
-function blurActiveElement() {
-  const active = document.activeElement;
-  if (active instanceof HTMLElement) {
-    active.blur();
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function closeSplashScreen() {
-  showSplashScreen.value = false;
-}
-
-function selectSheet(name: SheetType) {
-  if (sheet.value === name) {
-    sheet.value = null;
-    nextTick(() => {
-      blurActiveElement();
-    });
-  } else {
-    sheet.value = name;
-  }
 }
 
 function addCoastlines() {
@@ -1113,40 +1054,6 @@ function pause() {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function nearestDate(date: Date): number {
-  const onedayinms = 1000 * 60 * 60 * 24;
-  const time = date.getTime();
-  const timestamp = timestamps.value.find(ts => ((ts - time) < onedayinms) && (ts - time) >= 0);
-  if (timestamp !== undefined) {
-    return timestamp;
-  } else {
-    console.warn("No matching timestamp found, returning default value.");
-    return timestamps.value[0];
-  }
-}
-
-function nearestDateIndex(date: Date): number {
-  const onedayinms = 1000 * 60 * 60 * 24;
-  const timestamp = date.getTime();
-  const index = timestamps.value.findIndex(ts => ((ts - timestamp) < onedayinms) && (ts - timestamp) >= 0);
-  if (index === null) {
-    console.log("No matching timestamp found, returning default index.");
-  }
-  return index ?? 0;
-}
-
-function setNearestDate(date: number | null) {
-  if (date == null) {
-    return;
-  }
-  const onedayinms = 1000 * 60 * 60 * 24;
-  const mod = timestamps.value.filter(ts => ((ts - date) < onedayinms) && (ts - date) > 0);
-  minIndex.value = timestamps.value.indexOf(mod[0]);
-  maxIndex.value = timestamps.value.indexOf(mod[mod.length - 1]);
-  timeIndex.value = minIndex.value;
-  imagePreload();
-}
 
 function updateFieldOfRegard() {
   if (date.value.getUTCFullYear() === 2023 && date.value.getUTCMonth() === 7) {
@@ -1182,16 +1089,14 @@ function imagePreload() {
 
 
 
-watch(introSlide, (val: number) => {
-  inIntro.value = val < 4;
-});
-
-watch(dontShowIntro, (val: boolean) => {
-  window.localStorage.setItem("dontShowIntro", val.toString());
-  if (!val) {
-    inIntro.value = true;
+function blurActiveElement() {
+  const active = document.activeElement;
+  if (active instanceof HTMLElement) {
+    active.blur();
   }
-});
+}
+
+
 
 watch(loadedImagesProgress, (val: number) => {
   playing.value = false;

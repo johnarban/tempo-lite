@@ -659,14 +659,14 @@ __metadata:
   resolution: "@terraformer/arcgis@npm:2.1.2"
   dependencies:
     "@terraformer/common": "npm:^2.1.2"
-  checksum: 087dfc7a6f304f6a677714982336846956b753ca867bd7fd775aedc2d5a4cf233229e2970ad72a7ad310c6a6904dc4585d143ac6353331ca5ea70399fb259ae4
+  checksum: 10/087dfc7a6f304f6a677714982336846956b753ca867bd7fd775aedc2d5a4cf233229e2970ad72a7ad310c6a6904dc4585d143ac6353331ca5ea70399fb259ae4
   languageName: node
   linkType: hard
 
 "@terraformer/common@npm:^2.1.2":
   version: 2.1.2
   resolution: "@terraformer/common@npm:2.1.2"
-  checksum: 78807f8102f478f97193cb6eb79fb4976462ba75fbfb8ec0b2ac21f3d2554177bfd78f2b19ed0a111c03e3047ac2110656f01a7de57712f86cd44fd8cda2c049
+  checksum: 10/78807f8102f478f97193cb6eb79fb4976462ba75fbfb8ec0b2ac21f3d2554177bfd78f2b19ed0a111c03e3047ac2110656f01a7de57712f86cd44fd8cda2c049
   languageName: node
   linkType: hard
 
@@ -730,7 +730,7 @@ __metadata:
   resolution: "@types/esri-leaflet@npm:3.0.3"
   dependencies:
     "@types/leaflet": "npm:*"
-  checksum: 959e577d1135d889b6171450062dfe44fe29213b5445b2e303f456bab6673dcca7d9f62ed55c8fd0d6328ab64b59dc0f55b50ac52ca7ee65d40a83e9effa90e3
+  checksum: 10/959e577d1135d889b6171450062dfe44fe29213b5445b2e303f456bab6673dcca7d9f62ed55c8fd0d6328ab64b59dc0f55b50ac52ca7ee65d40a83e9effa90e3
   languageName: node
   linkType: hard
 
@@ -3440,7 +3440,7 @@ __metadata:
     tiny-binary-search: "npm:^1.0.3"
   peerDependencies:
     leaflet: ^1.0.0
-  checksum: a00606bb314f040e3508ac6fa4cf54cbbfde8fddfff6a3b6f1bd32b8fcf516c987c0d135d63bc8182faf29bd9ef22de048010518e91633233c387600ca687cfb
+  checksum: 10/a00606bb314f040e3508ac6fa4cf54cbbfde8fddfff6a3b6f1bd32b8fcf516c987c0d135d63bc8182faf29bd9ef22de048010518e91633233c387600ca687cfb
   languageName: node
   linkType: hard
 
@@ -7620,7 +7620,7 @@ __metadata:
 "tiny-binary-search@npm:^1.0.3":
   version: 1.0.3
   resolution: "tiny-binary-search@npm:1.0.3"
-  checksum: 811eb7b53a9664d14023926ae02f4406c8b215355de1e647809962dba421fbb2c10891f0d45c433043d80f563ce7037dcaf200103bca5674a9cb23803ebb1df7
+  checksum: 10/811eb7b53a9664d14023926ae02f4406c8b215355de1e647809962dba421fbb2c10891f0d45c433043d80f563ce7037dcaf200103bca5674a9cb23803ebb1df7
   languageName: node
   linkType: hard
 

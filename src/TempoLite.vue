@@ -585,8 +585,7 @@ import { useTempoFilenames } from "./useTempoFilenames";
 import { useFieldOfRegard } from "./useFieldOfRegard";
 import { useOverlays } from "./useOverlays";
 import { useMap } from "./useMap";
-import * as esri from 'esri-leaflet';
-import { renderingRule, EsriSliceResponse } from "./esri";
+
 
 const urlParams = new URLSearchParams(window.location.search);
 const hideIntro = urlParams.get("hideintro") === "true";
@@ -683,11 +682,7 @@ const useHighRes = ref(false);
 const showClouds = ref(false);
 const opacity = ref(0.9);
 
-const esriURL = ref( 'https://gis.earthdata.nasa.gov/image/rest/services/C2930763263-LARC_CLOUD/TEMPO_NO2_L3_V03_HOURLY_TROPOSPHERIC_VERTICAL_COLUMN/ImageServer');
-const esriTimesteps = ref( [] as number[]);
-const esriImageLayer = ref( null as esri.ImageMapLayer | null);
-const esriOpacity = ref( opacity.value);
-const noEsriData = ref( false);
+const singleOpacity = ref(false);
 
 const erdTimestamps = ref<number[]>([]);
 const newTimestamps = ref<number[]>([]);
@@ -696,24 +691,7 @@ const fosterTimestamps = ref<number[]>([
   1698838920000, 1698841320000, 1698843720000, 1698846120000, 1698848520000, 1698852120000, 1698855720000, 1698859320000, 1698862920000, 1698866520000, 1698870120000, 1698873720000, 1698876120000, 1698878520000, 1698880920000, 1699011720000, 1699014120000, 1699016520000, 1699018920000, 1699021320000, 1699024920000, 1699028520000, 1699032120000, 1699035720000, 1699039320000, 1699042920000, 1699046520000, 1699048920000, 1699051320000, 1699053720000, 1711626180000, 1711628640000, 1711631040000, 1711633440000, 1711637040000, 1711640640000, 1711644240000, 1711647840000, 1711651440000, 1711655040000, 1711658640000, 1711662240000, 1711665840000, 1711668240000,
 ]);
 
-getEsriTimeSteps()
-  .then((json => {
-    // const esriEpoch = new Date('1980-01-01T00:00:00Z').getTime();
-    console.log('esri json', json);
-    json.slices.map(slice => {
-      if (slice.multidimensionalDefinition.length > 0) {
-        const values = slice.multidimensionalDefinition[0].values as number[];
-        if (values && values.length > 0) {
-          esriTimesteps.value.push(values[0]);
-        }
-      }
-    });
-  })
-  ).then(() => {
-    updateEsriTimeRange();
-    console.log('done loading esri timesteps');
-    console.log('Most recent esri timestamp:', new Date(esriTimesteps.value[esriTimesteps.value.length - 1]));
-  });
+
 
 async function updateTimestamps() {
   return getTimestamps().then((ts) => {
@@ -745,58 +723,8 @@ const cloudDataAvailable = computed(() => {
   return cloudTimestamps.value.includes(timestamp.value);
 });
 
-function updateEsriTimeRange() {
-  const now = timestamp.value;
-  // find neareast timestep to timestamp
-  if (esriTimesteps.value.length === 0) {
-    return;
-  }
-  const nearest = esriTimesteps.value.reduce((a, b) => Math.abs(b - now) < Math.abs(a - now) ? b : a);
-  console.log(nearest, new Date(nearest), new Date(now), (nearest - now)/(1000 * 60));
-  noEsriData.value = Math.abs((nearest - now)/(1000 * 60)) > 60;
-  if (noEsriData.value) {
-    console.log('nearest time is more than an hour away');
-  }
-  if (esriImageLayer.value) {
-    esriImageLayer.value.setTimeRange(new Date(nearest), new Date(nearest * 2));
-  }
-}
-
-function updateEsriOpacity(value: number | null |undefined = undefined) {
-  if (esriImageLayer.value) {
-    esriImageLayer.value.setOpacity(value ?? esriOpacity.value ?? 0.8);
-  }
-}
 
 
-async function getEsriTimeSteps(): Promise<EsriSliceResponse> {
-  const url=esriURL.value + '/slices';
-  const format="json";
-  const multidimensionalDefinition = {variableName:"NO2_Troposphere",dimensionName:"StdTime"};
-  const params = {f: format, multidimensionalDefinition: JSON.stringify(multidimensionalDefinition)};
-  const fetchURL = new URL(url);  
-  fetchURL.search = new URLSearchParams(params).toString();
-  return fetch(fetchURL).then(res => {
-    console.log(res.url);
-    return res.json();
-  });
-}
-
-esriImageLayer.value = esri.imageMapLayer({
-  url: esriURL.value,
-  format: 'png',
-  opacity: opacity.value,
-});
-
-esriImageLayer.value.setPixelType('U8');
-if (esriImageLayer.value) {
-  esriImageLayer.value.setRenderingRule(renderingRule);
-  esriImageLayer.value.setOpacity(0.9);
-  updateEsriTimeRange();
-
-}
-
-esriImageLayer.value.addTo(map.value as Map);
     
 const { imageUrl, cloudUrl, getCloudFilename, getTempoDataUrl, getTempoFilename } = useTempoFilenames(timestamp, customImageUrl, useHighRes, fosterTimestamps, erdTimestamps, newTimestamps, cloudTimestamps);
 
@@ -816,6 +744,10 @@ const imageBounds = computed(() => {
 const { imageOverlay, cloudOverlay } = useOverlays(imageUrl, cloudUrl, showClouds, opacity, imageBounds);
 import 'leaflet.zoomhome';
 
+import { no2Url, useEsriLayer} from './useEsriLayer';
+
+const { esriImageLayer, noEsriData, getEsriTimeSteps } = useEsriLayer(no2Url, timestamp, opacity);
+getEsriTimeSteps();
 
 const { map, initializeMap, addCoastlines, setView } = useMap();
 const { showFieldOfRegard, updateFieldOfRegard, addFieldOfRegard } = useFieldOfRegard(date, map as Ref<Map>);
@@ -838,6 +770,9 @@ onMounted(() => {
   cloudOverlay.value.setUrl(cloudUrl.value).addTo(map.value  as Map);
   updateFieldOfRegard();
   addFieldOfRegard();
+  if (esriImageLayer.value) {
+    esriImageLayer.value.addTo(map.value as Map);
+  }
 });
 
 
@@ -892,21 +827,10 @@ const thumbLabel = computed(() => {
   return `${date.value.getUTCMonth() + 1}/${dateWithOffset.getUTCDate()}/${dateWithOffset.getUTCFullYear()} ${hourValue}:${dateWithOffset.getUTCMinutes().toString().padStart(2, '0')} ${amPm}`;
 });
 
-watch(opacity, (value: number) => {
-  esriOpacity.value = value;
-  updateEsriOpacity();
-});
 
 
 
-watch(noEsriData, (value: boolean) => {
-  if (value) {
-    esriOpacity.value = 0;
-    updateEsriOpacity();
-  } else {
-    updateEsriOpacity(opacity.value);
-  }
-});
+
 
 
 

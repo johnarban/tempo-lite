@@ -572,7 +572,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, nextTick, Ref } from "vue";
-import  L, { Map } from "leaflet";
+// import  L, { Map } from "leaflet";
+import { Map } from "maplibre-gl";
 
 import { getTimezoneOffset } from "date-fns-tz";
 import { cbarNO2 } from "./revised_cmap";
@@ -582,9 +583,9 @@ import { getTimestamps } from "./timestamps";
 import { SheetType, Timeout, InterestingEvent, LatLng, LatLngBounds } from "./types";
 import { useDisplay } from 'vuetify';
 import { useTempoFilenames } from "./useTempoFilenames";
-import { useFieldOfRegard } from "./useFieldOfRegard";
-import { useOverlays } from "./useOverlays";
-import { useMap } from "./useMap";
+import { useFieldOfRegard } from "./useFieldOfRegard-Maplibre";
+import { useOverlays } from "./useOverlays-Maplibre";
+import { useMap } from "./useMap-Maplibre";
 import { useSyncedValues } from "./useSyncedValues";
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -741,7 +742,7 @@ const imageBounds = computed(() => {
 
 
 
-const { imageOverlay, cloudOverlay } = useOverlays(imageUrl, cloudUrl, showClouds, opacity, imageBounds);
+const {  addOverlays } = useOverlays(imageUrl, cloudUrl, showClouds, opacity, imageBounds);
 import 'leaflet.zoomhome';
 
 import { no2Url, useEsriLayer} from './useEsriLayer';
@@ -756,26 +757,34 @@ const { map, initializeMap, addCoastlines, setView } = useMap();
 const { showFieldOfRegard, updateFieldOfRegard, addFieldOfRegard } = useFieldOfRegard(date, map as Ref<Map>);
 onMounted(() => {
   showSplashScreen.value = false;
-  
-  initializeMap('map');
+  const onLoad = () => {
+    addCoastlines();
+    addOverlays(map.value as Map);
+    updateFieldOfRegard();
+    addFieldOfRegard();
+  };
+  try {
+    initializeMap('map', onLoad);
+  } catch (e) {
+    console.error(e);
+  }
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const zoomHome = L.Control.zoomHome();
-  const originalZH = zoomHome._zoomHome.bind(zoomHome);
-  zoomHome._zoomHome = (_e: Event) => {
-    originalZH();
-    sublocationRadio.value = null;
-  };
-  zoomHome.addTo(map.value);
-  addCoastlines();
+  // const zoomHome = L.Control.zoomHome();
+  // const originalZH = zoomHome._zoomHome.bind(zoomHome);
+  // zoomHome._zoomHome = (_e: Event) => {
+  //   originalZH();
+  //   sublocationRadio.value = null;
+  // };
+  // zoomHome.addTo(map.value);
+  
   singleDateSelected.value = uniqueDays.value[uniqueDays.value.length - 1];
-  imageOverlay.value.setUrl(imageUrl.value).addTo(map.value  as Map);
-  cloudOverlay.value.setUrl(cloudUrl.value).addTo(map.value  as Map);
-  updateFieldOfRegard();
-  addFieldOfRegard();
-  if (esriImageLayer.value) {
-    esriImageLayer.value.addTo(map.value as Map);
-  }
+  // imageOverlay.value.setUrl(imageUrl.value).addTo(map.value  as Map);
+  // cloudOverlay.value.setUrl(cloudUrl.value).addTo(map.value  as Map);
+  
+  // if (esriImageLayer.value) {
+  //   esriImageLayer.value.addTo(map.value as Map);
+  // }
 });
 
 
@@ -1816,4 +1825,9 @@ button:focus-visible,
   transform: translateX(-50%);
   pointer-events: auto;
 }
+
+canvas.maplibregl-canvas {
+  background-color: whitesmoke;
+}
+
 </style>

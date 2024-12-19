@@ -4,7 +4,7 @@ export type SheetType = "text" | "video" | null;
 export type Timeout = ReturnType<typeof setTimeout>;
 
 export interface LocationOfInterest {
-  latlng: L.LatLngExpression;
+  latlng: [number, number];
   zoom: number;
   text: string;
   description: string;
@@ -29,14 +29,27 @@ export class LatLng extends L.LatLng {
     return this;
   }
   
+  toLngLat(): maplibregl.LngLat {
+    return new maplibregl.LngLat(this.lng, this.lat);
+  }
+  
 }
 
 export class LatLngBounds extends L.LatLngBounds {
-  constructor(sw: L.LatLng, ne: L.LatLng) {
+  constructor(public sw: LatLng, public ne: LatLng) {
     super(sw, ne);
   }
 
   toLeaflet(): L.LatLngBounds {
     return this;
   }
+  
+  toMaplibreBounds(): maplibregl.LngLatBounds {
+    return new maplibregl.LngLatBounds(
+      this.sw.toLngLat(),
+      this.ne.toLngLat()
+    );
+  }
 }
+
+import maplibregl from 'maplibre-gl';

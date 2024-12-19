@@ -45,3 +45,25 @@ interface MultidimensionalDefinition {
 export interface EsriSliceResponse {
   slices: EsriSlice[];
 }
+
+
+
+
+export async function fetchEsriTimeSteps(esriUrl: string): Promise<EsriSliceResponse> {
+  const url = esriUrl + '/slices';
+  const format = "json";
+  const multidimensionalDefinition = { variableName: "NO2_Troposphere", dimensionName: "StdTime" };
+  const params = { f: format, multidimensionalDefinition: JSON.stringify(multidimensionalDefinition) };
+  const fetchURL = new URL(url);
+  fetchURL.search = new URLSearchParams(params).toString();
+  return fetch(fetchURL).then(res => {
+    console.log(res.url);
+    return res.json();
+  });
+}
+
+export function extractTimeSteps(data: EsriSliceResponse) {
+  const slices = data.slices;
+  const timesteps = slices.map(slice => slice.multidimensionalDefinition[0].values[0]);
+  return timesteps;
+}

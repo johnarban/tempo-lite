@@ -749,16 +749,11 @@ import 'leaflet.zoomhome';
 import { no2Url, useEsriLayer} from './useEsriLayer-Maplibre';
 
 
-
-
-
-
-
-
 const { map, initializeMap, addCoastlines, setView } = useMap();
 const { addEsriSource, noEsriData, esriOpacity, getEsriTimeSteps } = useEsriLayer(map as Ref<Map | null>, no2Url, timestamp, opacity);
 getEsriTimeSteps();
 useSyncedValues(opacity, esriOpacity, singleOpacity);
+
 const { showFieldOfRegard, addFieldOfRegard } = useFieldOfRegard(date, map as Ref<Map>);
 onMounted(() => {
   showSplashScreen.value = false;
@@ -840,7 +835,6 @@ const radio = ref<number | null>(null);
 const sublocationRadio = ref<number | null>(null);
 
 import _interestingEvents from "./locationsOfInterest";
-import { add } from "date-fns";
 const interestingEvents = ref<InterestingEvent[]>(_interestingEvents as InterestingEvent[]);
 
 const datesOfInterest = computed(() => {

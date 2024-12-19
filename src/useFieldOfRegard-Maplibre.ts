@@ -9,7 +9,7 @@ export function useFieldOfRegard(date: Ref<Date>, map: Ref<maplibregl.Map | null
 
   function updateFieldOfRegard() {
     if (!map.value) return;
-    if (!map.value.isStyleLoaded()) return;
+    // if (!map.value.isStyleLoaded()) return;
 
     const data = date.value.getUTCFullYear() === 2023 && date.value.getUTCMonth() === 7
       ? augustFieldOfRegard
@@ -51,7 +51,10 @@ export function useFieldOfRegard(date: Ref<Date>, map: Ref<maplibregl.Map | null
     }
   });
 
-  watch(date, updateFieldOfRegard);
+  watch(date, () => {
+    if (map.value && !map.value.isStyleLoaded()) return;
+    updateFieldOfRegard();
+  });
 
   function addFieldOfRegard() {
     if (showFieldOfRegard.value && map.value) {

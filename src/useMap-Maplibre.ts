@@ -85,7 +85,7 @@ export function useMap(): UseMapType {
     
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    map.value.on('load', () => {
+    map.value.on('style.load', () => {
       console.log('Map loaded');
       _onMapLoad();
       onMapLoad();

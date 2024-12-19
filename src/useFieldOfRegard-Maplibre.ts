@@ -9,6 +9,7 @@ export function useFieldOfRegard(date: Ref<Date>, map: Ref<maplibregl.Map | null
 
   function updateFieldOfRegard() {
     if (!map.value) return;
+    if (!map.value.isStyleLoaded()) return;
 
     const data = date.value.getUTCFullYear() === 2023 && date.value.getUTCMonth() === 7
       ? augustFieldOfRegard

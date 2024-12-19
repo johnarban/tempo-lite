@@ -755,13 +755,12 @@ useSyncedValues(opacity, esriOpacity, singleOpacity);
 
 
 const { map, initializeMap, addCoastlines, setView } = useMap();
-const { showFieldOfRegard, updateFieldOfRegard, addFieldOfRegard } = useFieldOfRegard(date, map as Ref<Map>);
+const { showFieldOfRegard, addFieldOfRegard } = useFieldOfRegard(date, map as Ref<Map>);
 onMounted(() => {
   showSplashScreen.value = false;
   const onLoad = () => {
     addCoastlines();
     addOverlays(map.value as Map);
-    updateFieldOfRegard();
     addFieldOfRegard();
   };
   try {

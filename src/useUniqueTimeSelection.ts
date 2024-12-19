@@ -49,7 +49,6 @@ export const useUniqueTimeSelection = (timestamps: Ref<number[]>) => {
   
   const timestamp = computed(() => {
     const val = timestamps.value[timeIndex.value];
-    console.log("timestamp", new Date(timeIndex.value));
     return val;
   });
   
@@ -94,7 +93,6 @@ export const useUniqueTimeSelection = (timestamps: Ref<number[]>) => {
   }
   
   watch(singleDateSelected, (value) => {
-    console.log("singleDateSelected.value", value);
     setNearestDate(value.getTime());
   });
   

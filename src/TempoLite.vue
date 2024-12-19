@@ -746,15 +746,19 @@ const imageBounds = computed(() => {
 const { addOverlays } = useOverlays(imageUrl, cloudUrl, showClouds, opacity, imageBounds);
 import 'leaflet.zoomhome';
 
-import { no2Url, useEsriLayer} from './useEsriLayer';
+import { no2Url, useEsriLayer} from './useEsriLayer-MapLibre';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { esriImageLayer, noEsriData, esriOpacity, esriTimesteps, getEsriTimeSteps } = useEsriLayer(no2Url, timestamp, opacity);
-getEsriTimeSteps();
-useSyncedValues(opacity, esriOpacity, singleOpacity);
+
+
+
+
+
 
 
 const { map, initializeMap, addCoastlines, setView } = useMap();
+const { addEsriSource, noEsriData, esriOpacity, getEsriTimeSteps } = useEsriLayer(map as Ref<Map | null>, no2Url, timestamp, opacity);
+getEsriTimeSteps();
+useSyncedValues(opacity, esriOpacity, singleOpacity);
 const { showFieldOfRegard, addFieldOfRegard } = useFieldOfRegard(date, map as Ref<Map>);
 onMounted(() => {
   showSplashScreen.value = false;
@@ -762,6 +766,7 @@ onMounted(() => {
     addCoastlines();
     addOverlays(map.value as Map);
     addFieldOfRegard();
+    addEsriSource();
   };
   try {
     initializeMap('map', onLoad);
@@ -835,6 +840,7 @@ const radio = ref<number | null>(null);
 const sublocationRadio = ref<number | null>(null);
 
 import _interestingEvents from "./locationsOfInterest";
+import { add } from "date-fns";
 const interestingEvents = ref<InterestingEvent[]>(_interestingEvents as InterestingEvent[]);
 
 const datesOfInterest = computed(() => {

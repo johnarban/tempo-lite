@@ -1,38 +1,21 @@
 // src/composables/useEsriLayer.ts
 import { ref, watch, Ref, nextTick } from 'vue';
 import * as esri from 'esri-leaflet';
-import { EsriSliceResponse, renderingRule } from '@/esri';
-
+import { renderingRule, fetchEsriTimeSteps, extractTimeSteps } from '@/esri';
+import { Map } from 'leaflet';
 export const no2Url = ref('https://gis.earthdata.nasa.gov/image/rest/services/C2930763263-LARC_CLOUD/TEMPO_NO2_L3_V03_HOURLY_TROPOSPHERIC_VERTICAL_COLUMN/ImageServer');
 
-export function useEsriLayer(url: Ref<string>, timestamp: Ref<number>, opacity: Ref<number>) {
+export function useEsriLayer(map: Ref<Map | null>, url: Ref<string>, timestamp: Ref<number>, opacity: Ref<number>) {
   const esriURL = ref(url);
   const esriTimesteps = ref([] as number[]);
   const esriImageLayer = ref(null as esri.ImageMapLayer | null);
   const esriOpacity = ref(opacity.value);
   const noEsriData = ref(false);
   
-  async function fetchEsriTimeSteps(): Promise<EsriSliceResponse> {
-    const url = esriURL.value + '/slices';
-    const format = "json";
-    const multidimensionalDefinition = { variableName: "NO2_Troposphere", dimensionName: "StdTime" };
-    const params = { f: format, multidimensionalDefinition: JSON.stringify(multidimensionalDefinition) };
-    const fetchURL = new URL(url);
-    fetchURL.search = new URLSearchParams(params).toString();
-    return fetch(fetchURL).then(res => {
-      console.log(res.url);
-      return res.json();
-    });
-  }
   
-  function extractTimeSteps(data: EsriSliceResponse) {
-    const slices = data.slices;
-    const timesteps = slices.map(slice => slice.multidimensionalDefinition[0].values[0]);
-    return timesteps;
-  }
   
   async function getEsriTimeSteps() {
-    fetchEsriTimeSteps()
+    fetchEsriTimeSteps(esriURL.value)
       .then((json) => {
         esriTimesteps.value = extractTimeSteps(json);
         nextTick(updateEsriTimeRange);
@@ -75,6 +58,11 @@ export function useEsriLayer(url: Ref<string>, timestamp: Ref<number>, opacity: 
     esriImageLayer.value.setOpacity(0.9);
     updateEsriTimeRange();
   }
+  
+  function addEsriSource() {
+    if (!map.value) return;
+    esriImageLayer.value?.addTo(map.value);
+  }
 
   watch(timestamp, (_value: number) => {
     updateEsriTimeRange();
@@ -101,5 +89,6 @@ export function useEsriLayer(url: Ref<string>, timestamp: Ref<number>, opacity: 
     getEsriTimeSteps,
     updateEsriTimeRange,
     updateEsriOpacity,
+    addEsriSource,
   };
 }

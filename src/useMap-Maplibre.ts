@@ -1,6 +1,7 @@
 import { ref, Ref } from 'vue';
 import maplibregl, { Map, NavigationControl, LngLat } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { CDSMaplibreHomeTool } from './MaplibreHomeTool';
 
 const scale = window.devicePixelRatio;
 const retinaParam = scale > 1 ? '@2x' : '';
@@ -16,6 +17,9 @@ interface UseMapType {
 export function useMap(): UseMapType {
   const map = ref<Map | null>(null);
   const basemap = ref<null>(null);
+  
+  const startingCenter: [number, number] = [-98.789, 40.044];
+  const startingZoom = 2.5;
 
   function setView(latlng: [number, number], zoom: number) {
     if (map.value) {
@@ -75,8 +79,8 @@ export function useMap(): UseMapType {
     map.value = new maplibregl.Map({
       container: containerId,
       style: 'https://tiles.stadiamaps.com/styles/stamen_toner_lines.json', // https://docs.stadiamaps.com/map-styles/stamen-toner/
-      center: [-98.789, 40.044],
-      zoom: 4
+      center: startingCenter,
+      zoom: startingZoom
     });
     
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -88,7 +92,8 @@ export function useMap(): UseMapType {
     });
 
     // Add zoom and rotation controls to the map.
-    map.value.addControl(new NavigationControl(), 'top-left');
+    map.value.addControl(new NavigationControl({showCompass: false}), 'top-left');
+    map.value.addControl(new CDSMaplibreHomeTool(startingCenter, startingZoom), 'top-left');
 
     // Add a scale control
     // map.value.addControl(new ScaleControl(), 'bottom-left');

@@ -46,10 +46,10 @@ export function useEsriLayer(url: Ref<string>, timestamp: Ref<number>, opacity: 
       return;
     }
     const nearest = esriTimesteps.value.reduce((a, b) => Math.abs(b - now) < Math.abs(a - now) ? b : a);
-    console.log(nearest, new Date(nearest), new Date(now), (nearest - now) / (1000 * 60));
+    // console.log(nearest, new Date(nearest), new Date(now), (nearest - now) / (1000 * 60));
     noEsriData.value = Math.abs((nearest - now) / (1000 * 60)) > 60;
     if (noEsriData.value) {
-      console.log('nearest time is more than an hour away');
+      console.error('nearest time is more than an hour away');
     }
     if (esriImageLayer.value) {
       esriImageLayer.value.setTimeRange(new Date(nearest), new Date(nearest * 2));

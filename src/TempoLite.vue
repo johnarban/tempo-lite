@@ -746,7 +746,7 @@ const imageBounds = computed(() => {
 const { addOverlays } = useOverlays(imageUrl, cloudUrl, showClouds, opacity, imageBounds);
 import 'leaflet.zoomhome';
 
-import { no2Url, useEsriLayer} from './useEsriLayer-MapLibre';
+import { no2Url, useEsriLayer} from './useEsriLayer-Maplibre';
 
 
 

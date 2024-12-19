@@ -264,6 +264,7 @@ __metadata:
     leaflet.zoomhome: "npm:^1.0.0"
     less: "npm:^4.2.0"
     less-loader: "npm:^12.0.0"
+    mapbox-gl-esri-sources: "npm:^0.0.7"
     maplibre-gl: "npm:^4.7.1"
     typescript: "npm:^5.3.3"
     vue: "npm:^3.4.15"
@@ -5353,6 +5354,13 @@ __metadata:
     promise-retry: "npm:^2.0.1"
     ssri: "npm:^10.0.0"
   checksum: 10/11bae5ad6ac59b654dbd854f30782f9de052186c429dfce308eda42374528185a100ee40ac9ffdc36a2b6c821ecaba43913e4730a12f06f15e895ea9cb23fa59
+  languageName: node
+  linkType: hard
+
+"mapbox-gl-esri-sources@npm:^0.0.7":
+  version: 0.0.7
+  resolution: "mapbox-gl-esri-sources@npm:0.0.7"
+  checksum: 10/528c20bc86a7aa7183f01339fe61a693950832eb9aba63be0cfe11f0cdb43da6b02f2aa8ffc3c9362b5d5d0617db39e47580a8113431ec1594d710876ad89cae
   languageName: node
   linkType: hard
 

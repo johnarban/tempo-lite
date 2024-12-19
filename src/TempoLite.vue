@@ -744,12 +744,13 @@ const imageBounds = computed(() => {
 
 
 const { addOverlays } = useOverlays(imageUrl, cloudUrl, showClouds, opacity, imageBounds);
-import 'leaflet.zoomhome';
+// import 'leaflet.zoomhome';
 
 import { no2Url, useEsriLayer} from './useEsriLayer-Maplibre';
 
 
 const { map, initializeMap, addCoastlines, setView } = useMap();
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { addEsriSource, noEsriData, esriOpacity, getEsriTimeSteps } = useEsriLayer(map as Ref<Map | null>, no2Url, timestamp, opacity);
 getEsriTimeSteps();
 useSyncedValues(opacity, esriOpacity, singleOpacity);

@@ -59,6 +59,9 @@ export function useEsriLayer(map: Ref<Map | null>, url: Ref<string>, timestamp: 
       id: esriLayerId,
       type: 'raster',
       source:esriLayerId,
+      paint: {
+        'raster-resampling': 'nearest'
+      },
     });
     
     esriImageLayer.value = map.value.getSource(esriLayerId) as  maplibregl.RasterTileSource;

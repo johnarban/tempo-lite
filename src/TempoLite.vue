@@ -703,7 +703,6 @@ async function updateTimestamps() {
   });
 }
 
-updateTimestamps();
 
 import { useUniqueTimeSelection } from "./useUniqueTimeSelection";
 const timestamps = ref<number[]>(fosterTimestamps.value);
@@ -724,7 +723,9 @@ const cloudDataAvailable = computed(() => {
   return cloudTimestamps.value.includes(timestamp.value);
 });
 
-
+updateTimestamps().then(() => {
+  singleDateSelected.value = uniqueDays.value[uniqueDays.value.length - 1];
+});
 
     
 const { imageUrl, cloudUrl, getCloudFilename, getTempoDataUrl, getTempoFilename } = useTempoFilenames(timestamp, customImageUrl, useHighRes, fosterTimestamps, erdTimestamps, newTimestamps, cloudTimestamps);
@@ -742,7 +743,7 @@ const imageBounds = computed(() => {
 
 
 
-const {  addOverlays } = useOverlays(imageUrl, cloudUrl, showClouds, opacity, imageBounds);
+const { addOverlays } = useOverlays(imageUrl, cloudUrl, showClouds, opacity, imageBounds);
 import 'leaflet.zoomhome';
 
 import { no2Url, useEsriLayer} from './useEsriLayer';
@@ -768,23 +769,6 @@ onMounted(() => {
   } catch (e) {
     console.error(e);
   }
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  // const zoomHome = L.Control.zoomHome();
-  // const originalZH = zoomHome._zoomHome.bind(zoomHome);
-  // zoomHome._zoomHome = (_e: Event) => {
-  //   originalZH();
-  //   sublocationRadio.value = null;
-  // };
-  // zoomHome.addTo(map.value);
-  
-  singleDateSelected.value = uniqueDays.value[uniqueDays.value.length - 1];
-  // imageOverlay.value.setUrl(imageUrl.value).addTo(map.value  as Map);
-  // cloudOverlay.value.setUrl(cloudUrl.value).addTo(map.value  as Map);
-  
-  // if (esriImageLayer.value) {
-  //   esriImageLayer.value.addTo(map.value as Map);
-  // }
 });
 
 

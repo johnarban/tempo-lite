@@ -7,14 +7,14 @@
           aria-label="Copy link to share view"
           class="share-button"
           icon
-          @click="copy()"
-          @keyup.enter="copy()"
+          @click="copy(source)"
+          @keyup.enter="copy(source)"
           v-bind="props"
           :color="buttonColor"
           :elevation="elevation"
           :size="size"
           :rounded="rounded"
-        >
+        > 
           <v-icon :color="iconColor">mdi-share-variant</v-icon>
         </v-btn>
       </template>

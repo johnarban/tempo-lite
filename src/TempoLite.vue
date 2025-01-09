@@ -1202,7 +1202,7 @@ export default defineComponent({
         const searchParams = new URLSearchParams(state);
         url.search = searchParams.toString();
         this.currentUrl = url.toString();
-        window.history.replaceState(null,'',url);
+        // window.history.replaceState(null,'',url);
       }
     },
     
@@ -2389,7 +2389,7 @@ button:focus-visible,
 }
 
 .menu-button, .share-button {
-  outline: 2px solid yellow;
+  outline: 2px solid var(--smithsonian-yellow);
   border: none;
 }
 

@@ -2,13 +2,13 @@ import { InterestingEvent } from "./types";
 
 export const interestingEvents = [
   {
-    date: new Date(2024, 0, 8),
+    date: new Date(2025, 0, 6),
     dateString: "Jan 8",
     label: "LA Wildfires (Jan 8)",
     highlighted: true,
     info: `
     <p> 
-      Beginning on January 7, 2024, a series of wildfires broke out 
+      Beginning on January 7, 2025, a series of wildfires broke out 
       in the Los Angeles area. Wildfires create a severe public health
       hazard by releasing large amounts of particulate matter and NO<sub>2</sub> in
       addition to other pollutants.
@@ -23,7 +23,7 @@ export const interestingEvents = [
         latlng: [34.0522, -118.2437],
         zoom: 8,
         text: "Los Angeles Wildfires",
-        time: "2024-01-08T19:51:00.000Z",
+        time: "2025-01-06T19:51:00.000Z",
         description: `
         <p>
           Plumes of NO<sub>2</sub> from the wildfires can be seen from the 

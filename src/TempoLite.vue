@@ -164,14 +164,14 @@
                 View Changes
               </v-list-item>
               
-              <v-list-item 
+              <!-- <v-list-item 
                 tabindex="0"
                 aria-label="Show user guide"
                 @click="showUserGuide = true"
                 @keyup.enter="showUserGuide = true"
                 >
                 User Guide
-              </v-list-item>
+              </v-list-item> -->
               
               <v-list-item 
                 tabindex="0"

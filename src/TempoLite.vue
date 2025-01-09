@@ -449,15 +449,13 @@
             </v-tooltip>
           </div>
           <v-progress-linear
-            v-if="loadedImagesProgress < 100"
+            v-if="loadedImagesProgress < 101"
             v-model="loadedImagesProgress"
-            color="#c10124"
+            color="#092088"
             height="20"
-            rounded
-            striped
           >
           <span v-if="loadedImagesProgress < 100">Loading Data ({{ loadedImagesProgress.toFixed(0) }}%)</span>
-          <span v-else>Selected Date Loaded</span>
+          <span v-else>Data Loaded</span>
           </v-progress-linear>
         </div>
 

@@ -785,6 +785,10 @@ const initLon = parseFloat(urlParams.get("lon") || '-98.789');
 const initZoom = parseFloat(urlParams.get("zoom") || '4');
 const initTime = urlParams.get("t");
 
+const homeLat =  40.044;
+const homeLon =  -98.789;
+const homeZoom =  4;
+
 function zpad(n: number, width: number = 2, character: string = "0"): string {
   return n.toString().padStart(width, character);
 }
@@ -826,6 +830,11 @@ export default defineComponent({
         loc: [initLat, initLon] as LatLngExpression,
         zoom: initZoom,
         t: initTime ? +initTime : null
+      },
+      homeState: {
+        loc: [homeLat, homeLon] as LatLngExpression,
+        zoom: homeZoom,
+        t: null as number | null
       },
       showSplashScreen,
       sheet: null as SheetType,
@@ -930,7 +939,7 @@ export default defineComponent({
     });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const zoomHome = L.Control.zoomHome();
+    const zoomHome = L.Control.zoomHome({homeCoordinates: this.homeState.loc, homeZoom: this.homeState.zoom});
     const originalZH = zoomHome._zoomHome.bind(zoomHome);
     zoomHome._zoomHome = (_e: Event) => {
       originalZH();

@@ -129,8 +129,8 @@
       </div>
       <snackbar-alert label="What's new" v-model="showChanges" hide-button>
         <ol class="snackbar-alert-ol">
-          <li class="change-item" v-for="change in changes" :key="change.date" :data-date="change.date">
-            <span style="font-weight:bold;">{{ change.date }}</span>: {{ change.text }}
+          <li class="change-item mb-5" v-for="change in changes" :key="change.date" :data-date="change.date">
+            <span style="font-weight:bold;">{{ change.date }}</span><br> {{ change.text }}
           </li>
         </ol>
         <!-- <template v-slot:activator="{ onClick, id }">

@@ -157,11 +157,11 @@
             <v-list>
               <v-list-item 
                 tabindex="0"
-                aria-label="Show what's new"
+                aria-label="See recent changes"
                 @click="showChanges = true"
                 @keyup.enter="showChanges = true"
                 >
-                View Changes
+                What's New
               </v-list-item>
               
               <!-- <v-list-item 
@@ -578,10 +578,10 @@
 
                   <h4 class="mb-2"><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Team:</h4> 
 
-                  Jonathan Foster<br>
-                  Jon Carifio<br>
                   John Lewis<br>
+                  Jonathan Foster<br>
                   Pat Udomprasert<br>
+                  Jon Carifio<br>
                   Alyssa Goodman<br>
                   Erika Wright<br>
                   Mary Dussault<br>
@@ -651,7 +651,7 @@
                 </p>
                 <br />
                 <p>
-                  The data has been processed and visualized by the CosmicDS team at the Harvard-Smithsonian Center for Astrophysics. The images displayed have undergone preprocessing to filter out erroneous data, and a 50% cloud cover mask has been applied. 
+                  The data has been processed and visualized by the CosmicDS team at the Harvard-Smithsonian Center for Astrophysics. The images displayed have undergone pre-processing to filter out erroneous data, and a 50% cloud cover mask has been applied. 
                   For performance optimization, the data resolution has been halved and reprojected to a Web Mercator projection to ensure compatibility with 
                   <a href="https://leafletjs.com/" target="_blank" rel="noopener noreferrer">Leaflet.js</a>.
                 </p>

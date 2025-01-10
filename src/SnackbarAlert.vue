@@ -112,6 +112,7 @@ export default defineComponent({
       close-on-back
       role="alert"
       aria-live="assertive"
+      timeout="-1"
       >
       <span ref="snackbarMessage" tabindex="0" @keydown.esc="closeDialog">
       <slot> {{ msg }} </slot>

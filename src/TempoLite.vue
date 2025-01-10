@@ -127,7 +127,7 @@
 
       <h1 id="title">What is in the Air You Breathe?</h1>
       </div>
-      <snackbar-alert label="What's new" v-model="showChanges" hide-button>
+      <cds-dialog title="What's new" v-model="showChanges" :color="accentColor2">
         <ol class="snackbar-alert-ol">
           <li class="change-item mb-5" v-for="change in changes" :key="change.date" :data-date="change.date">
             <span style="font-weight:bold;">{{ change.date }}</span><br> {{ change.text }}
@@ -138,7 +138,7 @@
             Custom Activator
           </v-btn>
         </template>  -->
-      </snackbar-alert>
+      </cds-dialog>
 
       <div id="menu-area">
         <share-button

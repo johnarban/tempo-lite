@@ -90,8 +90,8 @@ export default defineComponent({
 .share-button {
   z-index: 1000;
   padding-inline: 5px;
-  border-radius: 8px;
-  border: thin solid var(--accent-color-2);
+  border-radius: 8px !important;
+  border: thin solid var(--accent-color-2) !important;
 }
 
 .share-button-snackbar .v-snackbar__wrapper > .v-snackbar__content {

@@ -1825,28 +1825,10 @@ a {
   color: var(--accent-color-2);
 }
 
-.v-dialog > .v-overlay__content > .v-card {
-  padding: 1rem;
-}
 
-.v-overlay__content {
-    align-self: center;
-    margin: unset;
-  }
 
-  .v-card-text {
-    height: 40vh;
-  }
 
-#credits-dialog {
-  display: flex;
-  width: calc(100% - 1rem);
-}
 
-.dialog-card {
-  align-self: center;
-  max-width: 80%;
-}
 
 // prevent overflows of the content
 #user-options {

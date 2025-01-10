@@ -8,7 +8,7 @@
       <slot name="activator" v-bind="props"></slot>
     </template>
      
-    <v-card class="dialog-card">
+    <v-card class="cds-dialog-card">
       <font-awesome-icon 
         class="cds-dialog-close-icon cds-touch-pad"
         icon="square-xmark" 
@@ -113,9 +113,23 @@ export default defineComponent({
   cursor: pointer;
 }
 
-// pad the touch area by 0.5em
+/* pad the touch area by 0.5em */
 .cds-dialog-touch-pad {
   padding: 0.5em;
   margin: -0.5em;
+}
+
+
+.v-dialog.cds-dialog > .v-overlay__content > .v-card {
+  padding: 1rem;
+}
+
+.v-dialog.cds-dialog > .v-overlay__content {
+  align-self: center;
+  margin: unset;
+}
+
+.cds-dialog .v-card-text {
+  height: 40vh;
 }
 </style>

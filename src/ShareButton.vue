@@ -1,13 +1,13 @@
 
 <template>
-  <use-clipboard v-slot="{ copy, copied }" :source="source">
+  <use-clipboard v-slot="{ copy }" :source="source">
     <v-snackbar 
       v-if="tooltipDisabled || alert"
       class="share-button-snackbar"   
-      timeout="1000" 
+      timeout="4000" 
       location="top" 
       activator="#share-button"
-      text="Link Copied"
+      text="Share link copied to clipboard. Paste to share this view!"
       color="success"
       variant="flat"
       min-height="0px"
@@ -15,11 +15,11 @@
       transition="slide-y-transition"
       >
     </v-snackbar>
-    <v-tooltip :disabled="tooltipDisabled" :text="copied ? 'Link Copied' : 'Copy link to share view'">
+    <v-tooltip :disabled="tooltipDisabled" text="Share selected view">
       <template v-slot:activator="{ props }">
         <v-btn
           id="share-button"
-          aria-label="Copy link to share view"
+          aria-label="Get link to share selected view"
           class="share-button"
           icon
           @click="copy(source)"

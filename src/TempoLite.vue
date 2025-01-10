@@ -544,129 +544,94 @@
           <div class="d-flex flex-row justify-space-between">
           <a tabindex="0">
             Credits
-            <v-dialog
+            <cds-dialog
+              title="Credits"
               id="credits-dialog"
               v-model="showCredits"
               activator="parent"
               :scrim="false"
               location="center center"
+              :color="accentColor2"
             >
-              <v-card class="dialog-card">
-                <font-awesome-icon
-                    style="position:absolute;right:16px;cursor:pointer;padding:0.5em;margin:-0.5em"
-                    icon="square-xmark"
-                    size="xl"
-                    @click="showCredits = false"
-                    @keyup.enter="showCredits = false"
-                    :color="accentColor2"
-                    tabindex="0"
-                  ></font-awesome-icon>
-                <v-card-title tabindex="0"><h3>Credits</h3></v-card-title>
-                <v-card-text>
-                  <h4 class="mb-2"><a href="https://tempo.si.edu/" target="_blank" rel="noopener noreferrer">TEMPO</a> Team Acknowledgments:</h4>
-                  <p>
-                    Caroline Nowlan, Aaron Naeger, and Erika Wright provided dates and featured events of interest in the TEMPO data.
-                  </p>
-                  <p>
-                    Xiong Liu provided the L3 version 2 TEMPO data files.
-                  </p>
-                  <p>
-                    Heesung Chong provided the shape file for the TEMPO field of regard.
-                  </p>
+              <h4 class="mb-2"><a href="https://tempo.si.edu/" target="_blank" rel="noopener noreferrer">TEMPO</a> Team Acknowledgments:</h4>
+              <p>
+                Caroline Nowlan, Aaron Naeger, and Erika Wright provided dates and featured events of interest in the TEMPO data.
+              </p>
+              <p>
+                Xiong Liu provided the L3 version 2 TEMPO data files.
+              </p>
+              <p>
+                Heesung Chong provided the shape file for the TEMPO field of regard.
+              </p>
 
-                  <p class="my-3">NASA's Scientific Visualization Studio provided the TEMPO NO<sub>2</sub> colormap.</p>
+              <p class="my-3">NASA's Scientific Visualization Studio provided the TEMPO NO<sub>2</sub> colormap.</p>
 
-                  <h4 class="mb-2"><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Team:</h4> 
+              <h4 class="mb-2"><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Team:</h4> 
 
-                  John Lewis<br>
-                  Jonathan Foster<br>
-                  Pat Udomprasert<br>
-                  Jon Carifio<br>
-                  Alyssa Goodman<br>
-                  Erika Wright<br>
-                  Mary Dussault<br>
-                  Harry Houghton<br>
-                  Evaluator: Sue Sunbury<br>
+              John Lewis<br>
+              Jonathan Foster<br>
+              Pat Udomprasert<br>
+              Jon Carifio<br>
+              Alyssa Goodman<br>
+              Erika Wright<br>
+              Mary Dussault<br>
+              Harry Houghton<br>
+              Evaluator: Sue Sunbury<br>
 
-                  <funding-acknowledgement class="my-3"></funding-acknowledgement>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
+              <funding-acknowledgement class="my-3"></funding-acknowledgement>
+            </cds-dialog>
           </a>
-          <v-dialog
+          <cds-dialog
             id="user-guide-dialog"
             v-model="showUserGuide"
             :scrim="false"
             location="center center"
+            title="User Guide"
+            :color="accentColor2"
           >
-            <v-card class="dialog-card">
-              <font-awesome-icon
-                  style="position:absolute;right:16px;cursor:pointer;padding:0.5em;margin:-0.5em"
-                  icon="square-xmark"
-                  size="xl"
-                  @click="showUserGuide = false"
-                  @keyup.enter="showUserGuide = false"
-                  :color="accentColor2"
-                  tabindex="0"
-                ></font-awesome-icon>
-              <v-card-title tabindex="0"><h3>User Guide</h3></v-card-title>
-              <v-card-text>
-                <p>
-                  Do consectetur consequat dolore esse nulla .
-                </p>
+            <p>
+              Do consectetur consequat dolore esse nulla .
+            </p>
 
-                <p>
-                  Reprehenderit sint ipsum laborum in reprehenderit sunt eu pariatur ipsum tempor .
-                </p>
+            <p>
+              Reprehenderit sint ipsum laborum in reprehenderit sunt eu pariatur ipsum tempor .
+            </p>
 
-                <p>
-                  Ex laboris fugiat ad duis eu ipsum cupidatat veniam fugiat .
-                </p>
-              </v-card-text>
-            </v-card>
-          </v-dialog>
+            <p>
+              Ex laboris fugiat ad duis eu ipsum cupidatat veniam fugiat .
+            </p>
+          </cds-dialog>
           
           
-          <v-dialog
+          <cds-dialog
             id="aboud-data-dialog"
             v-model="showAboutData"
             :scrim="false"
             location="center center"
+            title="Data source and processing"
+            short-title="Aboud Data"
+            :color="accentColor2"
           >
-            <v-card class="dialog-card">
-              <font-awesome-icon
-                  style="position:absolute;right:16px;cursor:pointer;padding:0.5em;margin:-0.5em"
-                  icon="square-xmark"
-                  size="xl"
-                  @click="showAboutData = false"
-                  @keyup.enter="showAboutData = false"
-                  :color="accentColor2"
-                  tabindex="0"
-                ></font-awesome-icon>
-              <v-card-title tabindex="0"><h3>Data source and processing</h3></v-card-title>
-              <v-card-text>
-                <p>
-                  This visualization of the TEMPO satellite NO<sub>2</sub> Tropospheric Column Density data is derived from Level 3 data files obtained from the 
-                  <a href="https://asdc.larc.nasa.gov/project/TEMPO" target="_blank" rel="noopener noreferrer">NASA ASDC TEMPO Data Products Page</a>.
-                </p>
-                <br />
-                <p>
-                  The data has been processed and visualized by the CosmicDS team at the Harvard-Smithsonian Center for Astrophysics. The images displayed have undergone pre-processing to filter out erroneous data, and a 50% cloud cover mask has been applied. 
-                  For performance optimization, the data resolution has been halved and reprojected to a Web Mercator projection to ensure compatibility with 
-                  <a href="https://leafletjs.com/" target="_blank" rel="noopener noreferrer">Leaflet.js</a>.
-                </p>
-                <br />
-                <p>
-                  The data is rendered using the color map provided by NASA's Scientific Visualization Studio.
-                </p>
-                <br />
-                <p>
-                  All data processing scripts are available on 
-                  <a href="https://github.com/johnarban/tempo_processing_scripts" target="_blank" rel="noopener noreferrer">GitHub</a>.
-                </p>
-              </v-card-text>
-            </v-card>
-          </v-dialog>
+            <p>
+              This visualization of the TEMPO satellite NO<sub>2</sub> Tropospheric Column Density data is derived from Level 3 data files obtained from the 
+              <a href="https://asdc.larc.nasa.gov/project/TEMPO" target="_blank" rel="noopener noreferrer">NASA ASDC TEMPO Data Products Page</a>.
+            </p>
+            <br />
+            <p>
+              The data has been processed and visualized by the CosmicDS team at the Harvard-Smithsonian Center for Astrophysics. The images displayed have undergone pre-processing to filter out erroneous data, and a 50% cloud cover mask has been applied. 
+              For performance optimization, the data resolution has been halved and reprojected to a Web Mercator projection to ensure compatibility with 
+              <a href="https://leafletjs.com/" target="_blank" rel="noopener noreferrer">Leaflet.js</a>.
+            </p>
+            <br />
+            <p>
+              The data is rendered using the color map provided by NASA's Scientific Visualization Studio.
+            </p>
+            <br />
+            <p>
+              All data processing scripts are available on 
+              <a href="https://github.com/johnarban/tempo_processing_scripts" target="_blank" rel="noopener noreferrer">GitHub</a>.
+            </p>
+          </cds-dialog>
 
           <!-- make small inline show introduction link button -->
           <a href="#" @click="inIntro = true" @keyup.enter="inIntro = true" style="right: 0;">
@@ -2251,6 +2216,15 @@ button:focus-visible,
       grid-row: 1 / 2;
     }
     
+    #menu-area {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 1rem;
+    align-items: flex-end;
+  }
+    
     #map-container {
       grid-column: 1 / 2;
       grid-row: 2 / 3;
@@ -2391,6 +2365,10 @@ button:focus-visible,
   z-index: 999;
 }
 
+.snackbar-alert-ol { 
+  margin-left: 1em;
+}
+
 @media (max-width: 750px) {
   .cds-snackbar-alert {
     top: -1rem;
@@ -2401,6 +2379,8 @@ button:focus-visible,
   outline: 2px solid var(--smithsonian-yellow);
   border: none;
 }
+
+
 
 .menu-link {
   text-decoration: none;

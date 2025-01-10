@@ -1075,7 +1075,7 @@ export default defineComponent({
       const currentOffset = getTimezoneOffset(this.selectedTimezone, this.date);
       // console.log(standardOffset / (3600 * 1000), currentOffset / (3600 * 1000));
       // log offsets in houts
-      console.log(`standard: ${standardOffset/ (3600 * 1000)}, current ${currentOffset  / (3600 * 1000)}`);
+      // console.log(`standard: ${standardOffset/ (3600 * 1000)}, current ${currentOffset  / (3600 * 1000)}`);
       if (standardOffset === currentOffset) {
         return false;
       }
@@ -1405,7 +1405,7 @@ export default defineComponent({
       if (!this.preload) {
         return;
       }
-      console.log('preloading images for ', this.thumbLabel);
+      // console.log('preloading images for ', this.thumbLabel);
       const times = this.timestamps.slice(this.minIndex, this.maxIndex + 1);
       const images = times.map(ts => this.getTempoDataUrl(ts) + this.getTempoFilename(new Date(ts)));
       const cloudImages = times.filter(ts => this.cloudTimestamps.includes(ts)).map(ts => this.getCloudFilename(new Date(ts)));
@@ -1418,7 +1418,7 @@ export default defineComponent({
           loaded += 1;
           this.loadedImagesProgress = (loaded / promises.length) * 100;
         }).catch((err) => {
-          console.log('error loading image', err);
+          console.error('error loading image', err);
         });
       });
     },
@@ -1458,7 +1458,7 @@ export default defineComponent({
     timestampsLoaded(loaded: boolean) {
       // this.$nextTick(() => {
       if (loaded) {
-        console.log('loaded');
+        console.log('timestamps loaded');
         if (this.initState.t) {
           let index = this.uniqueDaysIndex(this.initState.t);
           if (index == -1) {
@@ -1528,7 +1528,7 @@ export default defineComponent({
     },
     
     imageBounds(bounds: L.LatLngBounds) {
-      console.log(this.whichDataSet, bounds.toBBoxString());
+      console.log('image bounds change to', this.whichDataSet, bounds.toBBoxString());
     },
     
     showFieldOfRegard (show: boolean) {
@@ -1570,7 +1570,7 @@ export default defineComponent({
         // run this manually as the watcher wouldn't trigger
         this.goToLocationOfInterst(value, 0);
       } else {
-      this.sublocationRadio = 0;
+        this.sublocationRadio = 0;
       }
     },
     

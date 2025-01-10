@@ -59,10 +59,8 @@ export default defineComponent({
 <style scoped>
 .share-button {
   z-index: 1000;
-  background-color: rgb(255 255 255);
-  border: 1px solid black;
-  backdrop-filter: blur(5px);
   padding-inline: 5px;
-  border-radius: 10px;
+  border-radius: 8px;
+  border: thin solid var(--accent-color-2);
 }
 </style>

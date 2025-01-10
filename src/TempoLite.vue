@@ -1182,6 +1182,7 @@ export default defineComponent({
         };
         const url = new URL(location.origin);
         const searchParams = new URLSearchParams(state);
+        url.pathname = location.pathname;
         url.search = searchParams.toString();
         this.currentUrl = url.toString();
         // window.history.replaceState(null,'',url);

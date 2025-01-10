@@ -60,7 +60,13 @@
                 </p>
                 <ul>
                   <li>
-                    Select a date and press the “Play” button or scroll the time slider to view the changing concentrations of NO<sub>2</sub> over North America on those dates. 
+                    Use the search box to navigate a location of your choice.
+                  </li>
+                  <li>
+                    Select a date and press the “Play” button or scroll the time slider to view the changing concentrations of NO<sub>2</sub> on those dates. 
+                  </li>
+                  <li>
+                    Click <v-icon style="color: #ffcc33">mdi-share-variant</v-icon> to share your selected location, date, and time with others.
                   </li>
                   <li v-bind:style="cssVars">
                     Press the <v-icon style="font-size: 1.3em; color: var(--accent-color)" elevation="1">mdi-information-variant-circle-outline</v-icon> button next to each Notable Date to get an overview of what to look for on that date
@@ -69,7 +75,7 @@
                     For each Notable Date, select one of two zoomed-in Locations to investigate specific pollution events.
                   </li>
                   <li>
-                    You can use the “Timezone” setting to investigate how pollution evolves over the day, for example as rush hour progresses in large cities.
+                    You can use the “Timezone” setting to investigate how pollution evolves over the day in different parts of the country, for example as rush hour progresses in large cities.
                   </li>
                 </ul>
                 <!-- add do not show introduction again button -->
@@ -148,6 +154,8 @@
             elevation="0"
             size="small"
             rounded="1"
+            :tooltip-disabled="mobile"
+            alert
           />
         <v-btn aria-role="menu" aria-label="Show menu" class="menu-button" variant="outlined" rounded="lg" :color="accentColor2" elevation="5">
           <v-icon size="x-large">mdi-menu</v-icon>
@@ -163,23 +171,23 @@
                 >
                 What's New
               </v-list-item>
-              
-              <!-- <v-list-item 
-                tabindex="0"
-                aria-label="Show user guide"
-                @click="showUserGuide = true"
-                @keyup.enter="showUserGuide = true"
-                >
-                User Guide
-              </v-list-item> -->
-              
+
               <v-list-item 
                 tabindex="0" 
                 aria-label="Show introduction"
-                @click="inIntro = true" 
-                @keyup.enter="inIntro = true" 
+                @click="() => {introSlide = 1; inIntro = true;}"
+                @keyup.enter="() => {introSlide = 1; inIntro = true;}"
                 >
                   Introduction
+              </v-list-item>
+              
+              <v-list-item 
+                tabindex="0"
+                aria-label="Show user guide"
+                @click="() => {introSlide = 3; inIntro = true;}"
+                @keyup.enter="() => {introSlide = 3; inIntro = true;}"
+                >
+                User Guide
               </v-list-item>
               
               <v-list-item 

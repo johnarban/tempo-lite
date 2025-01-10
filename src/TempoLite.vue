@@ -921,6 +921,10 @@ export default defineComponent({
     zoomHome._zoomHome = (_e: Event) => {
       originalZH();
       this.sublocationRadio = null;
+      // check if location marker is not null and on map. if so remove it
+      if (this.locationMarker !== null) {
+        this.locationMarker.remove();
+      }
     };
     zoomHome.addTo(this.map);
     this.addCoastlines();

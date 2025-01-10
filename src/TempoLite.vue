@@ -1578,8 +1578,10 @@ export default defineComponent({
       // console.log(`singleDateSelected ${value}`);
       const timestamp = value.getTime();
       this.setNearestDate(timestamp);
-      // const index = this.datesOfInterest.map(d => d.getTime()).indexOf(timestamp);
-      // this.radio = index < 0 ? null : index;
+      if (this.radio !== null) {
+        const index = this.datesOfInterest.map(d => d.getTime()).indexOf(timestamp);
+        this.radio = index < 0 ? null : index;
+      }
     },
     
     sublocationRadio(value: number | null) {

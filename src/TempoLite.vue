@@ -1440,7 +1440,17 @@ export default defineComponent({
       let date = new Date(ts + offset(new Date(ts)));
       date = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
       return this.uniqueDays.map(e => e.getTime()).indexOf(date.getTime());
-    }
+    },
+    
+    goToLocationOfInterst(index: number, subindex: number) {
+      const loi = this.locationsOfInterest[index][subindex];
+      this.map?.setView(loi.latlng, loi.zoom);
+      if (loi.index !== undefined) {
+        this.timeIndex = loi.index;
+      } else {
+        console.warn('No index found for location of interest');
+      }
+    },
     
   },
 
@@ -1556,7 +1566,12 @@ export default defineComponent({
       const date = this.datesOfInterest[value] ?? this.singleDateSelected;
       this.singleDateSelected = date;
       this.setNearestDate(date.getTime());
+      if (this.sublocationRadio == 0) {
+        // run this manually as the watcher wouldn't trigger
+        this.goToLocationOfInterst(value, 0);
+      } else {
       this.sublocationRadio = 0;
+      }
     },
     
     singleDateSelected(value: Date) {
@@ -1569,13 +1584,7 @@ export default defineComponent({
     
     sublocationRadio(value: number | null) {
       if (value !== null && this.radio != null) {
-        const loi = this.locationsOfInterest[this.radio][value];
-        this.map?.setView(loi.latlng, loi.zoom);
-        if (loi.index !== undefined) {
-          this.timeIndex = loi.index;
-        } else {
-          console.warn('No index found for location of interest');
-        }
+        this.goToLocationOfInterst(this.radio, value);
       }
     },
 

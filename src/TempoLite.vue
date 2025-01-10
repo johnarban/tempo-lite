@@ -1188,7 +1188,7 @@ export default defineComponent({
         shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
       });
       if (this.locationMarker == null) {
-        this.locationMarker = new L.Marker(latlng,{icon: icon, pane: 'labels'});
+        this.locationMarker = new L.Marker(latlng,{icon: icon, pane: 'labels', opacity:0.8}, );
         // this.locationMarker.setZIndexOffset(1000);
       } else {
         this.locationMarker.setLatLng(latlng);

@@ -3,6 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
+      - "fix-url-to-include-all-deploy"
       - "deploy"
       - "master"
       - "main"

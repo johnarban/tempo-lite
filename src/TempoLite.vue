@@ -126,7 +126,7 @@
       </a>
 
       <h1 id="title">What is in the Air You Breathe?</h1>
-      </div>
+      <!-- </div> -->
       <cds-dialog title="What's new" v-model="showChanges" :color="accentColor2">
         <ol class="snackbar-alert-ol">
           <li class="change-item mb-5" v-for="change in changes" :key="change.date" :data-date="change.date">
@@ -195,6 +195,7 @@
           </v-menu>
         </v-btn>
       </div>
+    </div>
       <div id="where" class="big-label">where</div>
       <div id="map-container">
         <colorbar-horizontal
@@ -1744,12 +1745,12 @@ ul {
   }
   
   #menu-area {
-    grid-column: 3 / 4;
-    grid-row: 1 / 2;
-    // border: 1px solid red;
+    // grid-column: 3 / 4;
+    // grid-row: 1 / 2;
+    // // border: 1px solid red;
     display: flex;
-    justify-self: flex-end;
-    gap: 2rem;
+    justify-self: end;
+    gap: 1rem;
     align-items: center;
   }
 
@@ -1802,6 +1803,7 @@ ul {
   font-size: 2.5rem;
   text-align: left;
   text-wrap: nowrap;
+  flex-grow: 1;
 }
 
 a[href="https://tempo.si.edu"] > img {

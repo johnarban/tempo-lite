@@ -399,6 +399,7 @@
                 :model-value="singleDateSelected"
                 @internal-model-change="(value: Date) => {
                   if (value != null && value.getTime() != singleDateSelected.getTime()) {
+                    radio = null;
                     singleDateSelected = value;
                     $refs.calendar.closeMenu();
                   }
@@ -832,7 +833,7 @@ export default defineComponent({
       inIntro: !WINDOW_DONTSHOWINTRO,
       dontShowIntro: WINDOW_DONTSHOWINTRO,
 
-      radio: -1 as number | null,
+      radio: null as number | null,
       sublocationRadio: null as number | null,
 
       touchscreen: false,
@@ -1428,10 +1429,12 @@ export default defineComponent({
     },
 
     moveBackwardOneDay() {
+      this.radio=null;
       this.singleDateSelected = this.uniqueDays[this.getUniqueDayIndex(this.singleDateSelected) - 1];
     },
 
     moveForwardOneDay() {
+      this.radio=null;
       this.singleDateSelected = this.uniqueDays[this.getUniqueDayIndex(this.singleDateSelected) + 1];
     },
     
@@ -1443,6 +1446,10 @@ export default defineComponent({
     },
     
     goToLocationOfInterst(index: number, subindex: number) {
+      if (index < 0 || index >= this.locationsOfInterest.length) {
+        console.warn('Invalid index for location of interest');
+        return;
+      }
       const loi = this.locationsOfInterest[index][subindex];
       this.map?.setView(loi.latlng, loi.zoom);
       if (loi.index !== undefined) {
@@ -1566,7 +1573,7 @@ export default defineComponent({
       const date = this.datesOfInterest[value] ?? this.singleDateSelected;
       this.singleDateSelected = date;
       this.setNearestDate(date.getTime());
-      if (this.sublocationRadio == 0) {
+      if (this.sublocationRadio == 0 && value) {
         // run this manually as the watcher wouldn't trigger
         this.goToLocationOfInterst(value, 0);
       } else {

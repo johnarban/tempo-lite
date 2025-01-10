@@ -542,8 +542,6 @@
         </p>
 
           <div class="d-flex flex-row justify-space-between">
-          <a tabindex="0">
-            Credits
             <cds-dialog
               title="Credits"
               id="credits-dialog"
@@ -580,7 +578,7 @@
 
               <funding-acknowledgement class="my-3"></funding-acknowledgement>
             </cds-dialog>
-          </a>
+
           <cds-dialog
             id="user-guide-dialog"
             v-model="showUserGuide"

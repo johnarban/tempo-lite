@@ -171,6 +171,15 @@
                 >
                 What's New
               </v-list-item>
+
+              <v-list-item 
+                tabindex="0" 
+                aria-label="Show introduction"
+                @click="inIntro = true" 
+                @keyup.enter="inIntro = true" 
+                >
+                  Introduction
+              </v-list-item>
               
               <v-list-item 
                 tabindex="0"
@@ -179,15 +188,6 @@
                 @keyup.enter="() => {introSlide = 3; inIntro = true;}"
                 >
                 User Guide
-              </v-list-item>
-              
-              <v-list-item 
-                tabindex="0" 
-                aria-label="Show introduction"
-                @click="inIntro = true" 
-                @keyup.enter="inIntro = true" 
-                >
-                  Introduction
               </v-list-item>
               
               <v-list-item 

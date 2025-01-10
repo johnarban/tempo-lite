@@ -172,14 +172,14 @@
                 What's New
               </v-list-item>
               
-              <!-- <v-list-item 
+              <v-list-item 
                 tabindex="0"
                 aria-label="Show user guide"
-                @click="showUserGuide = true"
-                @keyup.enter="showUserGuide = true"
+                @click="() => {introSlide = 3; inIntro = true;}"
+                @keyup.enter="() => {introSlide = 3; inIntro = true;}"
                 >
                 User Guide
-              </v-list-item> -->
+              </v-list-item>
               
               <v-list-item 
                 tabindex="0" 

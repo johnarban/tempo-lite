@@ -2360,6 +2360,7 @@ button:focus-visible,
 .menu-button, .share-button {
   outline: 2px solid var(--smithsonian-yellow);
   border: none;
+  height: 2rem !important;
 }
 
 

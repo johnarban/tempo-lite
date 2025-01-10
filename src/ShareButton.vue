@@ -6,6 +6,7 @@
       class="share-button-snackbar"   
       timeout="1000" 
       location="top" 
+      activator="#share-button"
       text="Link Copied"
       color="success"
       variant="flat"
@@ -13,26 +14,11 @@
       min-width="0px"
       transition="slide-y-transition"
       >
-      <template v-slot:activator="{ props }">
-        <v-btn
-          aria-label="Copy link to share view"
-          class="share-button"
-          icon
-          @click="copy(source)"
-          @keyup.enter="copy(source)"
-          v-bind="props"
-          :color="buttonColor"
-          :elevation="elevation"
-          :size="size"
-          :rounded="rounded"
-        > 
-          <v-icon :color="iconColor">mdi-share-variant</v-icon>
-        </v-btn>
-      </template>
     </v-snackbar>
-    <v-tooltip v-if="!tooltipDisabled" :disabled="tooltipDisabled" :text="copied ? 'Link Copied' : 'Copy link to share view'">
+    <v-tooltip :disabled="tooltipDisabled" :text="copied ? 'Link Copied' : 'Copy link to share view'">
       <template v-slot:activator="{ props }">
         <v-btn
+          id="share-button"
           aria-label="Copy link to share view"
           class="share-button"
           icon

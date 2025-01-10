@@ -1,7 +1,36 @@
 
 <template>
   <use-clipboard v-slot="{ copy, copied }" :source="source">
-    <v-tooltip :disabled="tooltipDisabled" :text="copied ? 'Link Copied' : 'Copy link to share view'">
+    <v-snackbar 
+      v-if="tooltipDisabled || alert"
+      class="share-button-snackbar"   
+      timeout="1000" 
+      location="top" 
+      text="Link Copied"
+      color="success"
+      variant="flat"
+      min-height="0px"
+      min-width="0px"
+      transition="slide-y-transition"
+      >
+      <template v-slot:activator="{ props }">
+        <v-btn
+          aria-label="Copy link to share view"
+          class="share-button"
+          icon
+          @click="copy(source)"
+          @keyup.enter="copy(source)"
+          v-bind="props"
+          :color="buttonColor"
+          :elevation="elevation"
+          :size="size"
+          :rounded="rounded"
+        > 
+          <v-icon :color="iconColor">mdi-share-variant</v-icon>
+        </v-btn>
+      </template>
+    </v-snackbar>
+    <v-tooltip v-if="!tooltipDisabled" :disabled="tooltipDisabled" :text="copied ? 'Link Copied' : 'Copy link to share view'">
       <template v-slot:activator="{ props }">
         <v-btn
           aria-label="Copy link to share view"
@@ -55,12 +84,22 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    alert: {
+      type: Boolean,
+      default: false,
+    },
     
+  },
+  
+  data() {
+    return {
+      snackbar: false,
+    };
   },
 });
 </script>
 
-<style scoped>
+<style>
 .share-button {
   z-index: 1000;
   background-color: rgb(255 255 255);
@@ -69,4 +108,9 @@ export default defineComponent({
   padding-inline: 5px;
   border-radius: 10px;
 }
+
+.share-button-snackbar .v-snackbar__wrapper > .v-snackbar__content {
+  padding: 0.75em 1em;
+}
+
 </style>

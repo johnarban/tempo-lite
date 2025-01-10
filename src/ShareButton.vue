@@ -4,7 +4,7 @@
     <v-snackbar 
       v-if="tooltipDisabled || alert"
       class="share-button-snackbar"   
-      timeout="4000" 
+      timeout="3500" 
       location="top" 
       activator="#share-button"
       text="Share link copied to clipboard. Paste to share this view!"
@@ -13,6 +13,7 @@
       min-height="0px"
       min-width="0px"
       transition="slide-y-transition"
+      close-on-content-click
       >
     </v-snackbar>
     <v-tooltip :disabled="tooltipDisabled" text="Share selected view">

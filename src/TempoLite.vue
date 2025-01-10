@@ -76,7 +76,7 @@
                 <v-checkbox
                   v-model="dontShowIntro"
                   @keyup.enter="dontShowIntro = !dontShowIntro"
-                  label="Don't show this introduction again"
+                  label="Don't show this introduction at launch"
                   color="#c10124"
                   hide-details
                 />
@@ -126,7 +126,85 @@
       </a>
 
       <h1 id="title">What is in the Air You Breathe?</h1>
+      <!-- </div> -->
+      <cds-dialog title="What's new" v-model="showChanges" :color="accentColor2">
+        <ul class="snackbar-alert-ul">
+          <li class="change-item mb-5" v-for="change in changes" :key="change.date" :data-date="change.date">
+            <span style="font-weight:bold;">{{ change.date }}</span><br> {{ change.text }}
+          </li>
+        </ul>
+        <!-- <template v-slot:activator="{ onClick, id }">
+          <v-btn :id="id" @click="onClick" color="primary">
+            Custom Activator
+          </v-btn>
+        </template>  -->
+      </cds-dialog>
+
+      <div id="menu-area">
+        <share-button
+            :source="currentUrl"
+            buttonColor="black"
+            iconColor="yellow"
+            elevation="0"
+            size="small"
+            rounded="1"
+          />
+        <v-btn aria-role="menu" aria-label="Show menu" class="menu-button" variant="outlined" rounded="lg" color="yellow" elevation="5">
+          <v-icon size="x-large">mdi-menu</v-icon>
+          <v-menu
+            activator="parent"
+            >
+            <v-list>
+              <v-list-item 
+                tabindex="0"
+                aria-label="See recent changes"
+                @click="showChanges = true"
+                @keyup.enter="showChanges = true"
+                >
+                What's New
+              </v-list-item>
+              
+              <!-- <v-list-item 
+                tabindex="0"
+                aria-label="Show user guide"
+                @click="showUserGuide = true"
+                @keyup.enter="showUserGuide = true"
+                >
+                User Guide
+              </v-list-item> -->
+              
+              <v-list-item 
+                tabindex="0" 
+                aria-label="Show introduction"
+                @click="inIntro = true" 
+                @keyup.enter="inIntro = true" 
+                >
+                  Introduction
+              </v-list-item>
+              
+              <v-list-item 
+                tabindex="0"
+                aria-label="Show dialog telling about the data"
+                @click="showAboutData = true"
+                @keyup.enter="showAboutData = true"
+                >
+                About the Data
+              </v-list-item>
+              
+              <v-list-item 
+                tabindex="0" 
+                aria-label="Show credits"
+                @click="showCredits = true"
+                @keyup.enter="showCredits = true"
+                >
+                  Credits
+              </v-list-item>
+              
+            </v-list>
+          </v-menu>
+        </v-btn>
       </div>
+    </div>
       <div id="where" class="big-label">where</div>
       <div id="map-container">
         <colorbar-horizontal
@@ -237,7 +315,7 @@
               </div>
             </v-card>
           </v-menu>
-
+          <div id="location-and-sharing">
           <location-search
             v-model="searchOpen"
             small
@@ -252,6 +330,7 @@
             }"
             @error="(error: string) => searchErrorMessage = error"
           ></location-search>
+        </div>
         </div>
         <colorbar 
           v-if="$vuetify.display.width > 750"
@@ -380,12 +459,13 @@
             </v-tooltip>
           </div>
           <v-progress-linear
+            v-if="loadedImagesProgress < 101"
             v-model="loadedImagesProgress"
-            color="#c10124"
+            color="#092088"
             height="20"
           >
           <span v-if="loadedImagesProgress < 100">Loading Data ({{ loadedImagesProgress.toFixed(0) }}%)</span>
-          <span v-else>Selected Date Loaded</span>
+          <span v-else>Data Loaded</span>
           </v-progress-linear>
         </div>
 
@@ -401,6 +481,7 @@
           >
             <div v-for = "(event, index) in interestingEvents" :key="index" class="d-flex flex-row align-center">
               <v-radio
+                :class="event.highlighted ? 'highlighted' : ''"
                 :label="event.label"
                 :value="index"
                 @keyup.enter="radio = index"
@@ -471,61 +552,99 @@
         </p>
 
           <div class="d-flex flex-row justify-space-between">
-          <a tabindex="0">
-            Credits
-            <v-dialog
+            <cds-dialog
+              title="Credits"
               id="credits-dialog"
               v-model="showCredits"
               activator="parent"
               :scrim="false"
               location="center center"
+              :color="accentColor2"
             >
-              <v-card class="dialog-card">
-                <font-awesome-icon
-                    style="position:absolute;right:16px;cursor:pointer;padding:0.5em;margin:-0.5em"
-                    icon="square-xmark"
-                    size="xl"
-                    @click="showCredits = false"
-                    @keyup.enter="showCredits = false"
-                    :color="accentColor2"
-                    tabindex="0"
-                  ></font-awesome-icon>
-                <v-card-title tabindex="0"><h3>Credits</h3></v-card-title>
-                <v-card-text>
-                  <h4 class="mb-2"><a href="https://tempo.si.edu/" target="_blank" rel="noopener noreferrer">TEMPO</a> Team Acknowledgments:</h4>
-                  <p>
-                    Caroline Nowlan, Aaron Naeger, and Erika Wright provided dates and featured events of interest in the TEMPO data.
-                  </p>
-                  <p>
-                    Xiong Liu provided the L3 version 2 TEMPO data files.
-                  </p>
-                  <p>
-                    Heesung Chong provided the shape file for the TEMPO field of regard.
-                  </p>
+              <h4 class="mb-2"><a href="https://tempo.si.edu/" target="_blank" rel="noopener noreferrer">TEMPO</a> Team Acknowledgments:</h4>
+              <p>
+                Caroline Nowlan, Aaron Naeger, and Erika Wright provided dates and featured events of interest in the TEMPO data.
+              </p>
+              <p>
+                Xiong Liu provided the L3 version 2 TEMPO data files.
+              </p>
+              <p>
+                Heesung Chong provided the shape file for the TEMPO field of regard.
+              </p>
 
-                  <p class="my-3">NASA's Scientific Visualization Studio provided the TEMPO NO<sub>2</sub> colormap.</p>
+              <p class="my-3">NASA's Scientific Visualization Studio provided the TEMPO NO<sub>2</sub> colormap.</p>
 
-                  <h4 class="mb-2"><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Team:</h4> 
+              <h4 class="mb-2"><a href="https://www.cosmicds.cfa.harvard.edu/" target="_blank" rel="noopener noreferrer">CosmicDS</a> Team:</h4> 
 
-                  Jonathan Foster<br>
-                  Jon Carifio<br>
-                  John Lewis<br>
-                  Pat Udomprasert<br>
-                  Alyssa Goodman<br>
-                  Erika Wright<br>
-                  Mary Dussault<br>
-                  Harry Houghton<br>
-                  Evaluator: Sue Sunbury<br>
+              John Lewis<br>
+              Jonathan Foster<br>
+              Pat Udomprasert<br>
+              Jon Carifio<br>
+              Alyssa Goodman<br>
+              Erika Wright<br>
+              Mary Dussault<br>
+              Harry Houghton<br>
+              Evaluator: Sue Sunbury<br>
 
-                  <funding-acknowledgement class="my-3"></funding-acknowledgement>
-                </v-card-text>
-              </v-card>
-            </v-dialog>
-          </a>
+              <funding-acknowledgement class="my-3"></funding-acknowledgement>
+            </cds-dialog>
+
+          <cds-dialog
+            id="user-guide-dialog"
+            v-model="showUserGuide"
+            :scrim="false"
+            location="center center"
+            title="User Guide"
+            :color="accentColor2"
+          >
+            <p>
+              Do consectetur consequat dolore esse nulla .
+            </p>
+
+            <p>
+              Reprehenderit sint ipsum laborum in reprehenderit sunt eu pariatur ipsum tempor .
+            </p>
+
+            <p>
+              Ex laboris fugiat ad duis eu ipsum cupidatat veniam fugiat .
+            </p>
+          </cds-dialog>
+          
+          
+          <cds-dialog
+            id="about-data-dialog"
+            v-model="showAboutData"
+            :scrim="false"
+            location="center center"
+            title="Data source and processing"
+            short-title="About Data"
+            :color="accentColor2"
+          >
+            <p>
+              This visualization of the TEMPO satellite NO<sub>2</sub> Tropospheric Column Density data is derived from Level 3 data files obtained from the 
+              <a href="https://asdc.larc.nasa.gov/project/TEMPO" target="_blank" rel="noopener noreferrer">NASA ASDC TEMPO Data Products Page</a>.
+            </p>
+            <br />
+            <p>
+              The data has been processed and visualized by the CosmicDS team at the Harvard-Smithsonian Center for Astrophysics. The images displayed have undergone pre-processing to filter out erroneous data, and a 50% cloud cover mask has been applied. 
+              For performance optimization, the data resolution has been halved and reprojected to a Web Mercator projection to ensure compatibility with 
+              <a href="https://leafletjs.com/" target="_blank" rel="noopener noreferrer">Leaflet.js</a>.
+            </p>
+            <br />
+            <p>
+              The data is rendered using the color map provided by NASA's Scientific Visualization Studio.
+            </p>
+            <br />
+            <p>
+              All data processing scripts are available on 
+              <a href="https://github.com/johnarban/tempo_processing_scripts" target="_blank" rel="noopener noreferrer">GitHub</a>.
+            </p>
+          </cds-dialog>
+
           <!-- make small inline show introduction link button -->
-          <a href="#" @click="inIntro = true" @keyup.enter="inIntro = true" style="right: 0;">
+          <!-- <a href="#" @click="inIntro = true" @keyup.enter="inIntro = true" style="right: 0;">
             Show Introduction
-          </a>
+          </a> -->
         </div>
 
       </article>
@@ -544,7 +663,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import L, { Map } from "leaflet";
+import L, { LatLngExpression, Map } from "leaflet";
 import "leaflet.zoomhome";
 import { getTimezoneOffset } from "date-fns-tz";
 import  { cividis } from "./cividis";
@@ -556,7 +675,10 @@ import augustFieldOfRegard from "./assets/august_for.json";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MapBoxFeature, MapBoxFeatureCollection, geocodingInfoForSearch } from "./mapbox";
 import { _preloadImages } from "./PreloadImages";
-
+import changes from "./changes";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { InterestingEvent, LocationOfInterest } from "./types";
+import { interestingEvents } from "./interestingEvents";
 
 type SheetType = "text" | "video" | null;
 type Timeout = ReturnType<typeof setTimeout>;
@@ -624,27 +746,21 @@ const fosterTimestamps = [
 
 const timestamps = fosterTimestamps;
 
-interface LocationOfInterest {
-  latlng: L.LatLngExpression;
-  zoom: number;
-  text: string;
-  description: string;
-  time: string;
-  index?: number;
-}
 
-interface InterestingEvent {
-      date: Date;
-      dateString: string;
-      locations: LocationOfInterest[];
-      label?: string;
-      info?: string;
-    }
+
 
 const urlParams = new URLSearchParams(window.location.search);
 const hideIntro = urlParams.get("hideintro") === "true";
 const WINDOW_DONTSHOWINTRO = hideIntro ? true: window.localStorage.getItem("dontShowIntro") === 'true';
 
+const initLat = parseFloat(urlParams.get("lat") || '40.044');
+const initLon = parseFloat(urlParams.get("lon") || '-98.789');
+const initZoom = parseFloat(urlParams.get("zoom") || '4');
+const initTime = urlParams.get("t");
+
+const homeLat =  40.044;
+const homeLon =  -98.789;
+const homeZoom =  4;
 
 function zpad(n: number, width: number = 2, character: string = "0"): string {
   return n.toString().padStart(width, character);
@@ -678,96 +794,21 @@ export default defineComponent({
     
 
 
-    const interestingEvents = [
-      {
-        date: new Date(2023, 10, 1) ,
-        dateString: 'Nov 1',
-        label: "November 1, 2023",
-        info: `
-          <p>
-            Because the TEMPO instrument measures sunlight reflected and scattered from Earth’s 
-          surface and atmosphere, it can’t “see” through the clouds&mdash;so these
-          areas appear blank on the map.
-          </p>
-          <p>
-            But right away you’ll see that there 
-          are high concentrations of NO<sub>2</sub> around many urban centers, 
-          and sometimes along major highways.
-          </p>
-          `,
-        locations: [
-          { latlng: [34.359786, -111.700124], 
-            zoom:7, 
-            text: "Arizona Urban Traffic and Fires", 
-            time: '2023-11-01T14:22:00.000Z',
-            description: '<p>NO<sub>2</sub> increases during daily rush hour. In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, then start to build back up during the evening commute.</p><p>Fires can be seen between Phoenix and Flagstaff. These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly.</p>',
-          }, 
-          { latlng: [36.1716, -115.1391], 
-            zoom:7, 
-            text: "Las Vegas: Fairly Constant Levels All Day", 
-            time: '2023-11-01T14:22:00.000Z',
-            description: '<p>In this data Las Vegas has less daily variation than many other cities.</p>'
-          }
-        ]
-      }, 
-      {
-        date:  new Date(2023, 10, 3),
-        dateString: 'Nov 3',
-        label: "November 3, 2023",
-        info: `
-          Levels of NO<sub>2</sub> change quickly from day to day, 
-          and even from hour to hour as wind transports 
-          plumes of pollution.
-          `,
-        locations: [
-          { latlng: [36.215934, -119.777500], 
-            zoom:6, 
-            text: "California Traffic and Agriculture", 
-            time: '2023-11-03T14:22:00.000Z',
-            description: '<p>Los Angeles clearly stands out. NO<sub>2</sub> values are even higher than the maximum of our color bar. You can clearly see the highways including Route 10 between San Bernardino and Mexicali and Route 15 leading from San Bernardino towards Las Vegas. A significant amount of NO<sub>2</sub> in California&rsquo;s central valley is a byproduct of agricultural activity there. Excess fertilizer in the soil gets broken down by microbes to produce nitrogen oxides which are very reactive. Emissions that don&rsquo;t come from combustion are typically much harder to see, but the Central Valley is an area where TEMPO data may reveal this agricultural source of pollution.</p>'
-          }, 
-          { latlng: [41.857260, -80.531177], 
-            zoom:5, 
-            text: "Northeast: Large Emissions Plumes", 
-            time: '2023-11-03T12:22:00.000Z',
-            description: '<p>Air pollution is often transported, or moved, over great distances. In this data set large plumes can be seen over the Northeast. If you look closely you can see that many of these plumes appear to originate out of cities in the midwest including Nashville, St. Louis, and Memphis.</p>'
-          }
-        ]
-      }, 
-      {
-        date:  new Date(2024, 2, 28),
-        dateString: 'Mar 28',
-        label: "March 28, 2024",
-        info: `
-          Breathing air with a high concentration of NO<sub>2</sub>, 
-          and the resulting smog it forms when it reacts with other pollutants, 
-          can irritate human respiratory systems. 
-          People with asthma, as well as children and the elderly, 
-          are generally at greater risk for the health effects of air pollution. 
-          TEMPO data can help communities make informed 
-          decisions and take action to improve air quality.
-          `,
-        locations: [
-          { latlng: [31.938392, -99.095785], 
-            zoom:6, 
-            text: "Texas Oil and Gas Production", 
-            time: '2024-03-28T13:04:00.000Z',
-            description: '<p>The Permian basin, near Odessa, has two large plumes of NO2. This is the largest oil and gas producing area in the USA. You can also see here how pollution from a source in one state (Texas) can be transported across state lines to New Mexico.</p>'
-          }, 
-          { latlng: [31.331933, -91.575283], 
-            zoom: 8, 
-            text: "LA/MS Fires", 
-            time: '2024-03-28T16:44:00.000Z',
-            description: '<p>Two fires can be seen popping up south and east of Alexandria. These are most easily identified as hot spots of NO2 that appear quickly.</p>'
-          }
-        ]
-      }  // Mar 28
-    ]  as InterestingEvent[];
-    
+  
 
 
     const opacity = 0.9;
     return {
+      initState: {
+        loc: [initLat, initLon] as LatLngExpression,
+        zoom: initZoom,
+        t: initTime ? +initTime : null
+      },
+      homeState: {
+        loc: [homeLat, homeLon] as LatLngExpression,
+        zoom: homeZoom,
+        t: null as number | null
+      },
       showSplashScreen,
       sheet: null as SheetType,
       layersLoaded: false,
@@ -825,7 +866,8 @@ export default defineComponent({
       timestamps,
       erdTimestamps,
       newTimestamps,
-      fosterTimestamps,      
+      fosterTimestamps,    
+      timestampsLoaded: false,  
       preload: true,
       
       singleDateSelected: new Date(),
@@ -836,6 +878,8 @@ export default defineComponent({
       showControls: false,
       showFieldOfRegard: true,
       showCredits: false,
+      showUserGuide: false,
+      showAboutData: false,
       
       loadedImagesProgress: 0,
       useHighRes: false,
@@ -846,6 +890,9 @@ export default defineComponent({
       }),
       cloudTimestamps,
       showClouds: false,
+      currentUrl: window.location.href,
+      changes,
+      showChanges: false,
     };
   },
 
@@ -853,19 +900,19 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     this.touchscreen = ('ontouchstart' in window) || ('ontouchstart' in document.documentElement) || !!window.navigator.msPointerEnabled;
-    this.updateTimestamps();
+    this.updateTimestamps().then(() => {this.timestampsLoaded = true;});
   },
 
   mounted() {
     this.showSplashScreen = false;
-    this.map = L.map("map", { zoomControl: false }).setView([40.044, -98.789], 4, {
+    this.map = L.map("map", { zoomControl: false }).setView(this.initState.loc, this.initState.zoom, {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       crs: L.CRS.EPSG4326
     });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const zoomHome = L.Control.zoomHome();
+    const zoomHome = L.Control.zoomHome({homeCoordinates: this.homeState.loc, homeZoom: this.homeState.zoom});
     const originalZH = zoomHome._zoomHome.bind(zoomHome);
     zoomHome._zoomHome = (_e: Event) => {
       originalZH();
@@ -903,7 +950,7 @@ export default defineComponent({
       attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       pane: 'labels'
     }).addTo(this.map as Map);
-
+    
     this.singleDateSelected = this.uniqueDays[this.uniqueDays.length-1];
     this.imageOverlay.setUrl(this.imageUrl).addTo(this.map as Map);
     this.cloudOverlay.setUrl(this.cloudUrl).addTo(this.map as Map);
@@ -912,6 +959,19 @@ export default defineComponent({
     if (this.showFieldOfRegard) {
       this.fieldOfRegardLayer.addTo(this.map as Map);
     }
+    
+    this.map.on('moveend', this.updateURL);
+    this.map.on('zoomend', this.updateURL);
+    
+  },
+  
+  beforeUnmount() {
+    // cleanup event handlers
+    if (this.map) {
+      this.map.off('movend');
+      this.map.off('zoomend');
+    }
+    
   },
 
   computed: {
@@ -1110,6 +1170,24 @@ export default defineComponent({
 
   methods: {
     
+    updateURL() {
+      if (this.map) {
+        const center = this.map.getCenter();
+        const state = {
+          lat: `${center.lat.toFixed(4)}`,
+          lon: `${center.lng.toFixed(4)}`,
+          zoom: `${this.map.getZoom()}`,
+          t: `${this.timestamp}`
+          
+        };
+        const url = new URL(location.origin);
+        const searchParams = new URLSearchParams(state);
+        url.search = searchParams.toString();
+        this.currentUrl = url.toString();
+        // window.history.replaceState(null,'',url);
+      }
+    },
+    
     cividis(x: number): string {
       return cividis(x);
     },
@@ -1269,7 +1347,9 @@ export default defineComponent({
       // set minIndex and maxIndex to the first and last index of the mod array
       this.minIndex = this.timestamps.indexOf(mod[0]);
       this.maxIndex = this.timestamps.indexOf(mod[mod.length - 1]);
-      this.timeIndex = this.minIndex;
+      if (this.timeIndex < this.minIndex || this.timeIndex > this.maxIndex) {
+        this.timeIndex = this.minIndex;
+      }
       this.imagePreload();
     },
     
@@ -1315,11 +1395,43 @@ export default defineComponent({
 
     moveForwardOneDay() {
       this.singleDateSelected = this.uniqueDays[this.getUniqueDayIndex(this.singleDateSelected) + 1];
+    },
+    
+    uniqueDaysIndex(ts: number) {
+      const offset = (date: Date) => getTimezoneOffset("US/Eastern", date);
+      let date = new Date(ts + offset(new Date(ts)));
+      date = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+      return this.uniqueDays.map(e => e.getTime()).indexOf(date.getTime());
     }
     
   },
 
   watch: {
+    timestampsLoaded(loaded: boolean) {
+      // this.$nextTick(() => {
+      if (loaded) {
+        console.log('loaded');
+        if (this.initState.t) {
+          let index = this.uniqueDaysIndex(this.initState.t);
+          if (index == -1) {
+            return;
+          }
+          console.log('set the date');
+          this.singleDateSelected = this.uniqueDays[index];
+          index = this.nearestDateIndex(new Date(this.initState.t));
+          if (index == -1 ) {
+            return;
+          }
+          this.timeIndex = index;
+          // FIXME if needed. if we find the time is not being set, use nextTick
+          // this.$nextTick(() => { this.timeIndex = index;});
+        } 
+      }
+    },
+    
+    timestamp(_val: number) {
+      this.updateURL();
+    },
 
     introSlide(val: number) {
       this.inIntro = val < 4;
@@ -1398,6 +1510,7 @@ export default defineComponent({
     },
     
     singleDateSelected(value: Date) {
+      // console.log(`singleDateSelected ${value}`);
       const timestamp = value.getTime();
       this.setNearestDate(timestamp);
       const index = this.datesOfInterest.map(d => d.getTime()).indexOf(timestamp);
@@ -1431,7 +1544,7 @@ export default defineComponent({
 }
 
 // import Lexand from google fonts
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+// @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
 
 :root {
   // font-size: clamp(14px, 1.7vw, 16px);
@@ -1639,6 +1752,16 @@ ul {
     grid-row: 1 / 2;
     gap: 10px;
   }
+  
+  #menu-area {
+    // grid-column: 3 / 4;
+    // grid-row: 1 / 2;
+    // // border: 1px solid red;
+    display: flex;
+    justify-self: end;
+    gap: 1rem;
+    align-items: center;
+  }
 
   #where {
     display: none;
@@ -1689,6 +1812,7 @@ ul {
   font-size: 2.5rem;
   text-align: left;
   text-wrap: nowrap;
+  flex-grow: 1;
 }
 
 a[href="https://tempo.si.edu"] > img {
@@ -1710,28 +1834,10 @@ a {
   color: var(--accent-color-2);
 }
 
-.v-dialog > .v-overlay__content > .v-card {
-  padding: 1rem;
-}
 
-.v-overlay__content {
-    align-self: center;
-    margin: unset;
-  }
 
-  .v-card-text {
-    height: 40vh;
-  }
 
-#credits-dialog {
-  display: flex;
-  width: calc(100% - 1rem);
-}
 
-.dialog-card {
-  align-self: center;
-  max-width: 80%;
-}
 
 // prevent overflows of the content
 #user-options {
@@ -1743,6 +1849,14 @@ a {
 
 #date-radio {
   padding-block: 0.5rem;
+}
+
+#date-radio div.highlighted label {
+  font-size: 1.2em;
+  font-weight: bold;
+  border-radius: 5px;
+  color: var(--smithsonian-yellow);
+  opacity: 1;
 }
 
 #all-dates {
@@ -1791,12 +1905,17 @@ a {
     flex-shrink: 1;
   }
   
-  .forward-geocoding-container {
+  #location-and-sharing {
     position: absolute;
     bottom: 0;
-    left: 0;
-    
     z-index: 1000;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    width:fit-content;
+  }
+  .forward-geocoding-container {
     width: 250px;
     border: 2px solid black;
   }
@@ -2088,6 +2207,15 @@ button:focus-visible,
       grid-row: 1 / 2;
     }
     
+    #menu-area {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 1rem;
+    align-items: flex-end;
+  }
+    
     #map-container {
       grid-column: 1 / 2;
       grid-row: 2 / 3;
@@ -2210,5 +2338,43 @@ button:focus-visible,
   image-rendering: crisp-edges;               /* CSS4 Proposed  */
   image-rendering: pixelated;                 /* CSS4 Proposed  */
   -ms-interpolation-mode: nearest-neighbor;   /* IE8+           */
+}
+
+.share-button {
+  z-index: 1000;
+  background-color: rgb(255 255 255);
+  border: 1px solid black;
+  backdrop-filter: blur(5px);
+  padding-inline: 5px;
+  border-radius: 10px;
+}
+.cds-snackbar-alert {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  pointer-events: auto;
+  z-index: 999;
+}
+
+.snackbar-alert-ul { 
+  margin-left: 1em;
+}
+
+@media (max-width: 750px) {
+  .cds-snackbar-alert {
+    top: -1rem;
+  }
+}
+
+.menu-button, .share-button {
+  outline: 2px solid var(--smithsonian-yellow);
+  border: none;
+  height: 2rem !important;
+}
+
+
+
+.menu-link {
+  text-decoration: none;
 }
 </style>

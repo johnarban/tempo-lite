@@ -334,6 +334,7 @@
             @set-location="(feature: MapBoxFeature) => {
               if (feature !== null) {
                 map?.setView([feature.center[1], feature.center[0]], 12);
+                setMarker([feature.center[1], feature.center[0]]);
               }
             }"
             @error="(error: string) => searchErrorMessage = error"
@@ -898,6 +899,9 @@ export default defineComponent({
       }),
       cloudTimestamps,
       showClouds: false,
+      
+      showLocationMarker: true,
+      locationMarker: null as L.Marker | null,
       currentUrl: window.location.href,
       changes,
       showChanges: false,
@@ -925,6 +929,10 @@ export default defineComponent({
     zoomHome._zoomHome = (_e: Event) => {
       originalZH();
       this.sublocationRadio = null;
+      // check if location marker is not null and on map. if so remove it
+      if (this.locationMarker !== null) {
+        this.locationMarker.remove();
+      }
     };
     zoomHome.addTo(this.map);
     this.addCoastlines();
@@ -1178,6 +1186,26 @@ export default defineComponent({
 
   methods: {
     
+
+    setMarker(latlng: L.LatLngExpression) {
+      console.log(L.Icon.Default.prototype.options);
+      const icon = L.icon({
+        ...L.Icon.Default.prototype.options,
+        iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+      });
+      if (this.locationMarker == null) {
+        this.locationMarker = new L.Marker(latlng,{icon: icon, pane: 'labels', opacity:0.8}, );
+        // this.locationMarker.setZIndexOffset(1000);
+      } else {
+        this.locationMarker.setLatLng(latlng);
+      }
+      if (this.showLocationMarker) {
+        this.locationMarker.addTo(this.map as Map);
+      }
+    },
+
     updateURL() {
       if (this.map) {
         const center = this.map.getCenter();
@@ -1194,6 +1222,7 @@ export default defineComponent({
         url.search = searchParams.toString();
         this.currentUrl = url.toString();
         // window.history.replaceState(null,'',url);
+
       }
     },
     
@@ -1497,6 +1526,18 @@ export default defineComponent({
         this.fieldOfRegardLayer.addTo(this.map as Map);
       } else if (this.map) {
         this.map.removeLayer(this.fieldOfRegardLayer as L.Layer);
+      }
+    },
+    
+    showLocationMarker(show: boolean) {
+      if (this.locationMarker) {
+        if (show) {
+          this.locationMarker.addTo(this.map as Map);
+          return;
+        } else {
+          this.locationMarker.remove();
+          return;
+        }
       }
     },
     

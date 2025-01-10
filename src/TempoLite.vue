@@ -144,12 +144,12 @@
         <share-button
             :source="currentUrl"
             buttonColor="black"
-            iconColor="yellow"
+            :iconColor="accentColor2"
             elevation="0"
             size="small"
             rounded="1"
           />
-        <v-btn aria-role="menu" aria-label="Show menu" class="menu-button" variant="outlined" rounded="lg" color="yellow" elevation="5">
+        <v-btn aria-role="menu" aria-label="Show menu" class="menu-button" variant="outlined" rounded="lg" :color="accentColor2" elevation="5">
           <v-icon size="x-large">mdi-menu</v-icon>
           <v-menu
             activator="parent"
@@ -815,7 +815,7 @@ export default defineComponent({
       positionSet: false,
       
       accentColor: "#068ede",
-      accentColor2: "#ffd302",
+      accentColor2: "#ffcc33",
       buttonColor: "#ffffff",
       introSlide: 1,
       
@@ -1553,7 +1553,7 @@ export default defineComponent({
   font-size: 16px; // this is the standard browser default
   --default-line-height: clamp(1rem, min(2.2vh, 2.2vw), 1.6rem); // we don't use this
   --smithsonian-blue: #009ade;
-  --smithsonian-yellow: #ffcc33;
+  --smithsonian-yellow: #ffcc33;  
   --info-background: #092088;
   --map-height: 500px;
 }
@@ -2341,14 +2341,6 @@ button:focus-visible,
   -ms-interpolation-mode: nearest-neighbor;   /* IE8+           */
 }
 
-.share-button {
-  z-index: 1000;
-  background-color: rgb(255 255 255);
-  border: 1px solid black;
-  backdrop-filter: blur(5px);
-  padding-inline: 5px;
-  border-radius: 10px;
-}
 .cds-snackbar-alert {
   position: absolute;
   top: 1rem;
@@ -2368,8 +2360,7 @@ button:focus-visible,
 }
 
 .menu-button, .share-button {
-  outline: 2px solid var(--smithsonian-yellow);
-  border: none;
+  outline: 2px solid var(--smithsonian-yellow) !important;
   height: 2rem !important;
 }
 

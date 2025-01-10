@@ -175,8 +175,8 @@
               <v-list-item 
                 tabindex="0" 
                 aria-label="Show introduction"
-                @click="inIntro = true" 
-                @keyup.enter="inIntro = true" 
+                @click="() => {introSlide = 1; inIntro = true;}"
+                @keyup.enter="() => {introSlide = 1; inIntro = true;}"
                 >
                   Introduction
               </v-list-item>

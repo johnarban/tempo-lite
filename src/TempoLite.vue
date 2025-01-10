@@ -148,6 +148,7 @@
             elevation="0"
             size="small"
             rounded="1"
+            :tooltip-disabled="mobile"
           />
         <v-btn aria-role="menu" aria-label="Show menu" class="menu-button" variant="outlined" rounded="lg" color="yellow" elevation="5">
           <v-icon size="x-large">mdi-menu</v-icon>

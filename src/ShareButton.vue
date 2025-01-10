@@ -1,7 +1,7 @@
 
 <template>
   <use-clipboard v-slot="{ copy, copied }" :source="source">
-    <v-tooltip :text="copied ? 'Link Copied' : 'Copy link to share view'">
+    <v-tooltip :disabled="tooltipDisabled" :text="copied ? 'Link Copied' : 'Copy link to share view'">
       <template v-slot:activator="{ props }">
         <v-btn
           aria-label="Copy link to share view"
@@ -50,6 +50,10 @@ export default defineComponent({
     rounded: {
       type: [String, Number],
       default: "1",
+    },
+    tooltipDisabled: {
+      type: Boolean,
+      default: false,
     },
     
   },

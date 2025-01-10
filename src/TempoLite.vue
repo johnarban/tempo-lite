@@ -832,7 +832,7 @@ export default defineComponent({
       inIntro: !WINDOW_DONTSHOWINTRO,
       dontShowIntro: WINDOW_DONTSHOWINTRO,
 
-      radio: null as number | null,
+      radio: -1 as number | null,
       sublocationRadio: null as number | null,
 
       touchscreen: false,

@@ -1556,7 +1556,7 @@ export default defineComponent({
       const date = this.datesOfInterest[value] ?? this.singleDateSelected;
       this.singleDateSelected = date;
       this.setNearestDate(date.getTime());
-      this.sublocationRadio = null;
+      this.sublocationRadio = 0;
     },
     
     singleDateSelected(value: Date) {

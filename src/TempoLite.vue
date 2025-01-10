@@ -191,6 +191,15 @@
                   Credits
               </v-list-item>
               
+              <v-list-item 
+                tabindex="0" 
+                aria-label="Show introduction"
+                @click="inIntro = true" 
+                @keyup.enter="inIntro = true" 
+                >
+                  Introduction
+              </v-list-item>
+              
             </v-list>
           </v-menu>
         </v-btn>
@@ -633,9 +642,9 @@
           </cds-dialog>
 
           <!-- make small inline show introduction link button -->
-          <a href="#" @click="inIntro = true" @keyup.enter="inIntro = true" style="right: 0;">
+          <!-- <a href="#" @click="inIntro = true" @keyup.enter="inIntro = true" style="right: 0;">
             Show Introduction
-          </a>
+          </a> -->
         </div>
 
       </article>

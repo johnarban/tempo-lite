@@ -76,7 +76,7 @@
                 <v-checkbox
                   v-model="dontShowIntro"
                   @keyup.enter="dontShowIntro = !dontShowIntro"
-                  label="Don't show this introduction again"
+                  label="Don't show this introduction at launch"
                   color="#c10124"
                   hide-details
                 />
@@ -128,11 +128,11 @@
       <h1 id="title">What is in the Air You Breathe?</h1>
       <!-- </div> -->
       <cds-dialog title="What's new" v-model="showChanges" :color="accentColor2">
-        <ol class="snackbar-alert-ol">
+        <ul class="snackbar-alert-ul">
           <li class="change-item mb-5" v-for="change in changes" :key="change.date" :data-date="change.date">
             <span style="font-weight:bold;">{{ change.date }}</span><br> {{ change.text }}
           </li>
-        </ol>
+        </ul>
         <!-- <template v-slot:activator="{ onClick, id }">
           <v-btn :id="id" @click="onClick" color="primary">
             Custom Activator
@@ -174,6 +174,15 @@
               </v-list-item> -->
               
               <v-list-item 
+                tabindex="0" 
+                aria-label="Show introduction"
+                @click="inIntro = true" 
+                @keyup.enter="inIntro = true" 
+                >
+                  Introduction
+              </v-list-item>
+              
+              <v-list-item 
                 tabindex="0"
                 aria-label="Show dialog telling about the data"
                 @click="showAboutData = true"
@@ -189,15 +198,6 @@
                 @keyup.enter="showCredits = true"
                 >
                   Credits
-              </v-list-item>
-              
-              <v-list-item 
-                tabindex="0" 
-                aria-label="Show introduction"
-                @click="inIntro = true" 
-                @keyup.enter="inIntro = true" 
-                >
-                  Introduction
               </v-list-item>
               
             </v-list>
@@ -612,12 +612,12 @@
           
           
           <cds-dialog
-            id="aboud-data-dialog"
+            id="about-data-dialog"
             v-model="showAboutData"
             :scrim="false"
             location="center center"
             title="Data source and processing"
-            short-title="Aboud Data"
+            short-title="About Data"
             :color="accentColor2"
           >
             <p>
@@ -2356,7 +2356,7 @@ button:focus-visible,
   z-index: 999;
 }
 
-.snackbar-alert-ol { 
+.snackbar-alert-ul { 
   margin-left: 1em;
 }
 

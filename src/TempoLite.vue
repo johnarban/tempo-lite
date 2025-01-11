@@ -399,6 +399,7 @@
                 :model-value="singleDateSelected"
                 @internal-model-change="(value: Date) => {
                   if (value != null && value.getTime() != singleDateSelected.getTime()) {
+                    radio = null;
                     singleDateSelected = value;
                     $refs.calendar.closeMenu();
                   }
@@ -438,7 +439,7 @@
                   class="rounded-icon-wrapper"
                   @click="moveBackwardOneDay"
                   @keyup.enter="moveBackwardOneDay"
-                  :disabled="radio !== null || singleDateSelected === uniqueDays[0]"
+                  :disabled="singleDateSelected === uniqueDays[0]"
                   color="#009ade"
                   variant="outlined"
                   elevation="0"
@@ -456,7 +457,7 @@
                   class="rounded-icon-wrapper"
                   @click="moveForwardOneDay"
                   @keyup.enter="moveForwardOneDay"
-                  :disabled="radio !== null || singleDateSelected === uniqueDays[uniqueDays.length - 1]"
+                  :disabled="singleDateSelected === uniqueDays[uniqueDays.length - 1]"
                   color="#009ade"
                   variant="outlined"
                   elevation="0"
@@ -1075,7 +1076,7 @@ export default defineComponent({
       const currentOffset = getTimezoneOffset(this.selectedTimezone, this.date);
       // console.log(standardOffset / (3600 * 1000), currentOffset / (3600 * 1000));
       // log offsets in houts
-      console.log(`standard: ${standardOffset/ (3600 * 1000)}, current ${currentOffset  / (3600 * 1000)}`);
+      // console.log(`standard: ${standardOffset/ (3600 * 1000)}, current ${currentOffset  / (3600 * 1000)}`);
       if (standardOffset === currentOffset) {
         return false;
       }
@@ -1405,7 +1406,7 @@ export default defineComponent({
       if (!this.preload) {
         return;
       }
-      console.log('preloading images for ', this.thumbLabel);
+      // console.log('preloading images for ', this.thumbLabel);
       const times = this.timestamps.slice(this.minIndex, this.maxIndex + 1);
       const images = times.map(ts => this.getTempoDataUrl(ts) + this.getTempoFilename(new Date(ts)));
       const cloudImages = times.filter(ts => this.cloudTimestamps.includes(ts)).map(ts => this.getCloudFilename(new Date(ts)));
@@ -1418,7 +1419,7 @@ export default defineComponent({
           loaded += 1;
           this.loadedImagesProgress = (loaded / promises.length) * 100;
         }).catch((err) => {
-          console.log('error loading image', err);
+          console.error('error loading image', err);
         });
       });
     },
@@ -1428,10 +1429,12 @@ export default defineComponent({
     },
 
     moveBackwardOneDay() {
+      this.radio=null;
       this.singleDateSelected = this.uniqueDays[this.getUniqueDayIndex(this.singleDateSelected) - 1];
     },
 
     moveForwardOneDay() {
+      this.radio=null;
       this.singleDateSelected = this.uniqueDays[this.getUniqueDayIndex(this.singleDateSelected) + 1];
     },
     
@@ -1440,7 +1443,21 @@ export default defineComponent({
       let date = new Date(ts + offset(new Date(ts)));
       date = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
       return this.uniqueDays.map(e => e.getTime()).indexOf(date.getTime());
-    }
+    },
+    
+    goToLocationOfInterst(index: number, subindex: number) {
+      if (index < 0 || index >= this.locationsOfInterest.length) {
+        console.warn('Invalid index for location of interest');
+        return;
+      }
+      const loi = this.locationsOfInterest[index][subindex];
+      this.map?.setView(loi.latlng, loi.zoom);
+      if (loi.index !== undefined) {
+        this.timeIndex = loi.index;
+      } else {
+        console.warn('No index found for location of interest');
+      }
+    },
     
   },
 
@@ -1448,7 +1465,7 @@ export default defineComponent({
     timestampsLoaded(loaded: boolean) {
       // this.$nextTick(() => {
       if (loaded) {
-        console.log('loaded');
+        console.log('timestamps loaded');
         if (this.initState.t) {
           let index = this.uniqueDaysIndex(this.initState.t);
           if (index == -1) {
@@ -1518,7 +1535,7 @@ export default defineComponent({
     },
     
     imageBounds(bounds: L.LatLngBounds) {
-      console.log(this.whichDataSet, bounds.toBBoxString());
+      console.log('image bounds change to', this.whichDataSet, bounds.toBBoxString());
     },
     
     showFieldOfRegard (show: boolean) {
@@ -1556,26 +1573,27 @@ export default defineComponent({
       const date = this.datesOfInterest[value] ?? this.singleDateSelected;
       this.singleDateSelected = date;
       this.setNearestDate(date.getTime());
-      this.sublocationRadio = null;
+      if (this.sublocationRadio == 0 && value) {
+        // run this manually as the watcher wouldn't trigger
+        this.goToLocationOfInterst(value, 0);
+      } else {
+        this.sublocationRadio = 0;
+      }
     },
     
     singleDateSelected(value: Date) {
       // console.log(`singleDateSelected ${value}`);
       const timestamp = value.getTime();
       this.setNearestDate(timestamp);
-      const index = this.datesOfInterest.map(d => d.getTime()).indexOf(timestamp);
-      this.radio = index < 0 ? null : index;
+      if (this.radio !== null) {
+        const index = this.datesOfInterest.map(d => d.getTime()).indexOf(timestamp);
+        this.radio = index < 0 ? null : index;
+      }
     },
     
     sublocationRadio(value: number | null) {
       if (value !== null && this.radio != null) {
-        const loi = this.locationsOfInterest[this.radio][value];
-        this.map?.setView(loi.latlng, loi.zoom);
-        if (loi.index !== undefined) {
-          this.timeIndex = loi.index;
-        } else {
-          console.warn('No index found for location of interest');
-        }
+        this.goToLocationOfInterst(this.radio, value);
       }
     },
 

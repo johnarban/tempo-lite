@@ -1848,7 +1848,7 @@ ul {
   
   display: grid;
   grid-template-columns: 0 .8fr .3fr;
-  grid-template-rows: 70px var(--map-height) 78px .5fr .5fr;
+  grid-template-rows: 70px var(--map-height) auto .5fr .5fr;
   gap: 20px 10px;
   
   > * {
@@ -1904,6 +1904,7 @@ ul {
   #slider-row {
     grid-column: 2 / 3;
     grid-row: 3 / 4;
+    min-height: 78px;
   }
 
   #information {
@@ -2266,7 +2267,7 @@ button:focus-visible,
   
   .content-with-sidebars {
     grid-template-columns: 0px auto auto;
-    grid-template-rows: 3.5rem var(--map-height) 78px .5fr .5fr;
+    grid-template-rows: 3.5rem var(--map-height) auto .5fr .5fr;
     
     #when {
       display: none;
@@ -2328,7 +2329,7 @@ button:focus-visible,
   }
   .content-with-sidebars {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto 78px repeat(5, auto);
+    grid-template-rows: auto auto auto repeat(5, auto);
     gap: 10px;
     // padding-inline: 1rem;
     

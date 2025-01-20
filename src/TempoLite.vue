@@ -825,6 +825,8 @@ const initLon = parseFloat(urlParams.get("lon") || '-98.789');
 const initZoom = parseFloat(urlParams.get("zoom") || '4');
 const initTime = urlParams.get("t");
 
+const extendedRange = urlParams.get('extendedRange') === "true";
+
 const homeLat =  40.044;
 const homeLon =  -98.789;
 const homeZoom =  4;
@@ -964,7 +966,7 @@ export default defineComponent({
       currentUrl: window.location.href,
       changes,
       showChanges: false,
-      showLATimestamps: false,
+      showLATimestamps: extendedRange,
       showLADialog: false,
       laTimestamps: [] as number[]
     };
@@ -1275,7 +1277,8 @@ export default defineComponent({
           lat: `${center.lat.toFixed(4)}`,
           lon: `${center.lng.toFixed(4)}`,
           zoom: `${this.map.getZoom()}`,
-          t: `${this.timestamp}`
+          t: `${this.timestamp}`,
+          extendedRange: `${this.showLATimestamps}`
           
         };
         const url = new URL(location.origin);
@@ -1620,6 +1623,7 @@ export default defineComponent({
     },
     
     showLATimestamps() {
+      this.updateURL();
       this.imagePreload();
     },
     

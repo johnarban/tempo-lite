@@ -533,7 +533,7 @@
           <span v-if="loadedImagesProgress < 100">Loading Data ({{ loadedImagesProgress.toFixed(0) }}%)</span>
           <span v-else>Data Loaded</span>
           </v-progress-linear>
-          <v-switch v-model="showExtendedRange" />
+          <!-- <v-switch v-model="showExtendedRange" /> -->
         </div>
 
         <hr style="border-color: grey">

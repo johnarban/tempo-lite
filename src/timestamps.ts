@@ -17,9 +17,33 @@ export interface Manifest {
   };
 }
 
+export interface LAManifest {
+
+  'data_range_0_300/released': {
+    image_directory: string;
+    resized_image_directory: string;
+    timestamps: number[];
+  };
+  'data_range_0_300/clouds': {
+    image_directory: string;
+    resized_image_directory: string;
+    timestamps: number[];
+  };
+}
+
 export async function fetchManifest(): Promise<Manifest> {
   console.log("fetching manifest");
   const url = "https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/manifest.json";
+  // try to use cache busting, but if that fails try with plain url
+  return fetch(`${url}?version=${Date.now()}}`)
+    .then((response) => response.json())
+    .catch(() => fetch(url).then((response) => response.json()));
+    
+}
+
+export async function fetchLaFireManifest(): Promise<LAManifest> {
+  console.log("fetching la fire manifest");
+  const url = "https://tempo.si.edu/data2/tempo-data-holdings/manifest_la_fire.json";
   // try to use cache busting, but if that fails try with plain url
   return fetch(`${url}?version=${Date.now()}}`)
     .then((response) => response.json())
@@ -39,4 +63,11 @@ export  async function getTimestamps(): Promise<Timestamps> {
   const released = manifest.released;
   const clouds = manifest.clouds;
   return { early_release: earlyRelease.timestamps, released: released.timestamps, clouds: clouds.timestamps };
+}
+
+export async function getLATimestamps(): Promise<number[]> {
+  const manifest = await fetchLaFireManifest();
+  const ts =  manifest['data_range_0_300/released'].timestamps;
+  // console.log(ts.map(t => new Date(t)));
+  return ts;
 }

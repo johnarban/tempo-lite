@@ -8,6 +8,7 @@ export interface LocationOfInterest {
   }
 export interface InterestingEvent {
     date: Date;
+    endDate?: Date;
     dateString: string;
     locations: LocationOfInterest[];
     label?: string;

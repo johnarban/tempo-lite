@@ -222,7 +222,7 @@
           :nsteps="255"
           :cmap="cbarNO2"
           start-value="1"
-          end-value="150"
+          :end-value="showExtendedRange ? 300 : 150"
           :extend="true"
         >
         <template v-slot:label>
@@ -345,6 +345,21 @@
                   </p>
                 </info-button>
               </div>
+                <div class="d-flex flex-row align-center justify-space-between">
+                  <v-checkbox
+                  :disabled="!highresAvailable"
+                  v-model="useHighRes"
+                  @keyup.enter="useHighRes = !useHighRes"
+                  label="Use High Resolution Data"
+                  color="#c10124"
+                  hide-details
+                />
+                <info-button>
+                  <p>
+                    By default we show data at 1/2 resolution for performance. 
+                  </p>
+                </info-button>
+              </div>
             </v-card>
           </v-menu>
           <div id="location-and-sharing">
@@ -367,7 +382,7 @@
         
         <div id="la-fires">
           <v-btn @click="activateLAViewer" @keyup.enter="activateLAViewer">
-            See LA fires (Jan 7 &mdash;&nbsp;) 🔥
+            {{ showExtendedRange ? "Showing extend range" : "Use Exteneded range for LA 🔥" }}
           </v-btn>
           <cds-dialog title="LA Fires" v-model="showLADialog" :color="accentColor2">
             <v-row>
@@ -380,7 +395,7 @@
             By default we display values from 0.01-1.5&times;10<sup>16</sup> molecules per square centimeter, 
             check the box here to double the max of the range to 3&times;10<sup>16</sup> molecules per square centimeter.
 
-            <v-checkbox v-model="showExtendedRange" label="Use large data range"/>
+            <v-checkbox v-model="showExtendedRange" label="Use extended data range"/>
             
             Note on clouds. Some times (such as January 19th) smoke is detected as "clouds" and so those pixels get removed. 
             We (CosmicDS) currently do not have an algorithmic way retrieve the nitrogen dioxide column in these cases and so 
@@ -404,7 +419,7 @@
           :nsteps="255"
           :cmap="cbarNO2"
           start-value="1"
-          end-value="150"
+          :end-value="showExtendedRange ? 300 : 150"
           :extend="true"
         >
           <template v-slot:label>
@@ -2532,7 +2547,10 @@ button:focus-visible,
   height: 2rem !important;
 }
 
-
+div.callout-wrapper {
+  display: content;
+  // overflow-x: hidden;  
+}
 
 .menu-link {
   text-decoration: none;

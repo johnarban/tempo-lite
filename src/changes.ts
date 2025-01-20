@@ -1,5 +1,15 @@
 export default [
   {
+    date: "2025-01-21",
+    text:
+      "For the LA fires beginning Jan 8th, we have added the option to viewe the data process to display a larger range of values."
+  },
+  {
+    date: "2025-01-21",
+    text:
+      "Enable viewing the full resolution data. By default this is always off, displaying data at 1/2 the native Level 3 resolution for better performance"
+  },
+  {
     date: "2025-01-09",
     text:
       "We have added a new sharable url feature! Click the share icon to copy a link for the current view (location, zoom level, date, and time) to your clipboard.",

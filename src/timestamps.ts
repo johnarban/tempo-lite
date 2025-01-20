@@ -65,7 +65,7 @@ export  async function getTimestamps(): Promise<Timestamps> {
   return { early_release: earlyRelease.timestamps, released: released.timestamps, clouds: clouds.timestamps };
 }
 
-export async function getLATimestamps(): Promise<number[]> {
+export async function getExtendedRangeTimestamps(): Promise<number[]> {
   const manifest = await fetchLaFireManifest();
   const ts =  manifest['data_range_0_300/released'].timestamps;
   // console.log(ts.map(t => new Date(t)));

@@ -380,7 +380,7 @@
             By default we display values from 0.01-1.5&times;10<sup>16</sup> molecules per square centimeter, 
             check the box here to double the max of the range to 3&times;10<sup>16</sup> molecules per square centimeter.
 
-            <v-checkbox v-model="showLATimestamps" label="Use large data range"/>
+            <v-checkbox v-model="showExtendedRange" label="Use large data range"/>
             
             Note on clouds. Some times (such as January 19th) smoke is detected as "clouds" and so those pixels get removed. 
             We (CosmicDS) currently do not have an algorithmic way retrieve the nitrogen dioxide column in these cases and so 
@@ -533,7 +533,7 @@
           <span v-if="loadedImagesProgress < 100">Loading Data ({{ loadedImagesProgress.toFixed(0) }}%)</span>
           <span v-else>Data Loaded</span>
           </v-progress-linear>
-          <v-switch v-model="showLATimestamps" />
+          <v-switch v-model="showExtendedRange" />
         </div>
 
         <hr style="border-color: grey">
@@ -755,7 +755,7 @@ interface TimezoneInfo {
   name: string;
 }
 
-import { getTimestamps, getLATimestamps } from "./timestamps";
+import { getTimestamps, getExtendedRangeTimestamps } from "./timestamps";
 
 const erdTimestamps: number[] = [];
 const newTimestamps: number[] = [];
@@ -966,9 +966,9 @@ export default defineComponent({
       currentUrl: window.location.href,
       changes,
       showChanges: false,
-      showLATimestamps: extendedRange,
+      showExtendedRange: extendedRange,
       showLADialog: false,
-      laTimestamps: [] as number[]
+      extendedRangeTimestamps: [] as number[]
     };
   },
 
@@ -1278,7 +1278,7 @@ export default defineComponent({
           lon: `${center.lng.toFixed(4)}`,
           zoom: `${this.map.getZoom()}`,
           t: `${this.timestamp}`,
-          extendedRange: `${this.showLATimestamps}`
+          extendedRange: `${this.showExtendedRange}`
           
         };
         const url = new URL(location.origin);
@@ -1378,8 +1378,8 @@ export default defineComponent({
     // },
     
     async updateTimestamps() {
-      getLATimestamps().then(ts => {
-        this.laTimestamps = ts;
+      getExtendedRangeTimestamps().then(ts => {
+        this.extendedRangeTimestamps = ts;
       }
       );
       return getTimestamps().then((ts) => {
@@ -1404,7 +1404,7 @@ export default defineComponent({
     },
     
     getTempoDataUrl(timestamp: number): string {
-      if (this.showLATimestamps && this.laTimestamps.includes(timestamp)) {
+      if (this.showExtendedRange && this.extendedRangeTimestamps.includes(timestamp)) {
         // return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/data_range_0_300/released/images/';
         if (this.useHighRes) {
           return 'https://tempo.si.edu/data2/tempo-data-holdings/data_range_0_300/released/images/';

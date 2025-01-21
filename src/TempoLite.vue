@@ -3,6 +3,7 @@
   id="app"
   :style="cssVars"
 >
+
 <v-overlay
   :model-value="inIntro"
   :style="cssVars"
@@ -120,6 +121,12 @@
   <div
     id="main-content"
   > 
+  <marquee-alert 
+    v-if="smallSize"
+    timeout="30000"
+    message="You can view data with an extend range for the 
+            duration of the LA fires. See the 🔥 button on the map"
+    />
     <div class="content-with-sidebars">
       <!-- tempo logo -->
       <div id="logo-title">

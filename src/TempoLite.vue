@@ -381,8 +381,11 @@
         </div>
         
         <div id="la-fires">
-          <v-btn @click="activateLAViewer" @keyup.enter="activateLAViewer">
+          <v-btn v-if="!smallSize" @click="activateLAViewer" @keyup.enter="activateLAViewer" >
             {{ showExtendedRange ? "Showing extend range" : "Use Exteneded range for LA 🔥" }}
+          </v-btn>
+          <v-btn v-if="smallSize" @click="activateLAViewer" @keyup.enter="activateLAViewer" icon >
+            🔥
           </v-btn>
           <cds-dialog title="LA Fires" v-model="showLADialog" :color="accentColor2">
             <v-row>
@@ -2560,6 +2563,18 @@ div.callout-wrapper {
   font-size: large;
 }
 
+#la-fires {
+  max-width: 20ch;
+  
+  .v-btn {
+    height: calc(var(--v-btn-height) + 8px);
+  }
+  
+  .v-btn__content {
+    white-space: normal;
+
+  }
+}
 .la-fires-cds-dialog .cds-dialog-card .v-card-text {
   height: unset;
 }

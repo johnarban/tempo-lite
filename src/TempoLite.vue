@@ -229,7 +229,7 @@
           :nsteps="255"
           :cmap="cbarNO2"
           start-value="1"
-          :end-value="showingExtendedRange ? 300 : 150"
+          :end-value="showingExtendedRange ? '300' : '150'"
           :extend="true"
         >
         <template v-slot:label>
@@ -429,7 +429,7 @@
           :nsteps="255"
           :cmap="cbarNO2"
           start-value="1"
-          :end-value="showingExtendedRange ? 300 : 150"
+          :end-value="showingExtendedRange ? '300' : '150'"
           :extend="true"
         >
           <template v-slot:label>
@@ -558,7 +558,7 @@
           <span v-if="loadedImagesProgress < 100">Loading Data ({{ loadedImagesProgress.toFixed(0) }}%)</span>
           <span v-else>Data Loaded</span>
           </v-progress-linear>
-          <!-- <v-switch v-model="showExtendedRange" /> -->
+          <v-switch label="LA fires" v-model="showExtendedRange" />
         </div>
 
         <hr style="border-color: grey">
@@ -1434,11 +1434,12 @@ export default defineComponent({
     
     getTempoDataUrl(timestamp: number): string {
       if (this.showExtendedRange && this.extendedRangeTimestamps.includes(timestamp)) {
+        console.log('extended range');
         // return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/data_range_0_300/released/images/';
         if (this.useHighRes) {
-          return 'https://tempo.si.edu/data2/tempo-data-holdings/data_range_0_300/released/images/';
+          return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/data_range_0_300/released/images/';
         }
-        return 'https://tempo.si.edu/data2/tempo-data-holdings/data_range_0_300/released/images/resized_images/';
+        return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/data_range_0_300/released/images/resized_images/';
       }
       if (this.fosterTimestamps.includes(timestamp)) {
         return 'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/';

@@ -43,7 +43,7 @@ export async function fetchManifest(): Promise<Manifest> {
 
 export async function fetchLaFireManifest(): Promise<LAManifest> {
   console.log("fetching la fire manifest");
-  const url = "https://tempo.si.edu/data2/tempo-data-holdings/manifest_la_fire.json";
+  const url = "https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/manifest_la_fire.json";
   // try to use cache busting, but if that fails try with plain url
   return fetch(`${url}?version=${Date.now()}}`)
     .then((response) => response.json())

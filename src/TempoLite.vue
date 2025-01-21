@@ -222,7 +222,7 @@
           :nsteps="255"
           :cmap="cbarNO2"
           start-value="1"
-          :end-value="showExtendedRange ? 300 : 150"
+          :end-value="showingExtendedRange ? 300 : 150"
           :extend="true"
         >
         <template v-slot:label>
@@ -422,7 +422,7 @@
           :nsteps="255"
           :cmap="cbarNO2"
           start-value="1"
-          :end-value="showExtendedRange ? 300 : 150"
+          :end-value="showingExtendedRange ? 300 : 150"
           :extend="true"
         >
           <template v-slot:label>
@@ -1262,6 +1262,10 @@ export default defineComponent({
     highresAvailable() {
       return this.newTimestamps.includes(this.timestamp);
     },
+    
+    showingExtendedRange() {
+      return this.showExtendedRange && this.extendedRangeTimestamps.includes(this.timestamp);
+    }
     
     
   },

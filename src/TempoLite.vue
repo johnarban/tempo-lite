@@ -388,7 +388,7 @@
         </div>
         
         <div id="la-fires">
-          <v-btn v-if="!smallSize" @click="activateLAViewer" @keyup.enter="activateLAViewer" >
+          <v-btn v-if="!smallSize && extendedRangeAvailable" @click="activateLAViewer" @keyup.enter="activateLAViewer" >
             {{ showExtendedRange ? "Showing extend range" : "Use Exteneded range for LA 🔥" }}
           </v-btn>
           <v-btn v-if="smallSize" @click="activateLAViewer" @keyup.enter="activateLAViewer" icon >
@@ -558,7 +558,7 @@
           <span v-if="loadedImagesProgress < 100">Loading Data ({{ loadedImagesProgress.toFixed(0) }}%)</span>
           <span v-else>Data Loaded</span>
           </v-progress-linear>
-          <v-switch label="LA fires" v-model="showExtendedRange" />
+          <!-- <v-switch label="LA fires" v-model="showExtendedRange" /> -->
         </div>
 
         <hr style="border-color: grey">
@@ -1270,9 +1270,13 @@ export default defineComponent({
       return this.newTimestamps.includes(this.timestamp);
     },
     
+    extendedRangeAvailable() {
+      return this.extendedRangeTimestamps.includes(this.timestamp);
+    },
+    
     showingExtendedRange() {
-      return this.showExtendedRange && this.extendedRangeTimestamps.includes(this.timestamp);
-    }
+      return this.showExtendedRange && this.extendedRangeAvailable;
+    },
     
     
   },

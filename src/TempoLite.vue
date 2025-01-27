@@ -388,7 +388,7 @@
         </div>
         
         <div id="la-fires">
-          <v-btn v-if="!smallSize && extendedRangeAvailable" @click="activateLAViewer" @keyup.enter="activateLAViewer" >
+          <v-btn v-if="!smallSize && extendedRangeAvailable && showExtendedRangeFeatures" @click="activateLAViewer" @keyup.enter="activateLAViewer" >
             {{ showExtendedRange ? "Showing extend range" : "Use Exteneded range for LA 🔥" }}
           </v-btn>
           <v-btn v-if="smallSize" @click="activateLAViewer" @keyup.enter="activateLAViewer" icon >
@@ -851,6 +851,9 @@ const initZoom = parseFloat(urlParams.get("zoom") || '4');
 const initTime = urlParams.get("t");
 
 const extendedRange = urlParams.get('extendedRange') === "true";
+const hash = window.location.hash;
+console.log(hash);
+const showExtendedRangeFeatures = hash.includes("la-fires");
 
 const homeLat =  40.044;
 const homeLon =  -98.789;
@@ -993,7 +996,8 @@ export default defineComponent({
       showChanges: false,
       showExtendedRange: extendedRange,
       showLADialog: false,
-      extendedRangeTimestamps: [] as number[]
+      extendedRangeTimestamps: [] as number[],
+      showExtendedRangeFeatures
     };
   },
 
@@ -1005,6 +1009,7 @@ export default defineComponent({
   },
 
   mounted() {
+    window.addEventListener("hashchange", this.updateHash);
     this.showSplashScreen = false;
     this.map = L.map("map", { zoomControl: false }).setView(this.initState.loc, this.initState.zoom, {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -1275,7 +1280,7 @@ export default defineComponent({
     },
     
     showingExtendedRange() {
-      return this.showExtendedRange && this.extendedRangeAvailable;
+      return this.showExtendedRangeFeatures && this.showExtendedRange && this.extendedRangeAvailable;
     },
     
     
@@ -1302,7 +1307,9 @@ export default defineComponent({
         this.locationMarker.addTo(this.map as Map);
       }
     },
-
+    updateHash() {
+      this.showExtendedRangeFeatures = window.location.hash.includes("la-fires");
+    },
     updateURL() {
       if (this.map) {
         const center = this.map.getCenter();
@@ -1316,6 +1323,8 @@ export default defineComponent({
         };
         const url = new URL(location.origin);
         const searchParams = new URLSearchParams(state);
+        const hash = window.location.hash;
+        url.hash = hash;
         url.pathname = location.pathname;
         url.search = searchParams.toString();
         this.currentUrl = url.toString();

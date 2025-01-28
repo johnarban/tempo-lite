@@ -398,11 +398,17 @@
             <v-row>
               <v-col>
                 <p>
-                  Some events like the January 2025 Los Angeles fires generate so much smoke and pollution that NO<sub>2</sub> levels can greatly exceed the default range used in the color scale for the TEMPO-lite viewer. To show more clearly where the very highest levels of NO<sub>2</sub> are present, you can use an expanded color stretch.   
+                  Some events like the January 2025 Los Angeles fires generate so much smoke 
+                  and pollution that NO<sub>2</sub> levels can greatly
+                   exceed the default range used in the color scale 
+                   for the TEMPO-lite viewer. To show more clearly where 
+                   the very highest levels of NO<sub>2</sub> are present, 
+                   you can use an extended color stretch.   
                 </p>
                 <p>
                   By default we display values from 0.01-1.5&times;10<sup>16</sup> molecules per square centimeter, 
-                  check the box here to double the max of the range to 3&times;10<sup>16</sup> molecules per square centimeter. The expanded range will be available on dates with extreme events like the Los Angeles fire outbreaks.
+                  check the box here to double the max of the range to 3&times;10<sup>16</sup> molecules per square centimeter. 
+                  The extended range will be available on dates with extreme events like the Los Angeles fire outbreaks.
                 </p>
             
             <v-checkbox v-model="showExtendedRange" label="Use extended data range"/>

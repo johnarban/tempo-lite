@@ -2,7 +2,7 @@ export default [
   {
     date: "2025-01-21",
     html:
-      'For the LA fires beginning Jan 8th, we have added the option to view the data with an expanded colorbar. Add (or click) <a href="/#extreme-events"><code>#extreme-events</code></a> to the url to view these features',
+      'For the LA fires beginning Jan 8th, we have added the option to view the data with an extended NO<sub>2</sub> range. Add (or click) <a href="/#extreme-events"><code>#extreme-events</code></a> to the url to view these features',
       
   },
   {

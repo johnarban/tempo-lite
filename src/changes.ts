@@ -1,8 +1,9 @@
 export default [
   {
     date: "2025-01-21",
-    text:
-      "For the LA fires beginning Jan 8th, we have added the option to viewe the data process to display a larger range of values."
+    html:
+      'For the LA fires beginning Jan 8th, we have added the option to view the data with an expanded colorbar. Add (or click) <a href="/#extreme-events"><code>#extreme-events</code></a> to the url to view these features',
+      
   },
   {
     date: "2025-01-21",

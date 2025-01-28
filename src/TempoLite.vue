@@ -122,7 +122,7 @@
     id="main-content"
   > 
   <marquee-alert 
-    v-if="smallSize"
+    v-if="smallSize && showExtendedRangeFeatures"
     timeout="30000"
     message="You can view data with an extend range for the 
             duration of the LA fires. See the 🔥 button on the map"
@@ -143,7 +143,7 @@
       <cds-dialog title="What's new" v-model="showChanges" :color="accentColor2">
         <ul class="snackbar-alert-ul">
           <li class="change-item mb-5" v-for="change in changes" :key="change.date" :data-date="change.date">
-            <span style="font-weight:bold;">{{ change.date }}</span><br> {{ change.text }}
+            <span style="font-weight:bold;">{{ change.date }}</span><br> <span v-html="change.html">  </span>{{ change.text }}
           </li>
         </ul>
         <!-- <template v-slot:activator="{ onClick, id }">
@@ -391,7 +391,7 @@
           <v-btn v-if="!smallSize && extendedRangeAvailable && showExtendedRangeFeatures" @click="activateLAViewer" @keyup.enter="activateLAViewer" >
             {{ showExtendedRange ? "Showing extended range" : "Use extreme events range" }}
           </v-btn>
-          <v-btn v-if="smallSize" @click="activateLAViewer" @keyup.enter="activateLAViewer" icon >
+          <v-btn v-if="smallSize && showExtendedRangeFeatures" @click="activateLAViewer" @keyup.enter="activateLAViewer" icon >
             🔥
           </v-btn>
           <cds-dialog title="Extreme Events" v-model="showLADialog" :color="accentColor2">

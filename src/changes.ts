@@ -1,5 +1,16 @@
 export default [
   {
+    date: "2025-01-21",
+    html:
+      'For the LA fires beginning Jan 8th, we have added the option to view the data with an extended NO<sub>2</sub> range. Add (or click) <a href="#extreme-events" ><code>#extreme-events</code></a> to the url to view these features. A button will appear on the map to toggle between the standard and extended range.',
+      
+  },
+  {
+    date: "2025-01-21",
+    text:
+      "Enable viewing the full resolution data. By default this is always off, displaying data at 1/2 the native Level 3 resolution for better performance"
+  },
+  {
     date: "2025-01-09",
     text:
       "We have added a new sharable url feature! Click the share icon to copy a link for the current view (location, zoom level, date, and time) to your clipboard.",

@@ -3,6 +3,7 @@ import { InterestingEvent } from "./types";
 export const interestingEvents = [
   {
     date: new Date(2025, 0, 8),
+    endDate: new Date(2025, 0, 20),
     dateString: "Jan 8",
     label: "LA Wildfires (Jan 8, 2025)",
     highlighted: true,

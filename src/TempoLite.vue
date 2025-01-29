@@ -3,6 +3,7 @@
   id="app"
   :style="cssVars"
 >
+
 <v-overlay
   :model-value="inIntro"
   :style="cssVars"
@@ -120,6 +121,12 @@
   <div
     id="main-content"
   > 
+  <marquee-alert 
+    v-if="smallSize && showExtendedRangeFeatures"
+    timeout="30000"
+    message="You can view data with an extend range for the 
+            duration of the LA fires. See the 🔥 button on the map"
+    />
     <div class="content-with-sidebars">
       <!-- tempo logo -->
       <div id="logo-title">
@@ -136,7 +143,7 @@
       <cds-dialog title="What's new" v-model="showChanges" :color="accentColor2">
         <ul class="snackbar-alert-ul">
           <li class="change-item mb-5" v-for="change in changes" :key="change.date" :data-date="change.date">
-            <span style="font-weight:bold;">{{ change.date }}</span><br> {{ change.text }}
+            <span style="font-weight:bold;">{{ change.date }}</span><br> <span v-html="change.html">  </span>{{ change.text }}
           </li>
         </ul>
         <!-- <template v-slot:activator="{ onClick, id }">
@@ -147,6 +154,21 @@
       </cds-dialog>
 
       <div id="menu-area">
+        <v-btn 
+          v-if="(new Date('2025-02-21 00:00:00') > new Date())"
+          class='whats-new-button pulse' 
+          aria-label="What's new" 
+          @click="showChanges = true" 
+          @keyup.enter="showChanges = true" 
+          variant="outlined" 
+          rounded="lg" 
+          :color="accentColor2" 
+          elevation="0"
+          size="lg"
+          >
+          <v-tooltip location="bottom" activator="parent" :disabled="mobile" text="What's new"></v-tooltip>
+          <v-icon>mdi-creation</v-icon>
+        </v-btn>
         <share-button
             :source="currentUrl"
             buttonColor="black"
@@ -222,7 +244,7 @@
           :nsteps="255"
           :cmap="cbarNO2"
           start-value="1"
-          end-value="150"
+          :end-value="showingExtendedRange ? '300' : '150'"
           :extend="true"
         >
         <template v-slot:label>
@@ -345,6 +367,21 @@
                   </p>
                 </info-button>
               </div>
+                <div class="d-flex flex-row align-center justify-space-between">
+                  <v-checkbox
+                  :disabled="!highresAvailable"
+                  v-model="useHighRes"
+                  @keyup.enter="useHighRes = !useHighRes"
+                  label="Use High Resolution Data"
+                  color="#c10124"
+                  hide-details
+                />
+                <info-button>
+                  <p>
+                    By default we show data at 1/2 resolution for performance. 
+                  </p>
+                </info-button>
+              </div>
             </v-card>
           </v-menu>
           <div id="location-and-sharing">
@@ -364,6 +401,47 @@
             @error="(error: string) => searchErrorMessage = error"
           ></location-search>
         </div>
+        
+        <div id="la-fires">
+          <v-btn v-if="!smallSize && extendedRangeAvailable && showExtendedRangeFeatures" @click="activateLAViewer" @keyup.enter="activateLAViewer" >
+            {{ showExtendedRange ? "Showing extended range" : "Use extreme events range" }}
+          </v-btn>
+          <v-btn v-if="smallSize && showExtendedRangeFeatures" @click="activateLAViewer" @keyup.enter="activateLAViewer" icon >
+            🔥
+          </v-btn>
+          <cds-dialog title="Extreme Events" v-model="showLADialog" :color="accentColor2">
+            <v-row>
+              <v-col>
+                <p>
+                  Some events like the January 2025 Los Angeles fires generate so much smoke 
+                  and pollution that NO<sub>2</sub> levels can greatly
+                   exceed the default range used in the color scale 
+                   for the TEMPO-lite viewer. To show more clearly where 
+                   the very highest levels of NO<sub>2</sub> are present, 
+                   you can use an extended color stretch.   
+                </p>
+                <p>
+                  By default we display values from 0.01-1.5&times;10<sup>16</sup> molecules per square centimeter, 
+                  check the box here to double the max of the range to 3&times;10<sup>16</sup> molecules per square centimeter. 
+                  The extended range will be available on dates with extreme events like the Los Angeles fire outbreaks.
+                </p>
+            
+            <v-checkbox v-model="showExtendedRange" label="Use extended data range"/>
+            
+            <!-- Note on clouds. Some times (such as January 19th) smoke is detected as "clouds" and so those pixels get removed. 
+            We (CosmicDS) currently do not have an algorithmic way retrieve the nitrogen dioxide column in these cases and so 
+            those pixels are masked out in the "cloud mask". -->
+        
+              </v-col>
+            </v-row>
+            <v-row class="justify-center">
+
+              <v-btn :color="accentColor2" @click="goToLA" @keyup.enter="goToLA"> Go To Los Angeles</v-btn>
+
+            </v-row>
+          </cds-dialog>
+        </div>
+        
         </div>
         <colorbar 
           v-if="$vuetify.display.width > 750"
@@ -372,7 +450,7 @@
           :nsteps="255"
           :cmap="cbarNO2"
           start-value="1"
-          end-value="150"
+          :end-value="showingExtendedRange ? '300' : '150'"
           :extend="true"
         >
           <template v-slot:label>
@@ -501,6 +579,7 @@
           <span v-if="loadedImagesProgress < 100">Loading Data ({{ loadedImagesProgress.toFixed(0) }}%)</span>
           <span v-else>Data Loaded</span>
           </v-progress-linear>
+          <!-- <v-switch label="LA fires" v-model="showExtendedRange" /> -->
         </div>
 
         <hr style="border-color: grey">
@@ -571,6 +650,15 @@
             v-model="useHighRes"
             @keyup.enter="useHighRes = !useHighRes"
             label="Use High Resolution Data"
+            color="#c10124"
+            hide-details
+          />
+          <v-checkbox
+            v-if="showExtendedRangeFeatures"
+            :disabled="!showExtendedRangeFeatures"
+            v-model="showExtendedRange"
+            @keyup.enter="showExtendedRange = !showExtendedRange"
+            label="Use Extended NO2 range"
             color="#c10124"
             hide-details
           />
@@ -722,7 +810,7 @@ interface TimezoneInfo {
   name: string;
 }
 
-import { getTimestamps } from "./timestamps";
+import { getTimestamps, getExtendedRangeTimestamps } from "./timestamps";
 
 const erdTimestamps: number[] = [];
 const newTimestamps: number[] = [];
@@ -792,6 +880,14 @@ const initLon = parseFloat(urlParams.get("lon") || '-98.789');
 const initZoom = parseFloat(urlParams.get("zoom") || '4');
 const initTime = urlParams.get("t");
 
+
+const hash = window.location.hash;
+const showExtendedRangeFeatures = hash.includes("extreme-events");
+const extendedRange = showExtendedRangeFeatures || urlParams.get('extendedRange') === "true";
+// set the url to be only the base url, path and hash
+const newUrl = location.origin + location.pathname + location.hash;
+window.history.replaceState({}, '', newUrl);
+
 const homeLat =  40.044;
 const homeLon =  -98.789;
 const homeZoom =  4;
@@ -858,6 +954,8 @@ export default defineComponent({
       dontShowIntro: WINDOW_DONTSHOWINTRO,
       loadingOverlay: true,
 
+      showNotice: true,
+      
       radio: null as number | null,
       sublocationRadio: null as number | null,
 
@@ -931,6 +1029,10 @@ export default defineComponent({
       currentUrl: window.location.href,
       changes,
       showChanges: false,
+      showExtendedRange: extendedRange,
+      showLADialog: false,
+      extendedRangeTimestamps: [] as number[],
+      showExtendedRangeFeatures
     };
   },
 
@@ -942,6 +1044,7 @@ export default defineComponent({
   },
 
   mounted() {
+    window.addEventListener("hashchange", this.updateHash);
     this.showSplashScreen = false;
     this.map = L.map("map", { zoomControl: false }).setView(this.initState.loc, this.initState.zoom, {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -1207,6 +1310,14 @@ export default defineComponent({
       return this.newTimestamps.includes(this.timestamp);
     },
     
+    extendedRangeAvailable() {
+      return this.extendedRangeTimestamps.includes(this.timestamp);
+    },
+    
+    showingExtendedRange() {
+      return this.showExtendedRangeFeatures && this.showExtendedRange && this.extendedRangeAvailable;
+    },
+    
     
   },
 
@@ -1231,19 +1342,34 @@ export default defineComponent({
         this.locationMarker.addTo(this.map as Map);
       }
     },
-
+    updateHash() {
+      this.showExtendedRangeFeatures = window.location.hash.includes("extreme-events");
+    },
+    
     updateURL() {
       if (this.map) {
         const center = this.map.getCenter();
-        const state = {
-          lat: `${center.lat.toFixed(4)}`,
-          lon: `${center.lng.toFixed(4)}`,
-          zoom: `${this.map.getZoom()}`,
-          t: `${this.timestamp}`
-          
-        };
+        let state = null;
+        if (this.showExtendedRangeFeatures) {
+          state = {
+            lat: `${center.lat.toFixed(4)}`,
+            lon: `${center.lng.toFixed(4)}`,
+            zoom: `${this.map.getZoom()}`,
+            t: `${this.timestamp}`,
+            extendedRange: `${this.showExtendedRange}`
+          };
+        } else {
+          state = {
+            lat: `${center.lat.toFixed(4)}`,
+            lon: `${center.lng.toFixed(4)}`,
+            zoom: `${this.map.getZoom()}`,
+            t: `${this.timestamp}`
+          };
+        }
         const url = new URL(location.origin);
         const searchParams = new URLSearchParams(state);
+        const hash = window.location.hash;
+        url.hash = hash;
         url.pathname = location.pathname;
         url.search = searchParams.toString();
         this.currentUrl = url.toString();
@@ -1339,6 +1465,10 @@ export default defineComponent({
     // },
     
     async updateTimestamps() {
+      getExtendedRangeTimestamps().then(ts => {
+        this.extendedRangeTimestamps = ts;
+      }
+      );
       return getTimestamps().then((ts) => {
         this.erdTimestamps = ts.early_release;
         this.newTimestamps = ts.released;
@@ -1361,6 +1491,14 @@ export default defineComponent({
     },
     
     getTempoDataUrl(timestamp: number): string {
+      if (this.showExtendedRange && this.extendedRangeTimestamps.includes(timestamp)) {
+        console.log('extended range');
+        // return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/data_range_0_300/released/images/';
+        if (this.useHighRes) {
+          return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/data_range_0_300/released/images/';
+        }
+        return 'https://raw.githubusercontent.com/johnarban/tempo-data-holdings/main/data_range_0_300/released/images/resized_images/';
+      }
       if (this.fosterTimestamps.includes(timestamp)) {
         return 'https://tempo-images-bucket.s3.amazonaws.com/tempo-lite/';
       }
@@ -1484,6 +1622,19 @@ export default defineComponent({
       }
     },
     
+    goToLA() {
+      this.showLADialog = false;
+      const event = this.interestingEvents.filter(e => e.label == 'LA Wildfires (Jan 8, 2025)');
+      if (event !== undefined && this.map ) {
+        const loi = event[0].locations;
+        this.map.setView(loi[0].latlng, loi[0].zoom);
+      }
+    },
+    
+    activateLAViewer() {
+      this.showLADialog = true;
+    }
+    
   },
 
   watch: {
@@ -1559,6 +1710,7 @@ export default defineComponent({
       this.imagePreload();
     },
     
+    
     imageBounds(bounds: L.LatLngBounds) {
       console.log('image bounds change to', this.whichDataSet, bounds.toBBoxString());
     },
@@ -1625,7 +1777,18 @@ export default defineComponent({
     opacity(value: number) {
       this.imageOverlay.setOpacity(value);
       this.cloudOverlay.setOpacity(value);
-    }
+    },
+    
+    showChanges(_value: boolean) {
+      if (this.showNotice) {
+        this.showNotice = false;
+      }
+    },
+    
+    showExtendedRange(_value: boolean) {
+      this.updateURL();
+      this.imagePreload();
+    },
   }
 });
 </script>
@@ -2053,6 +2216,14 @@ a {
       font-size: .95em;
     }
   }
+  
+  #la-fires {
+    z-index: 1000;
+    position: absolute;
+    right: 80px ;
+    bottom: 1rem;
+    
+  }
 }
 
 #slider-row {
@@ -2451,12 +2622,19 @@ button:focus-visible,
   }
 }
 
-.menu-button, .share-button {
+.menu-button, .share-button, .whats-new-button {
   outline: 2px solid var(--smithsonian-yellow) !important;
   height: 2rem !important;
 }
 
+.whats-new-button {
+  padding-inline: 10px;
+}
 
+div.callout-wrapper {
+  display: content;
+  // overflow-x: hidden;  
+}
 
 .menu-link {
   text-decoration: none;
@@ -2464,5 +2642,40 @@ button:focus-visible,
 
 #loading-circle-progress-container {
   font-size: large;
+}
+
+#la-fires {
+  max-width: 20ch;
+  
+  .v-btn {
+    height: calc(var(--v-btn-height) + 8px);
+  }
+  
+  .v-btn__content {
+    white-space: normal;
+
+  }
+}
+.la-fires-cds-dialog .cds-dialog-card .v-card-text {
+  height: unset;
+}
+
+.pulse {
+  animation-name: pulse;
+  animation-duration: 1.5s ;
+  animation-iteration-count: 3;
+}
+
+/* Generated by Copilot */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 </style>

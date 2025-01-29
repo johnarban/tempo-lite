@@ -155,7 +155,7 @@
 
       <div id="menu-area">
         <v-btn 
-          v-if="(new Date('2025-02-01 00:00:00') > new Date()) && showNotice"
+          v-if="(new Date('2025-02-21 00:00:00') > new Date())"
           class='whats-new-button pulse' 
           aria-label="What's new" 
           @click="showChanges = true" 
@@ -871,10 +871,13 @@ const initLon = parseFloat(urlParams.get("lon") || '-98.789');
 const initZoom = parseFloat(urlParams.get("zoom") || '4');
 const initTime = urlParams.get("t");
 
-const extendedRange = urlParams.get('extendedRange') === "true";
+
 const hash = window.location.hash;
-console.log(hash);
 const showExtendedRangeFeatures = hash.includes("extreme-events");
+const extendedRange = showExtendedRangeFeatures || urlParams.get('extendedRange') === "true";
+// set the url to be only the base url, path and hash
+const newUrl = location.origin + location.pathname + location.hash;
+window.history.replaceState({}, '', newUrl);
 
 const homeLat =  40.044;
 const homeLon =  -98.789;
@@ -1333,17 +1336,27 @@ export default defineComponent({
     updateHash() {
       this.showExtendedRangeFeatures = window.location.hash.includes("extreme-events");
     },
+    
     updateURL() {
       if (this.map) {
         const center = this.map.getCenter();
-        const state = {
-          lat: `${center.lat.toFixed(4)}`,
-          lon: `${center.lng.toFixed(4)}`,
-          zoom: `${this.map.getZoom()}`,
-          t: `${this.timestamp}`,
-          extendedRange: `${this.showExtendedRange}`
-          
-        };
+        let state = null;
+        if (this.showExtendedRangeFeatures) {
+          state = {
+            lat: `${center.lat.toFixed(4)}`,
+            lon: `${center.lng.toFixed(4)}`,
+            zoom: `${this.map.getZoom()}`,
+            t: `${this.timestamp}`,
+            extendedRange: `${this.showExtendedRange}`
+          };
+        } else {
+          state = {
+            lat: `${center.lat.toFixed(4)}`,
+            lon: `${center.lng.toFixed(4)}`,
+            zoom: `${this.map.getZoom()}`,
+            t: `${this.timestamp}`
+          };
+        }
         const url = new URL(location.origin);
         const searchParams = new URLSearchParams(state);
         const hash = window.location.hash;
@@ -1688,10 +1701,6 @@ export default defineComponent({
       this.imagePreload();
     },
     
-    showLATimestamps() {
-      this.updateURL();
-      this.imagePreload();
-    },
     
     imageBounds(bounds: L.LatLngBounds) {
       console.log('image bounds change to', this.whichDataSet, bounds.toBBoxString());
@@ -1765,6 +1774,11 @@ export default defineComponent({
       if (this.showNotice) {
         this.showNotice = false;
       }
+    },
+    
+    showExtendedRange(_value: boolean) {
+      this.updateURL();
+      this.imagePreload();
     },
   }
 });

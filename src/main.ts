@@ -48,7 +48,7 @@ library.add(faHome);
 const update = (el: HTMLElement, binding: Vue.DirectiveBinding) => el.style.visibility = (binding.value) ? "hidden" : "";
 
 createApp(TempoLite, {})
- 
+
   // Plugins
   .use(vuetify)
 

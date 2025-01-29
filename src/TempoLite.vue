@@ -653,6 +653,15 @@
             color="#c10124"
             hide-details
           />
+          <v-checkbox
+            v-if="showExtendedRangeFeatures"
+            :disabled="!showExtendedRangeFeatures"
+            v-model="showExtendedRange"
+            @keyup.enter="showExtendedRange = !showExtendedRange"
+            label="Use Extended NO2 range"
+            color="#c10124"
+            hide-details
+          />
         </div>
       </div>
       

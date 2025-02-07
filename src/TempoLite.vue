@@ -403,8 +403,8 @@
         </div>
         
         <div id="la-fires">
-          <v-btn v-if="!smallSize && extendedRangeAvailable && showExtendedRangeFeatures" @click="activateLAViewer" @keyup.enter="activateLAViewer" >
-            {{ showExtendedRange ? "Showing extended range" : "Use extreme events range" }}
+          <v-btn v-if="!smallSize && showExtendedRangeFeatures" @click="activateLAViewer" @keyup.enter="activateLAViewer" >
+            {{ extendedRangeAvailable ? (showExtendedRange ? "Showing extended range" : "Use extreme events range") : "No extended range images available for this date" }}
           </v-btn>
           <v-btn v-if="smallSize && showExtendedRangeFeatures" @click="activateLAViewer" @keyup.enter="activateLAViewer" icon >
             🔥
@@ -2648,7 +2648,8 @@ div.callout-wrapper {
   max-width: 20ch;
   
   .v-btn {
-    height: calc(var(--v-btn-height) + 8px);
+    height: fit-content; // calc(var(--v-btn-height) + 18px);
+    padding-block: 5px;
   }
   
   .v-btn__content {

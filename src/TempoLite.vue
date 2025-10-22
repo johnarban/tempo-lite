@@ -111,10 +111,10 @@
                     Click <v-icon style="color: #ffcc33">mdi-share-variant</v-icon> to share your selected location, date, and time with others.
                   </li>
                   <li v-bind:style="cssVars">
-                    Press the <v-icon style="font-size: 1.3em; color: var(--accent-color)" elevation="1">mdi-information-variant-circle-outline</v-icon> button next to each Notable Date to get an overview of what to look for on that date
+                    Press the <v-icon style="font-size: 1.3em; color: var(--accent-color)" elevation="1">mdi-information-variant-circle-outline</v-icon> button next to each Notable Feature to get an overview of what to look for on that date
                   </li>
                   <li>
-                    For each Notable Date, select one of two zoomed-in Locations to investigate specific pollution events.
+                    For each Notable Feature, select one of two zoomed-in Locations to investigate specific pollution events.
                   </li>
                   <li>
                     You can use the “Timezone” setting to investigate how pollution evolves over the day in different parts of the country, for example as rush hour progresses in large cities.
@@ -208,7 +208,7 @@
 
       <div id="menu-area">
         <v-btn 
-          v-if="(new Date('2025-05-7 00:00:00') > new Date())"
+          v-if="(new Date('2025-10-25 00:00:00') > new Date())"
           class='whats-new-button pulse' 
           aria-label="What's new" 
           @click="showChanges = true" 
@@ -752,7 +752,7 @@
 
           <div id="date-radio">
             <!-- make a v-radio-group with 3 options -->
-          <h2>Notable Dates</h2>
+          <h2>Notable Features</h2>
           <v-radio-group
             v-model="radio"
             row

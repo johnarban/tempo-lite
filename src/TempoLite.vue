@@ -1706,6 +1706,10 @@ function imagePreload() {
   });
 }
 
+function within1Day(date1: Date, date2: Date): boolean {
+  const diff = Math.abs(date1.getTime() - date2.getTime());
+  return diff <= (24 * 60 * 60 * 1000);
+}
 
 function goToLocationOfInterst(index: number, subindex: number) {
   if (index < 0 || index >= locationsOfInterest.value.length) {
@@ -1713,12 +1717,24 @@ function goToLocationOfInterst(index: number, subindex: number) {
     return;
   }
   const loi = locationsOfInterest.value[index][subindex];
-  setView(loi.latlng, loi.zoom * zoomScale); // Adjust zoom level for maplibre
-  if (loi.index !== undefined) {
-    timeIndex.value = loi.index;
-  } else {
-    console.warn('No index found for location of interest');
+  const loiDay = new Date(loi.time);
+  console.log(`Single date selected: ${singleDateSelected.value}, LOI day: ${loiDay}`);
+  
+  if (!within1Day(singleDateSelected.value, loiDay)) {
+    singleDateSelected.value = uniqueDays.value[uniqueDaysIndex(loiDay.getTime())];
   }
+  // need to wait for singleDateSelected to update before setting timeIndex
+  nextTick(() => {
+    // set time index to loi index
+    if (loi.index !== undefined) {
+      console.log(`Setting time index to ${loi.index} for LOI at ${loi.day}`);
+      timeIndex.value = loi.index;
+    } else {
+      console.warn('No index found for location of interest');
+    }
+    setView(loi.latlng, loi.zoom * zoomScale); // Adjust zoom level for maplibre
+  });
+
 }
 
 
@@ -2004,32 +2020,44 @@ watch(timestamps, () => {
 });
 
 watch(radio, (value: number | null) => {
+  // reset the sublocation radio
+  sublocationRadio.value = null;
+  
   if (value == null) {
     setNearestDate(singleDateSelected.value.getTime());
-    sublocationRadio.value = null;
     return;
   }
-  const date = datesOfInterest.value[value] ?? singleDateSelected.value;
-  singleDateSelected.value = date;
-  if (sublocationRadio.value == 0 && value !== null) {
-    // nextTick so that singleDateSelected has time to update
-    nextTick(() => goToLocationOfInterst(value, 0));
-  } else {
-    sublocationRadio.value = 0;
+  
+  // is there a date for this event? then go to that date
+  const date = datesOfInterest.value[value];
+  if (date) {
+    singleDateSelected.value = date;
   }
+  // then go to the first location of interest for this event
+  nextTick(() => {
+    sublocationRadio.value = 0;
+  });
 });
 
 watch(singleDateSelected, (value: Date) => {
-  // console.log(`singleDateSelected ${value}`);
   const timestamp = value.getTime();
-  // setNearestDate(timestamp);
   if (radio.value !== null) {
     const indices = datesOfInterest.value
-      .map((d, i) => (d.getTime() === timestamp ? i : -1))
+      .map((d, i) => (d?.getTime() === timestamp ? i : -1))
       .filter(i => i !== -1);
+    
+    const sublocationIndices = locationsOfInterest.value[radio.value]
+      .filter(loc => {
+        const locTime = new Date(loc.time);
+        return within1Day(locTime, value);
+      });
+    
 
-    if (!indices.includes(radio.value)) {
-      radio.value = indices.length > 0 ? indices[0] : null;
+    if (!indices.includes(radio.value) && sublocationIndices.length === 0) {
+      const newRadioValue = indices.length > 0 ? indices[0] : null;
+      if (newRadioValue !== radio.value) {
+        radio.value = newRadioValue;
+      }
     }
   }
   imagePreload();

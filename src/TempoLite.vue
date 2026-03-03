@@ -992,12 +992,64 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    
+    <v-container>
+    <v-expand-transition>
+      <user-experience
+        v-show="showRating"
+        :question="question"
+        icon-size="3x"
+        @dismiss="(_rating: UserExperienceRating | null, _comments: string | null) => {
+          showRating = false;
+        }"
+        @rating="(rating: UserExperienceRating | null) => {
+          currentRating = rating;
+          updateUserExperienceInfo(currentRating, currentComments);
+        }"
+        @finish="(rating: UserExperienceRating | null, comments: string | null) => {
+          currentRating = rating;
+          currentComments = comments;
+          updateUserExperienceInfo(currentRating, currentComments)
+          showRating = false;
+        }"
+      >
+        <template #footer>
+          <div id="user-experience-footer">
+            <v-btn
+              class="rating-opt-put"
+              color="#BDBDBD"
+              size="small"
+              variant="text"
+              @click="() => {
+                showRating = false;
+                ratingOptOut = true;
+              }"
+            >
+            Don't show again
+            </v-btn>
+            <v-btn
+              class="privacy-button"
+              color="#BDBDBD"
+              @click="showRatingPrivacyPolicy = true"
+              @keyup.enter="showRatingPrivacyPolicy = true"
+              size="small"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+            What is this?
+            </v-btn> 
+          </div>
+        </template>
+      </user-experience>
+    </v-expand-transition>
+    <cds-privacy-policy v-model="showRatingPrivacyPolicy" />
+  </v-container>
 </v-app>
 </template>
   
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, nextTick, ComputedRef } from "vue";
-import { API_BASE_URL, blurActiveElement } from "@cosmicds/vue-toolkit";
+import { API_BASE_URL, blurActiveElement, type UserExperienceRating } from "@cosmicds/vue-toolkit";
 import { useDisplay } from 'vuetify';
 import { DatePickerInstance } from "@vuepic/vue-datepicker";
 import { v4 } from "uuid";
@@ -1138,17 +1190,71 @@ let userSelectedNotableEvents: [string, string][] = [];
 
 const STORY_DATA_URL = `${API_BASE_URL}/tempo-lite/data`;
 const OPT_OUT_KEY = "tempo-lite-optout" as const;
+const STORY_RATING_URL = `${API_BASE_URL}/tempo_lite/user-experience`;
+const RATING_OPT_OUT_KEY = "tempo-lite-optout" as const;
+
+const storedRatingOptOut = window.localStorage.getItem(RATING_OPT_OUT_KEY);
+
+const showRatingPrivacyPolicy = ref(false);
+const question = Math.random() > 0.5 ? 
+  "Does this spark your curiosity?" :
+  "Are you learning something new?";
+const currentRating = ref<UserExperienceRating | null>(null);
+const currentComments = ref<string | null>(null);
+
 const UUID_KEY = "tempo-lite-uuid" as const;
 const storedOptOut = window.localStorage.getItem(OPT_OUT_KEY);
 const maybeUUID = window.localStorage.getItem(UUID_KEY);
 const optOut = typeof storedOptOut === "string" ? storedOptOut === "true" : null;
 const showPrivacyDialog = ref(false);
 const responseOptOut = ref(optOut);
+
+// If the user has opted out of all data collection, don't ask them the question
+const ratingOptedOut = typeof storedRatingOptOut === "string" ? storedRatingOptOut === "true" : null;
+const ratingOptOut = ref(responseOptOut.value || ratingOptedOut);
+let ratingTimeout: ReturnType<typeof setTimeout> | null = null;
+const showRating = ref(false);
+
 const existingUser = maybeUUID !== null;
 const uuid = maybeUUID ?? v4();
 if (!existingUser) {
   window.localStorage.setItem(UUID_KEY, uuid);
 }
+
+
+function updateUserExperienceInfo(rating: UserExperienceRating | null, comments: string | null) {
+  const body: Record<string, unknown> = {
+    uuid,
+    question,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    story_name: "planet-parade",
+  };
+  if (rating) {
+    body.rating = rating;
+  }
+  if (comments) {
+    body.comments = comments;
+  }
+  fetch(STORY_RATING_URL, {
+    method: "PUT",
+    headers: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      "Authorization": process.env.VUE_APP_CDS_API_KEY ?? "",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+}
+
+
+
+function clearRatingTimeout() {
+  if (ratingTimeout !== null) {
+    clearTimeout(ratingTimeout);
+    ratingTimeout = null;
+  }
+}
+
 
 function selectSheet(name: SheetType) {
   if (sheet.value === name) {
@@ -1774,23 +1880,52 @@ async function createUserEntry() {
     headers: { "Authorization": process.env.VUE_APP_CDS_API_KEY ?? "" }
   });
   const content = await response.json();
-  const exists = response.status === 200 && content.response?.user_uuid != undefined;
-  if (exists) {
+  const userExists = response.status === 200 && content.response?.user_uuid != undefined;
+  
+  if (!userExists) {
+    fetch(`${STORY_DATA_URL}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        "Authorization": process.env.VUE_APP_CDS_API_KEY ?? "",
+      },
+      body: JSON.stringify({
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        user_uuid: uuid,
+      }),
+    });
+  }
+  
+  if (ratingOptOut.value) {
     return;
   }
+  
+  let gaveRating = false;
+  if (userExists) {
+    try {
+      const ratingResponse = await fetch(`${STORY_RATING_URL}/${uuid}`, {
+        method: "GET",
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        headers: { "Authorization": process.env.VUE_APP_CDS_API_KEY ?? "" }
+      });
 
-  fetch(`${STORY_DATA_URL}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      "Authorization": process.env.VUE_APP_CDS_API_KEY ?? "",
-    },
-    body: JSON.stringify({
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      user_uuid: uuid,
-    }),
-  });
+      const ratingContent = await ratingResponse.json();
+      gaveRating = ratingResponse.status === 200 && ratingContent.ratings?.length > 0;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  if (!gaveRating) {
+    console.log("will get rating");
+    ratingTimeout = setTimeout(() => {
+      console.log('getting rating');
+      showRating.value = true; 
+    }, 90_000);
+  }
+  
+  
 }
 
 function resetData() {
@@ -1942,8 +2077,21 @@ watch(showPrivacyDialog, (show: boolean) => {
 });
 
 watch(responseOptOut, (optOut: boolean | null) => {
-  if (responseOptOut.value !== null) {
+  if (optOut !== null) {
     window.localStorage.setItem(OPT_OUT_KEY, String(optOut));
+    if (optOut) {
+      clearRatingTimeout();
+      showRating.value = false;
+    }
+  }
+});
+
+watch(ratingOptOut, (optOut: boolean | null) => {
+  if (optOut !== null) {
+    window.localStorage.setItem(RATING_OPT_OUT_KEY, String(optOut));
+    if (optOut) {
+      clearRatingTimeout();
+    }
   }
 });
 
@@ -3162,5 +3310,61 @@ div.callout-wrapper {
 canvas.maplibregl-canvas {
   background-color: whitesmoke;
 }
+
+.rating-root {
+  position: absolute !important;
+  right: 5px;
+  bottom: 0;
+  padding: 5px;
+  width: fit-content !important;
+  // left: 50%;
+  // transform: translateX(-50%);
+  gap: 0 !important;
+  border: solid 1px #EFEFEF !important;
+  border-radius: 10px !important;
+  background-color: #222222 !important;
+  opacity: 0.95 !important;
+  z-index: 20000;
+
+  .rating-title {
+    color: #EFEFEF;
+    font-size: var(--default-font-size);
+  }
+
+  .rating-icon-row {
+    
+    padding: 0px;
+
+    .svg-inline--fa {
+      height: 30px;
+    }
+  }
+
+  .comments-box {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .v-card-text {
+    padding-bottom: 0;
+  }
+
+  .v-card-actions {
+    padding: 0;
+  }
+
+  #user-experience-footer {
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+  }
+
+  .v-btn.bg-success {
+    position: absolute;
+    right: 5px;
+  }
+}
+
 </style>
   

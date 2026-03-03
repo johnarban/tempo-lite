@@ -167,7 +167,7 @@
   > 
   <marquee-alert 
     v-if="smallSize && showExtendedRangeFeatures && extendedRangeAvailable" 
-    timeout="30000"
+    :timeout="30000"
     message="You can view data with an extend range for the 
             duration of the LA fires. See the 🔥 button on the map"
     />
@@ -177,7 +177,7 @@
     style="font-size:0.9em; gap: 1em;"
     icon="mdi-calendar-alert"
     type="error"
-    timeout="10000"
+    :timeout="10000"
     fixed
   >
     {{ new Date(timestamps[timestamps.length-1]).toLocaleDateString('en-US', { dateStyle: 'medium' }) }} is the latest date with available data. See <a href="https://asdc.larc.nasa.gov/project/TEMPO/" target="_blank" rel="noopener noreferrer">NASA's EarthData website</a> and <a href="https://github.com/Smithsonian/TEMPO-Observations-log/blob/main/daily_log.md"  target="_blank" rel="noopener noreferrer">TEMPO Observing Log</a> for more information.
@@ -232,7 +232,7 @@
             size="small"
             rounded="1"
             :tooltip-disabled="mobile"
-            @click="shareButtonClickedCount += 1"
+            @share="shareButtonClickedCount += 1"
             alert
           />
         <v-btn aria-role="menu" aria-label="Show menu" class="menu-button" variant="outlined" rounded="lg" :color="accentColor2" elevation="5">

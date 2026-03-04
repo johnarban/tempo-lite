@@ -1228,7 +1228,7 @@ function updateUserExperienceInfo(rating: UserExperienceRating | null, comments:
     uuid,
     question,
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    story_name: "planet-parade",
+    story_name: "tempo-lite",
   };
   if (rating) {
     body.rating = rating;

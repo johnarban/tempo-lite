@@ -996,7 +996,8 @@
     <v-container>
     <v-expand-transition>
       <user-experience
-        v-show="showRating"
+        id="rating-root"
+        v-show="true"
         :question="question"
         icon-size="3x"
         @dismiss="(_rating: UserExperienceRating | null, _comments: string | null) => {
@@ -3311,7 +3312,7 @@ canvas.maplibregl-canvas {
   background-color: whitesmoke;
 }
 
-.rating-root {
+#rating-root.rating-root {
   position: absolute !important;
   right: 5px;
   bottom: 0;
@@ -3360,10 +3361,6 @@ canvas.maplibregl-canvas {
     gap: 5px;
   }
 
-  .v-btn.bg-success {
-    position: absolute;
-    right: 5px;
-  }
 }
 
 </style>

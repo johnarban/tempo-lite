@@ -997,7 +997,7 @@
     <v-expand-transition>
       <user-experience
         id="rating-root"
-        v-show="true"
+        v-if="showRating"
         :question="question"
         icon-size="3x"
         @dismiss="(_rating: UserExperienceRating | null, _comments: string | null) => {
@@ -1191,7 +1191,7 @@ let userSelectedNotableEvents: [string, string][] = [];
 
 const STORY_DATA_URL = `${API_BASE_URL}/tempo-lite/data`;
 const OPT_OUT_KEY = "tempo-lite-optout" as const;
-const STORY_RATING_URL = `${API_BASE_URL}/tempo_lite/user-experience`;
+const STORY_RATING_URL = `${API_BASE_URL}/tempo-lite/user-experience`;
 const RATING_OPT_OUT_KEY = "tempo-lite-optout" as const;
 
 const storedRatingOptOut = window.localStorage.getItem(RATING_OPT_OUT_KEY);
@@ -1919,9 +1919,7 @@ async function createUserEntry() {
   }
 
   if (!gaveRating) {
-    console.log("will get rating");
     ratingTimeout = setTimeout(() => {
-      console.log('getting rating');
       showRating.value = true; 
     }, 90_000);
   }

@@ -1921,7 +1921,7 @@ async function createUserEntry() {
   if (!gaveRating) {
     ratingTimeout = setTimeout(() => {
       showRating.value = true; 
-    }, 90_000);
+    }, 60_000);
   }
   
   

@@ -280,7 +280,7 @@ export default defineComponent({
 
   // there are two separate labels, we want the 2nd one to be large. the first is the small floating label
   .v-field > .v-field__field > .v-label.v-field-label:nth-child(2) {
-    font-size: 1.2rem;
+    font-size: 0.9em;
   }
 
   // .v-input--horizontal .v-input__append {
@@ -305,7 +305,11 @@ export default defineComponent({
   
   .forward-geocoding-input-small label {
     // .v-label sets default to 1rem
-    font-size: 0.8rem;
+    font-size: 0.6rem;
+  }
+  
+  .forward-geocoding-input-small.v-input--density-compact .v-field--variant-filled {
+    --v-input-control-height: 30px !important;
   }
 
   .forward-geocoding-input-row {

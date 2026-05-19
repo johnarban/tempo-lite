@@ -547,11 +547,15 @@
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
           <v-slider
-            :class='["time-slider", maxIndex <= minIndex ? "hide-first-last-ticks" : ""]'
+            :class='[
+              "time-slider", 
+              maxIndex <= minIndex ? "hide-first-last-ticks" : "",
+              maxIndex < minIndex + 7 ? `hide-ticks-${minIndex + 7 - maxIndex}` : "",
+              ]'
             :disabled="maxIndex <= minIndex"
-            v-model="timeIndex"
+            v-model="timeSliderIndex"
             :min="minIndex"
-            :max="maxIndex"
+            :max="Math.max(minIndex + 7,maxIndex)"
             :step="1"
             color="#068ede95"
             thumb-label="always"
@@ -1371,6 +1375,18 @@ const {
   moveBackwardOneDay,
   moveForwardOneDay,
   nearestDateIndex } = useUniqueTimeSelection(timestamps);
+  
+const timeSliderIndex = computed({
+  get() {
+    return timeIndex.value;
+  },
+  set(value: number) {
+    if (value > maxIndex.value) {
+      return;
+    }
+    timeIndex.value = value;
+  }
+});
 
 const timestampsLoaded = ref(false);
 const fosterTimestampsSet = ref(new Set(fosterTimestamps.value));
@@ -2882,6 +2898,18 @@ a {
     width: 4px;
     margin-top: 0 !important;
     // top: -10%;
+  }
+
+
+  &.hide-ticks-1 .v-slider-track__tick:nth-last-child(-n + 1),
+  &.hide-ticks-2 .v-slider-track__tick:nth-last-child(-n + 2),
+  &.hide-ticks-3 .v-slider-track__tick:nth-last-child(-n + 3),
+  &.hide-ticks-4 .v-slider-track__tick:nth-last-child(-n + 4),
+  &.hide-ticks-5 .v-slider-track__tick:nth-last-child(-n + 5), 
+  &.hide-ticks-6 .v-slider-track__tick:nth-last-child(-n + 6),
+  &.hide-ticks-7 .v-slider-track__tick:nth-last-child(-n + 7)
+  {
+    display: none !important;
   }
 
   .v-slider {

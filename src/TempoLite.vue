@@ -1902,27 +1902,27 @@ async function createUserEntry() {
     return;
   }
   
-  let gaveRating = false;
-  if (userExists) {
-    try {
-      const ratingResponse = await fetch(`${STORY_RATING_URL}/${uuid}`, {
-        method: "GET",
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        headers: { "Authorization": process.env.VUE_APP_CDS_API_KEY ?? "" }
-      });
+  // let gaveRating = false;
+  // if (userExists) {
+  //   try {
+  //     const ratingResponse = await fetch(`${STORY_RATING_URL}/${uuid}`, {
+  //       method: "GET",
+  //       // eslint-disable-next-line @typescript-eslint/naming-convention
+  //       headers: { "Authorization": process.env.VUE_APP_CDS_API_KEY ?? "" }
+  //     });
 
-      const ratingContent = await ratingResponse.json();
-      gaveRating = ratingResponse.status === 200 && ratingContent.ratings?.length > 0;
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  if (!gaveRating) {
-    ratingTimeout = setTimeout(() => {
-      showRating.value = true; 
-    }, 60_000);
-  }
+  //     const ratingContent = await ratingResponse.json();
+  //     gaveRating = ratingResponse.status === 200 && ratingContent.ratings?.length > 0;
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // }
+  //
+  // if (!gaveRating) {
+  //   ratingTimeout = setTimeout(() => {
+  //     showRating.value = true; 
+  //   }, 60_000);
+  // }
   
   
 }

@@ -244,7 +244,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cosmicds/tempo-lite@workspace:."
   dependencies:
-    "@cosmicds/vue-toolkit": "npm:~0.5.2"
+    "@cosmicds/vue-toolkit": "npm:~0.6.0"
     "@fortawesome/fontawesome-svg-core": "npm:^6.5.1"
     "@fortawesome/free-solid-svg-icons": "npm:^6.5.1"
     "@fortawesome/vue-fontawesome": "npm:^3.0.5"
@@ -282,9 +282,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cosmicds/vue-toolkit@npm:~0.5.2":
-  version: 0.5.2
-  resolution: "@cosmicds/vue-toolkit@npm:0.5.2"
+"@cosmicds/vue-toolkit@npm:~0.6.0":
+  version: 0.6.0
+  resolution: "@cosmicds/vue-toolkit@npm:0.6.0"
   dependencies:
     "@capacitor/core": "npm:^5.7.4"
     "@capacitor/geolocation": "npm:^5.0.7"
@@ -294,13 +294,14 @@ __metadata:
     "@kyvg/vue3-notification": "npm:^2.9.1"
     "@mdi/font": "npm:^7.4.47"
     "@vueuse/core": "npm:^13.1.0"
+    "@wwtelescope/engine": "npm:^7.30.1"
     "@wwtelescope/engine-pinia": "npm:^0.9.0"
     leaflet: "npm:^1.9.4"
     pinia: "npm:~2.1.7"
     screenfull: "npm:^6.0.2"
     vue: "npm:^3.4"
     vuetify: "npm:^3.3.3"
-  checksum: 10/41ea8526241542261bd69ac49313da387c4cb702e9f0f8aeb26155009ebf20618a5c2274a3f4c76c2e7b110dadef013f38f4d03c86b80a9b1e5036aff55a8501
+  checksum: 10/c23fd5f9d5b20d712e655169531f2bc21c633e2035cf119c3b8e48788b7cf72064cdace4a203c420430efd9b8d8e42b400ea255847775b63007b1c60c997ecf9
   languageName: node
   linkType: hard
 
@@ -1974,6 +1975,17 @@ __metadata:
     pako: "npm:^1.0.11"
     uuid: "npm:^8.3.2"
   checksum: 10/3c88ab3063ea409eeb3558dd53684c6cf337e66de0db357b9b2493cc419769496601f902c9e6a6c36fbbab6820da4756cf7d1acb7b932290e513853daae1aa03
+  languageName: node
+  linkType: hard
+
+"@wwtelescope/engine@npm:^7.30.1":
+  version: 7.37.1
+  resolution: "@wwtelescope/engine@npm:7.37.1"
+  dependencies:
+    "@wwtelescope/engine-types": "npm:>=0.6.0"
+    pako: "npm:^1.0.11"
+    uuid: "npm:^14.0.0"
+  checksum: 10/da4cbef5d8e1e448c7f891076ae806e4df25b9cf5e92b0876a73d33355faa5d7c501f874c438a362685a4adf6f50e027a4ee5e1025472e17c8002024ee48d503
   languageName: node
   linkType: hard
 
@@ -8364,6 +8376,15 @@ __metadata:
   bin:
     uuid: dist/esm/bin/uuid
   checksum: 10/d2da43b49b154d154574891ced66d0c83fc70caaad87e043400cf644423b067542d6f3eb641b7c819224a7cd3b4c2f21906acbedd6ec9c6a05887aa9115a9cf5
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^14.0.0":
+  version: 14.0.0
+  resolution: "uuid@npm:14.0.0"
+  bin:
+    uuid: dist-node/bin/uuid
+  checksum: 10/8ee9b98f9650e25555515f7a28d3c3ae9364e72f7bb19b9e08b681bc135338beba5509b2830f6ae1cfaba4d45401da0d16d4d109b977097bc3d6ba0c5583341b
   languageName: node
   linkType: hard
 

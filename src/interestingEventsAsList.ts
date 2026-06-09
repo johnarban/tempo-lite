@@ -209,6 +209,28 @@ const arizonaTraffic: InterestingEvent = {
     },
   ],
 };
+const minnesotaAgriculture: InterestingEvent = {
+  label: "Minnesota Agriculture",
+  locations: [
+    {
+      latlng: [48.25, -96.9] as LatLngPair,
+      zoom: 6,
+      text: "Minnesota Agricultural NO\u2082",
+      time: "2025-05-04T14:00:00.000Z",
+      description:
+        `<p>
+        TEMPO observed elevated levels of NO<sub>2</sub> over agricultural fiels in Minnesota during the first week of May 2025.
+        </p>
+        <p>
+        Agricultural fields can be a major source of soil-emitted nitrogen oxides which can contribute to elevated levels of ozone and particulate matter.
+        </p>
+        <p>
+        High soil moisture due to April rainfall, and nitrogen fertilizer applied to weat and soybeans in the northwestern countries could have contributetd to the high levels of emission observed. 
+        </p>
+        `,
+    },
+  ],
+};
 const artemisIILaunch: InterestingEvent = {
   date: new Date(2026, 3, 1),
   dateString: "April 1, 2026",
@@ -327,6 +349,7 @@ export const interestingEvents: InterestingEvent[] = [
     `,
     locations: [
       ...caAgriculture.locations,
+      ...minnesotaAgriculture.locations,
     ],
   },
 

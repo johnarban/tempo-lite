@@ -209,6 +209,28 @@ const arizonaTraffic: InterestingEvent = {
     },
   ],
 };
+const artemisIILaunch: InterestingEvent = {
+  date: new Date(2026, 3, 1),
+  dateString: "April 1, 2026",
+  label: "Artemis II Launch",
+  highlighted: true,
+  hasFeature: true,
+  locations: [
+    {
+      latlng: [28.6246, -80.6207] as LatLngPair,
+      zoom: 8,
+      text: "Artemis II Launch",
+      time: "2026-04-01T22:37:00.000Z",
+      description:
+        `<p>The Artemis II mission, NASA's first mission to the Moon since Apollo 17 in 1972, 
+        launched from NASA's Kennedy Space Center near Cape Canaveral, Florida. 
+        Rocket launches produce significant amounts of NO<sub>2</sub> and other pollutants
+        as a byproduct of the combustion of rocket propellants. 
+        TEMPO can detect these emissions as a brief, intense hot spot near the launch site.
+        </p>`,
+    },
+  ],
+};
 const lasVegasUrban = {
   label: "Las Vegas: Fairly Constant Levels All Day",
   locations: [
@@ -305,6 +327,20 @@ export const interestingEvents: InterestingEvent[] = [
     `,
     locations: [
       ...caAgriculture.locations,
+    ],
+  },
+
+  {
+    label: 'Events',
+    info: `
+    <p>
+    One-time events such as rocket launches can produce brief, intense bursts of NO<sub>2</sub> 
+    that are detectable by TEMPO. These fleeting signatures offer a unique opportunity to observe 
+    the immediate atmospheric impact of human activities.
+    </p>
+    `,
+    locations: [
+      ...artemisIILaunch.locations,
     ],
   }
 ];

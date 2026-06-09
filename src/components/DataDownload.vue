@@ -4,7 +4,7 @@
       <div class="data-image" v-if="dataUrl" >
       <img 
         
-        :style="{ 'height': '150px', 'width': (150 * aspectRatio) + 'px' }"
+        :style="{ 'height': '200px', 'width': (200 * aspectRatio) + 'px' }"
         
         :src="dataUrl" 
         alt="Data Image" 
@@ -195,7 +195,7 @@ const earthdata_url_time = `${earthdata_stem}?${params.toString()}`;
   border-top: 2px solid #1976d2;
   border-bottom: 2px solid #1976d2;
   font-size: 0.8em;
-  display: grid;
+  display: none;
   grid-template-columns: 1fr;
   grid-template-rows: auto auto auto;
   row-gap: 5px;

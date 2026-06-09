@@ -2185,9 +2185,9 @@ watch(radio, (value: number | null) => {
     singleDateSelected.value = date;
   }
   // then go to the first location of interest for this event
-  nextTick(() => {
-    sublocationRadio.value = 0;
-  });
+  // nextTick(() => {
+  //   sublocationRadio.value = 0;
+  // });
 });
 
 watch(singleDateSelected, (value: Date) => {

@@ -2,8 +2,15 @@ export default [
   {
     date: "2025-10-25",
     html: 'Use the download button to download the currently displayed view as a PNG image.',
-    highlight: new Date() < new Date('2025-10-31 00:00:00') ,
+    highlight: new Date() < new Date('2026-07-09 00:00:00') ,
     
+  },
+  {
+    html: `
+    "Notable Dates" have been reorganized into "Notable Featuress" to improve clarity and usability. 
+    They are now categorized by what is being highlighted in each feature, wether it is a wildfire, power generation, etc. 
+    `,
+    highlight: new Date() < new Date('2026-07-09 00:00:00') ,
   },
   {
     date: "2025-04-24",

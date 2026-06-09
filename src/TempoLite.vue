@@ -180,7 +180,7 @@
     :timeout="10000"
     fixed
   >
-    {{ new Date(timestamps[timestamps.length-1]).toLocaleDateString('en-US', { dateStyle: 'medium' }) }} is the latest date with available data. See <a href="https://asdc.larc.nasa.gov/project/TEMPO/" target="_blank" rel="noopener noreferrer">NASA's EarthData website</a> and <a href="https://github.com/Smithsonian/TEMPO-Observations-log/blob/main/daily_log.md"  target="_blank" rel="noopener noreferrer">TEMPO Observing Log</a> for more information.
+    {{ new Date(timestamps[timestamps.length-1]).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }} is the latest date with available data. See <a href="https://asdc.larc.nasa.gov/project/TEMPO/" target="_blank" rel="noopener noreferrer">NASA's EarthData website</a> and <a href="https://github.com/Smithsonian/TEMPO-Observations-log/blob/main/daily_log.md"  target="_blank" rel="noopener noreferrer">TEMPO Observing Log</a> for more information.
     </marquee-alert>
     <div class="content-with-sidebars">
       <!-- tempo logo -->

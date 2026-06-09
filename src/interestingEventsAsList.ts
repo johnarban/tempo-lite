@@ -67,13 +67,13 @@ const texasOilAndGas: InterestingEvent = {
   ],
 }; 
 
-const caTrafficAndAgriculture: InterestingEvent = {
-  label: "California Traffic and Agriculture",
+const caTraffic: InterestingEvent = {
+  label: "Southern California Traffic",
   locations: [
     {
       latlng: [36.215934, -119.7775] as LatLngPair,
       zoom: 6,
-      text: "California Traffic and Agriculture",
+      text: "Southern California Traffic",
       time: "2023-11-03T14:22:00.000Z",
       description:
         `
@@ -81,7 +81,28 @@ const caTrafficAndAgriculture: InterestingEvent = {
     than the maximum of our color bar. 
     You can clearly see the highways including Route 10 between 
     San Bernardino and Mexicali and Route 15 leading from San Bernardino 
-    towards Las Vegas. A significant amount of NO<sub>2</sub> in 
+    towards Las Vegas. 
+    </p>
+    <p>
+    Levels of NO<sub>2</sub> change quickly from day to day, 
+    and even from hour to hour as wind transports 
+    plumes of pollution.
+    </p>
+    `,
+    },
+  ],
+};
+const caAgriculture: InterestingEvent = {
+  label: "California Agriculture",
+  locations: [
+    {
+      latlng: [36.215934, -119.7775] as LatLngPair,
+      zoom: 6,
+      text: "California Agriculture",
+      time: "2023-11-03T14:22:00.000Z",
+      description:
+        `
+    <p>A significant amount of NO<sub>2</sub> in 
     California's central valley is a byproduct of agricultural activity there. 
     </p>
     <p>
@@ -91,9 +112,6 @@ const caTrafficAndAgriculture: InterestingEvent = {
     to see, but the Central Valley is an area where TEMPO data may reveal this 
     agricultural source of pollution.
     </p>
-    Levels of NO<sub>2</sub> change quickly from day to day, 
-    and even from hour to hour as wind transports 
-    plumes of pollution.
     `,
     },
   ],
@@ -122,10 +140,41 @@ const northeastPowerPlants: InterestingEvent = {
     },
   ],
 };
-const arizonaTrafficAndFires: InterestingEvent = {
+const arizonaFires: InterestingEvent = {
   date: new Date(2023, 10, 1),
   dateString: "Nov 1",
-  label: "Arizona Urban Traffic and Fires",
+  label: "Arizona Fires",
+  highlighted: false,
+  hasFeature: true,
+  info: `
+    <p>
+    Fires can be seen between Phoenix and Flagstaff. 
+    These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly.
+    </p>
+    <p>
+    Because the TEMPO instrument measures sunlight reflected and scattered from Earth’s 
+    surface and atmosphere, it can’t “see” through the clouds&mdash;so these
+    areas appear blank on the map.
+    </p>
+    `,
+  locations: [
+    {
+      latlng: [34.359786, -111.700124] as LatLngPair,
+      zoom: 7,
+      text: "Arizona Fires",
+      time: "2023-11-01T14:22:00.000Z",
+      description:
+        `
+        <p>Fires can be seen between Phoenix and Flagstaff. 
+        These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly.
+        </p>`,
+    },
+  ],
+};
+const arizonaTraffic: InterestingEvent = {
+  date: new Date(2023, 10, 1),
+  dateString: "Nov 1",
+  label: "Arizona Urban Traffic",
   highlighted: false,
   hasFeature: true,
   info: `
@@ -133,10 +182,6 @@ const arizonaTrafficAndFires: InterestingEvent = {
     NO<sub>2</sub> increases during daily rush hour. 
     In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, dip down during the day, 
     then start to build back up during the evening commute.
-    </p>
-    <p>
-    Fires can be seen between Phoenix and Flagstaff. 
-    These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly.
     </p>
     <p>
     Because the TEMPO instrument measures sunlight reflected and scattered from Earth’s 
@@ -153,16 +198,14 @@ const arizonaTrafficAndFires: InterestingEvent = {
     {
       latlng: [34.359786, -111.700124] as LatLngPair,
       zoom: 7,
-      text: "Arizona Urban Traffic and Fires",
+      text: "Arizona Urban Traffic",
       time: "2023-11-01T14:22:00.000Z",
       description:
         `<p>NO<sub>2</sub> increases during daily rush hour. 
         In Phoenix, notice the high levels of NO<sub>2</sub> early in the morning, 
         dip down during the day, then start to build back up during the evening commute.
         </p>
-        <p>Fires can be seen between Phoenix and Flagstaff. 
-        These are most easily identified as hot spots of NO<sub>2</sub> that appear quickly.
-        </p>`,
+        `,
     },
   ],
 };
@@ -202,7 +245,7 @@ export const interestingEvents: InterestingEvent[] = [
     locations: [
       ...laWildfire.locations,
       ...laMississippiFires.locations,
-      ...arizonaTrafficAndFires.locations
+      ...arizonaFires.locations
     ],
   },
 
@@ -220,8 +263,8 @@ export const interestingEvents: InterestingEvent[] = [
     </p>
     `,
     locations: [
-      ...caTrafficAndAgriculture.locations,
-      ...arizonaTrafficAndFires.locations,
+      ...caTraffic.locations,
+      ...arizonaTraffic.locations,
       ...lasVegasUrban.locations
     ],
   },
@@ -261,7 +304,7 @@ export const interestingEvents: InterestingEvent[] = [
     </p>
     `,
     locations: [
-      ...caTrafficAndAgriculture.locations,
+      ...caAgriculture.locations,
     ],
   }
 ];

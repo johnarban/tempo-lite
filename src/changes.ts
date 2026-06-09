@@ -1,11 +1,11 @@
 export default [
   {
-    date: "2025-10-25",
+    date: "2026-06-09",
     html: `
-    "Notable Dates" have been reorganized into "Notable Featuress" to improve clarity and usability. 
-    They are now categorized by what is being highlighted in each feature, wether it is a wildfire, power generation, etc. 
+    "Notable Dates" have been reorganized into "Notable Features" to improve clarity and usability. 
+    They are now categorized by what is being highlighted in each feature, whether it is a wildfire, traffic pattern, etc. 
     `,
-    highlight: new Date() < new Date('2025-11-25 00:00:00') ,
+    highlight: new Date() < new Date('2026-07-09 00:00:00') ,
   },
   {
     date: "2025-04-24",

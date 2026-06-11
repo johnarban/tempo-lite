@@ -113,10 +113,10 @@
                     Click <v-icon style="color: #ffcc33">mdi-share-variant</v-icon> to share your selected location, date, and time with others.
                   </li>
                   <li v-bind:style="cssVars">
-                    Press the <v-icon style="font-size: 1.3em; color: var(--accent-color)" elevation="1">mdi-information-variant-circle-outline</v-icon> button next to each Notable Feature to get an overview of what to look for on that date
+                    Press the <v-icon style="font-size: 1.3em; color: var(--accent-color)" elevation="1">mdi-information-variant-circle-outline</v-icon> button next to each Featured Topic to get an overview of what you can explore in the TEMPO data.
                   </li>
                   <li>
-                    For each Notable Feature, select one of two zoomed-in Locations to investigate specific pollution events.
+                    For each Featured Topic, select Example Cases to investigate specific pollution events.
                   </li>
                   <li>
                     You can use the “Timezone” setting to investigate how pollution evolves over the day in different parts of the country, for example as rush hour progresses in large cities.
@@ -754,7 +754,7 @@
 
           <div id="date-radio">
             <!-- make a v-radio-group with 3 options -->
-          <h2>Notable Features</h2>
+          <h2>Featured Topics</h2>
           <v-radio-group
             v-model="radio"
             row
@@ -778,7 +778,7 @@
         <hr style="border-color: grey;"  v-if="radio !== null ">
         
         <div id="locations-of-interest" v-if="radio !== null">
-          <h3 class="mb-1">Featured Events for {{ dateStrings[radio] }}</h3>
+          <h3 class="mb-1">Example Cases</h3>
           <v-radio-group
             v-if="radio !== null"
             v-model="sublocationRadio"

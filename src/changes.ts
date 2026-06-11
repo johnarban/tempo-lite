@@ -2,8 +2,8 @@ export default [
   {
     date: "2026-06-09",
     html: `
-    "Notable Dates" have been reorganized into "Notable Features" to improve clarity and usability. 
-    They are now categorized by what is being highlighted in each feature, whether it is a wildfire, traffic pattern, etc. 
+    "Notable Dates" have been reorganized into "Featured Topics" to improve clarity and usability. 
+    Each topic (notable events, wildfires, traffic patterns, etc.) then presents one or more example cases.
     `,
     highlight: new Date() < new Date('2026-07-09 00:00:00') ,
   },

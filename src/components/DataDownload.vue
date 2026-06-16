@@ -1,19 +1,22 @@
 <template>
-  <v-card>
+  <v-card class="pa-0">
     <v-card-text class="data-download-stuff">
       <div class="data-image" v-if="dataUrl" >
+      <a class="download-link" :href="dataUrl" :download="filename">
       <img 
-        
-        :style="{ 'height': '200px', 'width': (200 * aspectRatio) + 'px' }"
-        
-        :src="dataUrl" 
+        class="data-image-img"
+        :style="{ 'aspect-ratio': aspectRatio }"
+        :src="dataUrl"
+        :name="filename"
         alt="Data Image" 
         />
+      </a>
       </div>
       <v-progress-linear striped v-else indeterminate height="30" color="primary">Loading Image....</v-progress-linear>
       <div class="mt-4">
       <div class="text-small">
-      Right click above, or <a class="download-link" :href="dataUrl" download="data_image.png">Click here<v-icon>mdi-download-outline</v-icon></a> to download the image
+      <!-- Tap or right click above, or <a class="download-link" :href="dataUrl" :download="filename">Click here<v-icon>mdi-download-outline</v-icon></a> to download the image -->
+       Tap or right click above to download the image.
       </div>
       <div class="dds-links">
         
@@ -76,6 +79,9 @@ const dataUrl = ref('');
 
 const html = document.getElementById('map');
 const aspectRatio = ref(0);
+
+const map_center = props.map ? props.map.getCenter() : { lat: 0, lng: 0 };
+const filename = `tempo_data_${new Date(props.timestamp).toISOString()}_${map_center.lat.toFixed(2)}_${map_center.lng.toFixed(2)}.png`;
 
 // import { hideLeafletControls, showLeafletControls } from '@/canvas_downloader';
 onMounted(() => {
@@ -172,16 +178,43 @@ const earthdata_url_time = `${earthdata_stem}?${params.toString()}`;
 </script>
 
 <style>
+
+.cds-dialog.download-map-image-cds-dialog .v-card-text {
+  height: auto;
+  padding-top: 0;
+}
+
+.cds-dialog.download-map-image-cds-dialog {
+  font-size: 0.8em;
+}
+
+.cds-dialog.download-map-image-cds-dialog > .v-overlay__content > .v-card {
+  padding: 0;
+}
+
+.cds-dialog-close-icon {
+  padding-top: 0.5em;
+}
+
 .data-download-stuff {
   display: flex;
   flex-direction: column;
-  font-size: 1.3em;
+  font-size: 1.1em;
   overflow: scroll;
   justify-content: center;
 }
 
 .data-download-stuff .data-image {
   margin-inline: auto;
+  max-width: 100%;
+}
+
+.data-download-stuff .data-image-img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 40vh;
 }
 
 .data-download-stuff a.download-link {

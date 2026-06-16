@@ -246,6 +246,7 @@
           >
           <data-download
             :timestamp="timestamps[timeIndex]"
+            :map="map"
             v-model="showDataDownload"
           />
         </cds-dialog>
@@ -3427,6 +3428,8 @@ canvas.maplibregl-canvas {
   }
 
 }
+
+
 
 </style>
   

@@ -244,27 +244,6 @@ const artemisIILaunch: InterestingEvent = {
     },
   ],
 };
-const july4Fireworks: InterestingEvent = {
-  date: new Date(2025, 7, 5),
-  dateString: "July 5, 2025",
-  label: "July 4th Fireworks",
-  highlighted: true,
-  hasFeature: true,
-  locations: [
-    {
-      latlng: [39.5549, -76.4158] as LatLngPair,
-      zoom: 7,
-      text: "July 4th Fireworks",
-      time: "2025-07-05T11:09:00.000Z",
-      description:
-        `<p>Saturday mornings around cities often have lower NO<sub>2</sub> emissions than on weekdays because fewer people are commuting to work. However, on Saturday July 5, you can see very high NO<sub>2</sub> measurements around cities like Washington, D.C.
-        </p> 
-        <p>   
-        This extra NO<sub>2</sub> is likely leftover from 4th of July fireworks the night before. This app only shows daytime measurements, so it doesn't capture the fireworks themselves, but we can still see the NO<sub>2</sub> lingering in the air the next morning. Sunlight helps convert NO<sub>2</sub> into other compounds, causing this excess NO<sub>2</sub> to disperse later in the day.
-        </p>`,
-    },
-  ],
-};
 const lasVegasUrban = {
   label: "Las Vegas: Fairly Constant Levels All Day",
   locations: [
@@ -289,7 +268,6 @@ export const interestingEvents: InterestingEvent[] = [
     `,
     locations: [
       ...artemisIILaunch.locations,
-      ...july4Fireworks.locations,
     ],
   },
   {
@@ -317,7 +295,7 @@ export const interestingEvents: InterestingEvent[] = [
     Daily traffic patterns in urban areas lead to predictable changes in NO<sub>2</sub> levels throughout the day.
     </p>
     <p>
-    With TEMPO's hourly observations, we can see emissions from cars due to morning and evening rush hour traffic in  
+    With TEMPO's hourly observations, we can see emissions from vehicles due to morning and evening rush hour traffic in  
     congested areas. 
     
     These emissions are byproducts of combustion in gasoline and diesel engines. 

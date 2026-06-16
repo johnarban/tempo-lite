@@ -1594,10 +1594,6 @@ const datesOfInterest = computed(() => {
   return interestingEvents.map(event => event.date);
 });
 
-const dateStrings = computed(() => {
-  return interestingEvents.map(event => event.dateString);
-});
-
 const locationsOfInterest = computed(() => {
   return interestingEvents.map(event =>
     event.locations.map(loc => ({

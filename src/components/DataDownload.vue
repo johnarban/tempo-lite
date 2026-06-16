@@ -81,7 +81,12 @@ const html = document.getElementById('map');
 const aspectRatio = ref(0);
 
 const map_center = props.map ? props.map.getCenter() : { lat: 0, lng: 0 };
-const filename = `tempo_data_${new Date(props.timestamp).toISOString()}_${map_center.lat.toFixed(2)}_${map_center.lng.toFixed(2)}.png`;
+function formatTime(timestamp: number) {
+  const date = new Date(timestamp);
+  // return yyyy-mm-ddThh:mm:ssZ (no decimals)
+  return date.toISOString().split('.')[0] + 'Z';
+}
+const filename = `tempo_data_${formatTime(props.timestamp)}_lat_${map_center.lat.toFixed(2)}_lon_${map_center.lng.toFixed(2)}.png`;
 
 // import { hideLeafletControls, showLeafletControls } from '@/canvas_downloader';
 onMounted(() => {
@@ -108,7 +113,6 @@ onMounted(() => {
       }
     }).then((canvas) => {
       dataUrl.value = canvas.toDataURL('image/png');
-    }).finally(() => {
     });
     
   }, 1000);

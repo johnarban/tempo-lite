@@ -1,15 +1,15 @@
 export default [
   {
-    date: "2026-06-09",
+    date: "2026-06-24",
     html: 'Use the download button to download the currently displayed view as a PNG image.',
-    highlight: new Date() < new Date('2026-07-09 00:00:00') ,
+    highlight: new Date() < new Date('2026-07-24 00:00:00') ,
     
   },
   {
     date: "2026-06-09",
     html: `
-    "Notable Dates" have been reorganized into "Notable Featuress" to improve clarity and usability. 
-    They are now categorized by what is being highlighted in each feature, wether it is a wildfire, power generation, etc. 
+    "Notable Dates" have been reorganized into "Featured Topics" to improve clarity and usability. 
+    Each topic (notable events, wildfires, traffic patterns, etc.) then presents one or more example cases.
     `,
     highlight: new Date() < new Date('2026-07-09 00:00:00') ,
   },

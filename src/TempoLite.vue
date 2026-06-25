@@ -209,7 +209,7 @@
 
       <div id="menu-area">
         <v-btn 
-          v-if="(new Date('2025-10-25 00:00:00') > new Date())"
+          v-if="(new Date('2026-07-25 00:00:00') > new Date())"
           class='whats-new-button pulse' 
           aria-label="What's new" 
           @click="showChanges = true" 

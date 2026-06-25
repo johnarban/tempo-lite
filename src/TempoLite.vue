@@ -189,7 +189,6 @@
         <img 
           src="./assets/TEMPO-Logo-Small.png"
           alt="TEMPO Logo"
-          style="width: 100px; height: 100px;"
         >
       </a>
 
@@ -210,7 +209,7 @@
 
       <div id="menu-area">
         <v-btn 
-          v-if="(new Date('2025-10-25 00:00:00') > new Date())"
+          v-if="(new Date('2026-07-25 00:00:00') > new Date())"
           class='whats-new-button pulse' 
           aria-label="What's new" 
           @click="showChanges = true" 
@@ -219,7 +218,7 @@
           rounded="lg" 
           :color="accentColor2" 
           elevation="0"
-          size="lg"
+          size="small"
           >
           <v-tooltip location="bottom" activator="parent" :disabled="mobile" text="What's new"></v-tooltip>
           <v-icon>mdi-creation</v-icon>
@@ -235,7 +234,7 @@
             @share="shareButtonClickedCount += 1"
             alert
           />
-        <v-btn aria-role="menu" aria-label="Show menu" class="menu-button" variant="outlined" rounded="lg" :color="accentColor2" elevation="5">
+        <v-btn aria-role="menu" aria-label="Show menu" size="small" class="menu-button" variant="outlined" rounded="lg" :color="accentColor2" elevation="5">
           <v-icon size="x-large">mdi-menu</v-icon>
           <v-menu
             activator="parent"
@@ -339,7 +338,7 @@
             </v-overlay>
           </div>
 
-          <div v-if="showFieldOfRegard" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
+          <div v-if="showFieldOfRegard && !smallSize" id="map-legend"><hr class="line-legend">TEMPO Field of Regard</div>
           <!-- show hide cloud data, disable if none is available -->
 
           <v-menu
@@ -351,7 +350,7 @@
               <div id="map-show-hide-controls">
                 <v-btn
                   v-bind="props"
-                  class="mx-2 mt-5"
+                  :class="['mx-2', smallSize ? 'mt-0' : 'mt-5']"
                   elevation="2"
                   color="white"
                   icon
@@ -478,7 +477,7 @@
             v-model="searchOpen"
             small
             stay-open
-            buttonSize="xl"
+            buttonSize="sm"
             persist-selected
             :search-provider="geocodingInfoForSearchLimited"
             @set-location="setLocationFromSearch"
@@ -547,11 +546,15 @@
         <div id="when" class="big-label">when</div>
         <div id="slider-row">
           <v-slider
-            :class='["time-slider", maxIndex <= minIndex ? "hide-first-last-ticks" : ""]'
+            :class='[
+              "time-slider", 
+              maxIndex <= minIndex ? "hide-first-last-ticks" : "",
+              maxIndex < minIndex + 7 ? `hide-ticks-${minIndex + 7 - maxIndex}` : "",
+              ]'
             :disabled="maxIndex <= minIndex"
-            v-model="timeIndex"
+            v-model="timeSliderIndex"
             :min="minIndex"
-            :max="maxIndex"
+            :max="Math.max(minIndex + 7,maxIndex)"
             :step="1"
             color="#068ede95"
             thumb-label="always"
@@ -1371,6 +1374,18 @@ const {
   moveBackwardOneDay,
   moveForwardOneDay,
   nearestDateIndex } = useUniqueTimeSelection(timestamps);
+  
+const timeSliderIndex = computed({
+  get() {
+    return timeIndex.value;
+  },
+  set(value: number) {
+    if (value > maxIndex.value) {
+      return;
+    }
+    timeIndex.value = value;
+  }
+});
 
 const timestampsLoaded = ref(false);
 const fosterTimestampsSet = ref(new Set(fosterTimestamps.value));
@@ -2703,8 +2718,10 @@ ul {
 
 a[href="https://tempo.si.edu"]>img {
   // display: inline;
-  height: 70px !important;
-  width: auto !important;
+  // height: 70px !important;
+  width: 100px !important;
+  max-width: 10vmin;
+  min-width: 50px;
 }
 
 #information {
@@ -2802,6 +2819,7 @@ a {
 
   .forward-geocoding-container {
     width: 250px;
+    max-width: 50vw;
     border: 2px solid black;
   }
 
@@ -2911,6 +2929,18 @@ a {
     width: 4px;
     margin-top: 0 !important;
     // top: -10%;
+  }
+
+
+  &.hide-ticks-1 .v-slider-track__tick:nth-last-child(-n + 1),
+  &.hide-ticks-2 .v-slider-track__tick:nth-last-child(-n + 2),
+  &.hide-ticks-3 .v-slider-track__tick:nth-last-child(-n + 3),
+  &.hide-ticks-4 .v-slider-track__tick:nth-last-child(-n + 4),
+  &.hide-ticks-5 .v-slider-track__tick:nth-last-child(-n + 5), 
+  &.hide-ticks-6 .v-slider-track__tick:nth-last-child(-n + 6),
+  &.hide-ticks-7 .v-slider-track__tick:nth-last-child(-n + 7)
+  {
+    display: none !important;
   }
 
   .v-slider {
@@ -3056,11 +3086,6 @@ button:focus-visible,
       margin-left: 3rem;
     }
 
-    a[href="https://tempo.si.edu"]>img {
-      height: 70px !important;
-      width: auto !important;
-    }
-
     #user-options {
       width: 250px;
     }
@@ -3071,9 +3096,9 @@ button:focus-visible,
 
 @media (max-width: 750px) {
   :root {
-    --map-height: 60vh;
-    --map-height: 60dvh;
-    --map-height: 60svh;
+    --map-height: 45vh;
+    --map-height: 45dvh;
+    --map-height: 45svh;
     font-size: 14px;
   }
 
@@ -3099,7 +3124,7 @@ button:focus-visible,
   .content-with-sidebars {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto 78px repeat(5, auto);
-    gap: 10px;
+    gap: 5px;
     // padding-inline: 1rem;
 
 
@@ -3118,7 +3143,7 @@ button:focus-visible,
       grid-column: 1 / 2;
       grid-row: 1 / 2;
       display: flex;
-      flex-direction: column-reverse;
+      flex-direction: row;
       gap: 1rem;
       align-items: flex-end;
     }
@@ -3180,6 +3205,7 @@ button:focus-visible,
 
     #user-options {
       margin: 0;
+      margin-top: -8px;
       width: auto;
     }
 
@@ -3193,14 +3219,19 @@ button:focus-visible,
 
 
     #title {
-      font-size: 2rem;
+      font-size: clamp(1.2rem, 4vw, 2rem);
       margin-left: 15px;
       text-wrap: wrap;
-
     }
+    
+    // a[href="https://tempo.si.edu"]>img {
+    //   // display: inline;
+    //   height: 50px !important;
+    //   width: auto !important;
+    // }
 
   }
-
+  
 
   #map-container {
     display: flex;
@@ -3224,7 +3255,21 @@ button:focus-visible,
 
   }
 
+  #all-dates {
+    
+    h2 {
+      font-size: 1.2em;
+    }
+    
+  }
+}
 
+@media (max-width: 455px) {
+    .content-with-sidebars {
+      #title {
+        font-size: 1.2em;
+    }
+  }
 }
 
 /* Leaflet crispness override */
@@ -3275,7 +3320,7 @@ button:focus-visible,
 .menu-button,
 .share-button,
 .whats-new-button {
-  outline: 2px solid var(--smithsonian-yellow) !important;
+  outline: 1px solid var(--smithsonian-yellow) !important;
   height: 2rem !important;
 }
 

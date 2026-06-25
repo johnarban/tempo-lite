@@ -1,11 +1,18 @@
 export default [
   {
+    date: "2026-06-25",
+    html: `
+    TEMPO data for the most recent date is sometimes only available for part of the day. The time slider styling has been updated to reflect this.
+    `,
+    highlight: new Date() < new Date('2026-07-25 00:00:00') ,
+  },
+  {
     date: "2026-06-09",
     html: `
     "Notable Dates" have been reorganized into "Featured Topics" to improve clarity and usability. 
     Each topic (notable events, wildfires, traffic patterns, etc.) then presents one or more example cases.
     `,
-    highlight: new Date() < new Date('2026-07-09 00:00:00') ,
+    highlight: new Date() < new Date('2026-07-25 00:00:00') ,
   },
   {
     date: "2025-04-24",

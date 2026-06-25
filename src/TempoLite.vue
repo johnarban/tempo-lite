@@ -3190,7 +3190,7 @@ button:focus-visible,
 
 
     #title {
-      font-size: 1.2em;
+      font-size: clamp(1.2rem, 4vw, 2rem);
       margin-left: 15px;
       text-wrap: wrap;
     }
@@ -3202,7 +3202,7 @@ button:focus-visible,
     // }
 
   }
-
+  
 
   #map-container {
     display: flex;
@@ -3232,6 +3232,14 @@ button:focus-visible,
       font-size: 1.2em;
     }
     
+  }
+}
+
+@media (max-width: 455px) {
+    .content-with-sidebars {
+      #title {
+        font-size: 1.2em;
+    }
   }
 }
 

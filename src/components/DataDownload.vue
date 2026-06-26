@@ -1,6 +1,6 @@
 <template>
-  <v-card class="pa-0">
-    <v-card-text class="data-download-stuff">
+  <v-card class="pa-0" elevation="0">
+    <v-card-text class="data-download-stuff" >
       <div class="data-image" v-if="dataUrl" >
       <a class="download-link" :href="dataUrl" :download="filename">
       <img 
@@ -14,7 +14,7 @@
       </div>
       <v-progress-linear striped v-else indeterminate height="30" color="primary">Loading Image....</v-progress-linear>
       <div class="mt-4">
-      <div class="text-small">
+      <div v-if="dataUrl" class="text-small">
       <!-- Tap or right click above, or <a class="download-link" :href="dataUrl" :download="filename">Click here<v-icon>mdi-download-outline</v-icon></a> to download the image -->
        Tap or right click above to download the image.
       </div>

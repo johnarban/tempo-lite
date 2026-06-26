@@ -230,10 +230,10 @@
               class="download-button"
               v-bind="props"
               icon="mdi-download-outline"
-              variant="text"
+              variant="outlined"
               @click="downloadMap"
-              rounded="lg" 
-              :color="accentColor2" 
+              rounded="lg"
+              :color="accentColor2"
               elevation="5"
             ></v-btn>
           </template>

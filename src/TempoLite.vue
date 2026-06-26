@@ -209,7 +209,7 @@
 
       <div id="menu-area">
         <v-btn 
-          v-if="(new Date('2026-07-25 00:00:00') > new Date())"
+          v-if="(new Date('2026-07-26 00:00:00') > new Date())"
           class='whats-new-button pulse' 
           aria-label="What's new" 
           @click="showChanges = true" 
@@ -223,13 +223,13 @@
           <v-tooltip location="bottom" activator="parent" :disabled="mobile" text="What's new"></v-tooltip>
           <v-icon>mdi-creation</v-icon>
         </v-btn>
-        <v-tooltip text="Download Map as Image">
+        <v-tooltip text="Download Map View as png Image">
           <template #activator="{ props }">
             <v-btn
               v-if="map"
               class="download-button"
               v-bind="props"
-              icon="mdi-download-outline"
+              icon="mdi-camera-outline"
               variant="outlined"
               @click="downloadMap"
               rounded="lg"
@@ -248,6 +248,7 @@
             :timestamp="timestamps[timeIndex]"
             :map="map"
             v-model="showDataDownload"
+            class="pa-0"
           />
         </cds-dialog>
         

@@ -8,7 +8,7 @@
       <slot name="activator" v-bind="props"></slot>
     </template>
      
-    <v-card class="cds-dialog-card">
+    <v-card class="cds-dialog-card pa-2">
       
         
       <div class="cds-dialog-title">
@@ -26,7 +26,7 @@
             ></font-awesome-icon>
       </div>
       
-      <v-card-text>
+      <v-card-text class="pa-0">
         
         <slot>
           Add content to the default slot
@@ -105,23 +105,24 @@ export default defineComponent({
 }
 
 .cds-dialog h3 {
-  font-size: clamp(1.5rem, 2vw, 2rem);  
+  font-size: clamp(1.3rem, 2vw, 2rem);  
   display: inline;
   padding-left: 0.5rem;
 }
 
 .cds-dialog-card {
   align-self: center;
-  max-width: 80%;
+  max-width: 90%;
+  border: #555 solid 1px;
 }
 
 .cds-dialog-title {
   margin: 4px;
-  padding-left: 4px;
 }
 .cds-dialog-close-icon {
   float: right;
   margin-inline: 0.5em;
+  margin-top: 0.25em;
 }
 
 /* pad the touch area by 0.5em */

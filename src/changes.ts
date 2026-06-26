@@ -1,8 +1,8 @@
 export default [
   {
-    date: "2026-06-24",
-    html: 'Use the download button to download the currently displayed view as a PNG image.',
-    highlight: new Date() < new Date('2026-07-24 00:00:00') ,
+    date: "2026-06-26",
+    html: 'Use the download button to download the currently displayed map view as a PNG image.',
+    highlight: new Date() < new Date('2026-07-26 00:00:00') ,
   },
   {
     

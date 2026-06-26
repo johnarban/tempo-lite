@@ -16,7 +16,7 @@
       <div class="mt-4">
       <div v-if="dataUrl" class="text-small">
       <!-- Tap or right click above, or <a class="download-link" :href="dataUrl" :download="filename">Click here<v-icon>mdi-download-outline</v-icon></a> to download the image -->
-       Tap or right click above to download the image.
+       Tap or right click above to download the image as a png file.
       </div>
       <div class="dds-links">
         

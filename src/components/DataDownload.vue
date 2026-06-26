@@ -83,10 +83,14 @@ const aspectRatio = ref(0);
 const map_center = props.map ? props.map.getCenter() : { lat: 0, lng: 0 };
 function formatTime(timestamp: number) {
   const date = new Date(timestamp);
-  // return yyyy-mm-ddThh:mm:ssZ (no decimals)
-  return date.toISOString().split('.')[0] + 'Z';
+  // return yyyy-mm-ddThh:mm (no decimals)f
+  // cut off the seconds but leave the Z
+  const s = date.toISOString();
+  const c =  s.substring(0, s.length - 8) + 'Z';
+  return c;
+  
 }
-const filename = `tempo_data_${formatTime(props.timestamp)}_lat_${map_center.lat.toFixed(2)}_lon_${map_center.lng.toFixed(2)}.png`;
+const filename = `tempo_n02_${formatTime(props.timestamp)}.png`; //_lat_${map_center.lat.toFixed(2)}_lon_${map_center.lng.toFixed(2)}.png`;
 
 // import { hideLeafletControls, showLeafletControls } from '@/canvas_downloader';
 onMounted(() => {

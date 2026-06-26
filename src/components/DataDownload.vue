@@ -213,7 +213,8 @@ const earthdata_url_time = `${earthdata_stem}?${params.toString()}`;
 }
 
 .data-download-stuff .data-image {
-  margin-inline: auto;
+  margin-left: auto;
+  margin-right: auto;
   max-width: 100%;
 }
 
@@ -253,7 +254,8 @@ const earthdata_url_time = `${earthdata_stem}?${params.toString()}`;
   justify-content: left;
   align-items: center;
   border-bottom: 1px solid var(--smithsonian-blue);
-  padding-block: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .dds-link-item div.dds-link-item-label {
@@ -273,6 +275,7 @@ const earthdata_url_time = `${earthdata_stem}?${params.toString()}`;
   background-color: var(--smithsonian-blue);
   border-radius: 5px;
   text-wrap: nowrap;
+  white-space: nowrap;
   box-sizing: content-box;
   
 }

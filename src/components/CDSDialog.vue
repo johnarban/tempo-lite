@@ -9,21 +9,22 @@
     </template>
      
     <v-card class="cds-dialog-card">
-      <font-awesome-icon 
-        class="cds-dialog-close-icon cds-touch-pad"
-        icon="square-xmark" 
-        size="xl" 
-        @click="showDialog = false" 
-        @keyup.enter="showDialog = false"
-        :color="color" 
-        tabindex="0"
-        ></font-awesome-icon>
+      
         
-      <v-card-title tabindex="0">
+      <div class="cds-dialog-title">
         <h3> 
           {{title}} 
         </h3>
-      </v-card-title>
+          <font-awesome-icon 
+            class="cds-dialog-close-icon cds-touch-pad"
+            icon="square-xmark" 
+            size="xl" 
+            @click="showDialog = false" 
+            @keyup.enter="showDialog = false"
+            :color="color" 
+            tabindex="0"
+            ></font-awesome-icon>
+      </div>
       
       <v-card-text>
         
@@ -102,15 +103,24 @@ export default defineComponent({
   display: flex;
   width: calc(100% - 1rem);
 }
+
+.cds-dialog h3 {
+  font-size: clamp(1.5rem, 2vw, 2rem);  
+  display: inline;
+}
+
 .cds-dialog-card {
   align-self: center;
   max-width: 80%;
 }
 
+.cds-dialog-title {
+  margin: 4px;
+  padding-left: 4px;
+}
 .cds-dialog-close-icon {
-  position: absolute;
-  right: 16px;
-  cursor: pointer;
+  float: right;
+  margin-inline: 0.5em;
 }
 
 /* pad the touch area by 0.5em */

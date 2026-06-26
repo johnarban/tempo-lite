@@ -242,6 +242,7 @@
         <cds-dialog
           v-model="showDataDownload"
           title="Download Map Image"
+          :color="accentColor2"
           >
           <data-download
             :timestamp="timestamps[timeIndex]"

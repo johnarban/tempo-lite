@@ -71,7 +71,7 @@ createApp(TempoLite, {})
     })
 
   // Components
-  .component('font-awesome-icon', FontAwesomeIcon)
+  .component('font-awesome-icon', FontAwesomeIcon as never)
   .component('icon-button', IconButton)
   .component('funding-acknowledgement', FundingAcknowledgement)
   .component('credit-logos', CreditLogos)

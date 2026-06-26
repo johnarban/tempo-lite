@@ -107,6 +107,7 @@ export default defineComponent({
 .cds-dialog h3 {
   font-size: clamp(1.5rem, 2vw, 2rem);  
   display: inline;
+  padding-left: 0.5rem;
 }
 
 .cds-dialog-card {

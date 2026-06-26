@@ -208,7 +208,6 @@ const earthdata_url_time = `${earthdata_stem}?${params.toString()}`;
   display: flex;
   flex-direction: column;
   font-size: 1.1em;
-  overflow: scroll;
   justify-content: center;
 }
 
